@@ -1,0 +1,7 @@
+<Solution>
+  <Configurations>
+    <Platform Name="x64" />
+    <Platform Name="x86" />
+  </Configurations>
+  <Project Path="CaroGame/CaroGame.vcxproj" Id="d7c7a2b9-f916-4a21-905a-11769fca441c" />
+</Solution>
