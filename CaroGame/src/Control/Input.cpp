@@ -1,6 +1,6 @@
-﻿#include "Control.h"
-#include "Model.h" // Phải include Model vì StartGame gọi ResetData, ExitGame gọi GabageCollect
-#include "View.h"  // Phải include View vì StartGame gọi DrawBoard
+﻿#include "../../include/Model.h"
+#include "../../include/Model.h" // Phải include Model vì StartGame gọi ResetData, ExitGame gọi GarbageCollect
+#include "../../include/View.h"  // Phải include View vì StartGame gọi DrawBoard
 
 // --- Copy nội dung 6 hàm StartGame, ExitGame, MoveRight, MoveLeft, MoveDown, MoveUp từ source cũ vào đây ---
 
@@ -12,7 +12,7 @@ void StartGame() {
 
 void ExitGame() {
 	system("cls");
-	GabageCollect();
+	GarbageCollect();
 	//Có thể lưu game trước khi exit
 }
 
