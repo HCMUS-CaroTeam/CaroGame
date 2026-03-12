@@ -1,4 +1,4 @@
-﻿#include "Common.h"
+﻿#include "../include/Common.h"
 #include "../include/View.h"
 #include "../include/Model.h"
 #include "../include/Control.h"
