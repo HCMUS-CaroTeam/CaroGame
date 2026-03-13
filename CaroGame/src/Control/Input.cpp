@@ -1,5 +1,6 @@
 ﻿#include "../../include/Model.h" // Phải include Model vì StartGame gọi ResetData, ExitGame gọi GarbageCollect
 #include "../../include/View.h"  // Phải include View vì StartGame gọi DrawBoard
+#include "../../include/Control.h" // Phải include Common vì các hàm sử dụng _X, _Y, _A
 
 // --- Copy nội dung 6 hàm StartGame, ExitGame, MoveRight, MoveLeft, MoveDown, MoveUp từ source cũ vào đây ---
 
