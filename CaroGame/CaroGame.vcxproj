@@ -177,16 +177,18 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="Control.cpp" />
-    <ClCompile Include="main.cpp" />
-    <ClCompile Include="Model.cpp" />
-    <ClCompile Include="View.cpp" />
+    <ClCompile Include="src\Control\Input.cpp" />
+    <ClCompile Include="src\main.cpp" />
+    <ClCompile Include="src\Model\Data.cpp" />
+    <ClCompile Include="src\Model\Logic.cpp" />
+    <ClCompile Include="src\View\Menu.cpp" />
+    <ClCompile Include="src\View\Renderer.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Control.h" />
-    <ClInclude Include="Header.h" />
-    <ClInclude Include="Model.h" />
-    <ClInclude Include="View.h" />
+    <ClInclude Include="include\Common.h" />
+    <ClInclude Include="include\Control.h" />
+    <ClInclude Include="include\Model.h" />
+    <ClInclude Include="include\View.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

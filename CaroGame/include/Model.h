@@ -1,7 +1,7 @@
 #pragma once
-#include "Header.h"
+#include "Common.h"
 
 void ResetData();
-void GabageCollect();
+void GarbageCollect();
 int TestBoard();
 int CheckBoard(int pX, int pY);
