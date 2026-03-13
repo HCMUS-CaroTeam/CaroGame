@@ -1,5 +1,5 @@
 #pragma once
-#include "Header.h"
+#include "Common.h"
 
 void StartGame();
 void ExitGame();
