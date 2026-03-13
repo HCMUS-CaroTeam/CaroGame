@@ -7,7 +7,8 @@ void DrawBoard(int pSize) {
 			cout << ".";
 		}
 	}
-	GotoXY(_X, _Y); // ?
+	GotoXY(_X, _Y); //	<?xml version="1.0" encoding="utf-8"?>
+	
 }
 
 // Qui ước: -1 = X thắng, 1 = O thắng, 0 = hòa, 2 = chưa hết game

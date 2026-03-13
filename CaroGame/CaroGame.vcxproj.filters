@@ -1,0 +1,49 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="src\main.cpp" />
+    <ClCompile Include="src\Control\Input.cpp">
+      <Filter>Control</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Model\Data.cpp">
+      <Filter>Model</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Model\Logic.cpp">
+      <Filter>Model</Filter>
+    </ClCompile>
+    <ClCompile Include="src\View\Renderer.cpp">
+      <Filter>View</Filter>
+    </ClCompile>
+    <ClCompile Include="src\View\Menu.cpp">
+      <Filter>View</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="include\Common.h">
+      <Filter>Header</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Control.h">
+      <Filter>Header</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Model.h">
+      <Filter>Header</Filter>
+    </ClInclude>
+    <ClInclude Include="include\View.h">
+      <Filter>Header</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Model">
+      <UniqueIdentifier>{4252a550-bc15-4649-aead-00a0cad5f50c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="View">
+      <UniqueIdentifier>{a8e4f8a1-a9c5-4ec9-9477-b50890e232f3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Control">
+      <UniqueIdentifier>{cf9e34af-e862-4084-9dc8-06e9c6aed395}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header">
+      <UniqueIdentifier>{c60fe8db-c28c-4b38-ae53-905acea85bf2}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>
