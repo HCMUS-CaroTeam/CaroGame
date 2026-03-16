@@ -51,7 +51,7 @@ int main()
             if (IsKeyPressed(KEY_ESCAPE)) gameState = 0;
         }
         else if (gameState == 2) {
-            int answer = AskContinue(); 
+            int answer = AskContinue(TestBoard()); 
             if (answer == 1) {
                 StartGame();
                 gameState = 1;
