@@ -17,7 +17,7 @@ void DrawBoard(int size) {
 		DrawLine(startX, startY + i * cellSize, startX + size * cellSize, startY + i * cellSize, BLACK);
 		DrawLine(startX + i * cellSize, startY, startX + i * cellSize, startY + size * cellSize, BLACK);
 
-		// Vẽ số tọa độ hàng và cột (Yêu cầu của Task 7)
+		// Vẽ số tọa độ hàng và cột 
 		if (i < size) {
 			DrawText(TextFormat("%d", i), startX + i * cellSize + 10, startY - 20, 15, DARKGRAY); // Ngang
 			DrawText(TextFormat("%d", i), startX - 25, startY + i * cellSize + 8, 15, DARKGRAY);  // Dọc
@@ -33,10 +33,10 @@ void DrawPieces() {
 	for (int i = 0; i < BOARD_SIZE; i++) {
 		for (int j = 0; j < BOARD_SIZE; j++) {
 			// Kiểm tra giá trị trong mảng _BOARD
-			if (_BOARD[i][j] == 'X' || _BOARD[i][j] == 1) {
+			if (_BOARD[i][j] == 'X' || _BOARD[i][j] == -1) {
 				DrawText("X", startX + j * cellSize + 8, startY + i * cellSize + 4, 25, BLUE);
 			}
-			else if (_BOARD[i][j] == 'O' || _BOARD[i][j] == -1) {
+			else if (_BOARD[i][j] == 'O' || _BOARD[i][j] == 1) {
 				DrawText("O", startX + j * cellSize + 8, startY + i * cellSize + 4, 25, RED);
 			}
 		}

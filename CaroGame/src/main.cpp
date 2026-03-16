@@ -1,13 +1,13 @@
 ﻿#define WIN32_LEAN_AND_MEAN
 #define NOGDI              
 #define NOUSER
+
 #include "raylib.h"
 #include "../include/View.h"
 #include "../include/Model.h"
 #include "../include/Control.h"
 
-// Trạng thái game: 0 là Menu, 1 là đang chơi
-int gameState = 0;
+int gameState = 0; // Trạng thái game: 0 là Menu, 1 là đang chơi, 2 là hỏi người chơi có muốn chơi tiếp không
 int menuSelected = 0; // Lựa chọn trong menu
 
 int main()
@@ -44,11 +44,22 @@ int main()
                     int result = TestBoard();
                     if (ProcessFinish(result) != 2)
                     {
-                        StartGame();
+                        gameState = 2;
                     }
                 }
             }
             if (IsKeyPressed(KEY_ESCAPE)) gameState = 0;
+        }
+        else if (gameState == 2) {
+            int answer = AskContinue(); 
+            if (answer == 1) {
+                StartGame();
+                gameState = 1;
+            }
+            else if (answer == -1) {
+                gameState = 0;
+                ResetData(true);
+            }
         }
 
         BeginDrawing();
