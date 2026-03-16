@@ -6,26 +6,21 @@
 
 void StartGame(bool resetAll)
 {
-	system("cls");
 	ResetData(resetAll);		   // Khởi tạo dữ liệu gốc
 	DrawBoard(BOARD_SIZE); // Vẽ màn hình game
 }
 
 void ExitGame()
 {
-	system("cls");
 	SaveGameProgress("game_progress.dat"); // Lưu tiến trình game vào file trước khi thoát
 	GarbageCollect();
 	// Có thể lưu game trước khi exit
 }
 
-void MoveRight()
-{
-	if (_COL < BOARD_SIZE - 1)
-	{
+void MoveRight() {
+	if (_COL < BOARD_SIZE - 1) {
 		_COL++;
-		_X += 4;
-		GotoXY(_X, _Y);
+		_X += 30; // 30 là kích thước 1 ô cờ 
 	}
 }
 
@@ -34,8 +29,7 @@ void MoveLeft()
 	if (_COL > 0)
 	{
 		_COL--;
-		_X -= 4;
-		GotoXY(_X, _Y);
+		_X -= 30;
 	}
 }
 
@@ -44,8 +38,7 @@ void MoveDown()
 	if (_ROW < BOARD_SIZE - 1)
 	{
 		_ROW++;
-		_Y += 2;
-		GotoXY(_X, _Y);
+		_Y += 30;
 	}
 }
 
@@ -54,7 +47,6 @@ void MoveUp()
 	if (_ROW > 0)
 	{
 		_ROW--;
-		_Y -= 2;
-		GotoXY(_X, _Y);
+		_Y -= 30;
 	}
 }
