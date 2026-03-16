@@ -1,43 +1,63 @@
 #include "../../include/View.h"
-extern void DrawBoard(int pSize)
-{
-	for (int i = 0; i <= pSize; i++)
-	{
-		for (int j = 0; j <= pSize; j++)
-		{
-			GotoXY(LEFT + 4 * i, TOP + 2 * j);
-			cout << ".";
+#include "../../include/Model.h"
+#include <raylib.h>
+
+extern char _BOARD[BOARD_SIZE][BOARD_SIZE];
+extern int _X, _Y;
+extern bool _TURN;
+extern short XScore, OScore, NumberOfRounds;
+
+void DrawBoard(int size) {
+	int cellSize = 30; // Kích thước ô
+	int startX = 100;  // Lề trái
+	int startY = 80;   // Lề trên
+
+	for (int i = 0; i <= size; i++) {
+		// Vẽ các đường kẻ lưới
+		DrawLine(startX, startY + i * cellSize, startX + size * cellSize, startY + i * cellSize, BLACK);
+		DrawLine(startX + i * cellSize, startY, startX + i * cellSize, startY + size * cellSize, BLACK);
+
+		// Vẽ số tọa độ hàng và cột (Yêu cầu của Task 7)
+		if (i < size) {
+			DrawText(TextFormat("%d", i), startX + i * cellSize + 10, startY - 20, 15, DARKGRAY); // Ngang
+			DrawText(TextFormat("%d", i), startX - 25, startY + i * cellSize + 8, 15, DARKGRAY);  // Dọc
 		}
 	}
-	GotoXY(_X, _Y); //	<?xml version="1.0" encoding="utf-8"?>
+}
 
+void DrawPieces() {
+	int cellSize = 30;
+	int startX = 100; 
+	int startY = 80;
+
+	for (int i = 0; i < BOARD_SIZE; i++) {
+		for (int j = 0; j < BOARD_SIZE; j++) {
+			// Kiểm tra giá trị trong mảng _BOARD
+			if (_BOARD[i][j] == 'X' || _BOARD[i][j] == 1) {
+				DrawText("X", startX + j * cellSize + 8, startY + i * cellSize + 4, 25, BLUE);
+			}
+			else if (_BOARD[i][j] == 'O' || _BOARD[i][j] == -1) {
+				DrawText("O", startX + j * cellSize + 8, startY + i * cellSize + 4, 25, RED);
+			}
+		}
+	}
 }
 
 // Qui ước: -1 = X thắng, 1 = O thắng, 0 = hòa, 2 = chưa hết game
 int ProcessFinish(int pWhoWin)
 {
-	GotoXY(0, TOP + 2 * BOARD_SIZE + 2); // Di chuyển con trỏ xuống dưới bàn cờ để in kết quả
-	switch (pWhoWin)
-	{
-	case -1:
-		cout << "Nguoi choi X thang!       " << endl;
-		XScore++;
+	if (pWhoWin == -1) {
+		XScore++; NumberOfRounds++;
+	}
+	else if (pWhoWin == 1) {
+		OScore++; NumberOfRounds++;
+	}
+	else if (pWhoWin == 0) {
 		NumberOfRounds++;
-		break;
-	case 1:
-		cout << "Nguoi choi O thang!       " << endl;
-		OScore++;
-		NumberOfRounds++;
-		break;
-	case 0:
-		cout << "Hoa nhau!                 " << endl;
-		NumberOfRounds++;
-		break;
-	case 2:
-		_TURN = !_TURN;
-		GotoXY(_X, _Y);
+	}
+	else {
+		_TURN = !_TURN; // Game tiếp tục, đổi lượt
 		return 2;
 	}
-	 // Trả về vị trí hiện hành của con trỏ màn hình bàn cờ
 	return pWhoWin;
 }
