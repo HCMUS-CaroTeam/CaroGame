@@ -39,8 +39,8 @@ void ResetData(bool resetGame)
 
     // Tính toán tọa độ màn hình thực tế cho con trỏ tại ô (0, 0)
     // Dựa trên công thức cũ của bạn: x = 4*j + LEFT + 2 và y = 2*i + TOP + 1
-    _X = 4 * _COL + LEFT + 2;
-    _Y = 2 * _ROW + TOP + 1;
+    _X = 100 + (_COL * 30);
+    _Y = 80 + (_ROW * 30);
 }
 
 void SaveGameProgress(const char *filename)
@@ -50,27 +50,10 @@ void SaveGameProgress(const char *filename)
     // Điền thông tin người chơi
     cout << "Nhap ten tran dau: ";
     int length = 0;
-    while (true)
-    {
-        char c = _getch();
-        if (c == 13)
-        {
-            progress.gameName[length] = '\0'; // Kết thúc chuỗi khi nhấn Enter
-            break;
-        }
-        if (length < 49) // Giới hạn độ dài tên
-        {
-            progress.gameName[length++] = c;
-            cout << c; // Hiển thị ký tự vừa nhập
-        }
-        else
-        {
-            progress.gameName[length] = '\0'; // Kết thúc chuỗi nếu đạt giới hạn
-            break;
-        }
-    }
+    strcpy_s(progress.gameName, sizeof(progress.gameName), "SaveGame1");
+
     strcpy_s(progress.playerXName, sizeof(progress.playerXName), "Player X"); // Có thể thay bằng tên thực tế nếu có
-    strcpy_s(progress.playerOName, sizeof(progress.playerOName), "Player X"); // Có thể thay bằng tên thực tế nếu có
+    strcpy_s(progress.playerOName, sizeof(progress.playerOName), "Player O"); // Có thể thay bằng tên thực tế nếu có
     
     // Điền thông tin trận đấu (có thể cập nhật sau mỗi ván)
     progress.playerXScore = XScore;
@@ -118,18 +101,18 @@ void LoadGameProgress(const char *filename, vector<Progress> &history)
 
 void PrintGameHistory()
 {
-    vector<Progress> history;
-    LoadGameProgress("game_progress.dat", history);
-    cout << "Lich su tran dau:" << endl;
-    for (const auto &progress : history)
-    {
-        cout << "Ten tran dau: " << progress.gameName << endl;
-        cout << "Nguoi choi X: " << progress.playerXName << " - Diem: " << progress.playerXScore << endl;
-        cout << "Nguoi choi O: " << progress.playerOName << " - Diem: " << progress.playerOScore << endl;
-        cout << "So van da choi: " << progress.numberOfRounds << endl;
-        cout << "Luot choi hien tai: " << (progress.isXTurn ? "X" : "O") << endl;
-        cout << "-----------------------------" << endl;
-    }
+    //vector<Progress> history;
+    //LoadGameProgress("game_progress.dat", history);
+    //cout << "Lich su tran dau:" << endl;
+    //for (const auto &progress : history)
+    //{
+    //    cout << "Ten tran dau: " << progress.gameName << endl;
+    //    cout << "Nguoi choi X: " << progress.playerXName << " - Diem: " << progress.playerXScore << endl;
+    //    cout << "Nguoi choi O: " << progress.playerOName << " - Diem: " << progress.playerOScore << endl;
+    //    cout << "So van da choi: " << progress.numberOfRounds << endl;
+    //    cout << "Luot choi hien tai: " << (progress.isXTurn ? "X" : "O") << endl;
+    //    cout << "-----------------------------" << endl;
+    //}
 }
 
 void GarbageCollect()
