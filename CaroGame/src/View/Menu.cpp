@@ -19,7 +19,13 @@ void GotoXY(int x, int y)
 
 int AskContinue(int pWhoWin) {
 	if(pWhoWin == -1)
+<<<<<<< HEAD
 		DrawText("Nguoi choi X thang, ban muon choi tiep? (ENTER/SPACE)", 150, 550, 20, RED);
+=======
+	{
+		DrawText("Nguoi choi X thang, ban muon choi tiep? (ENTER/SPACE)", 150, 550, 20, RED);
+	}
+>>>>>>> 59b0cf26e186710c3f2281b02469ba2eb0337898
 	else if (pWhoWin == 1)
 		DrawText("Nguoi choi O thang, ban muon choi tiep? (ENTER/SPACE)", 150, 550, 20, RED);
 	else if (pWhoWin == 0)
