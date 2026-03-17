@@ -1,5 +1,6 @@
 #include "../../include/Model.h"
 #include <fstream>
+#include <raylib.h>
 using namespace std;
 
 // ĐỊNH NGHĨA BIẾN TOÀN CỤC TẠI ĐÂY (Chỉ 1 lần duy nhất)
@@ -48,12 +49,10 @@ void ResetData(bool resetGame)
 
 void SaveGameProgress(const char* filename)
 {
-
     // Tạo một đối tượng Progress để lưu trữ thông tin hiện tại của game
     Progress progress;
     // Điền thông tin người chơi
-    cout << "Nhap ten tran dau: ";
-    int length = 0;
+    
     strcpy_s(progress.gameName, sizeof(progress.gameName), "SaveGame1");
     strcpy_s(progress.playerXName, sizeof(progress.playerXName), "Player X"); // Có thể thay bằng tên thực tế nếu có
     strcpy_s(progress.playerOName, sizeof(progress.playerOName), "Player O"); // Có thể thay bằng tên thực tế nếu có
@@ -104,8 +103,36 @@ vector<Progress> LoadGameProgress(const char* filename)
     return history;
 }
 
-void DrawHistoryMenu(const vector<Progress>& history, int x = 0) {
+void DrawHistoryMenu(const vector<Progress>& history, int selectedIdx) {
+    DrawText("--- LICH SU TRAN DAU ---", 250, 50, 30, DARKGRAY);
+    DrawText("Bam [ENTER] de xem lai | Bam [ESC] de quay lai", 200, 90, 15, GRAY);
 
+    if (history.empty()) {
+        DrawText("Chua co du lieu luu!", 300, 250, 20, LIGHTGRAY);
+        return;
+    }
+
+    for (int i = 0; i < (int)history.size(); i++) {
+        // Tính toán vị trí Y: mỗi dòng cách nhau 40 pixel
+        int posY = 150 + i * 45;
+
+        // Tạo hiệu ứng highlight cho dòng đang chọn
+        Color textColor = BLACK;
+        if (i == selectedIdx) {
+            textColor = RED;
+            DrawRectangle(140, posY - 5, 520, 35, Fade(LIGHTGRAY, 0.5f)); // Vẽ nền cho dòng đang chọn
+            DrawText("> ", 150, posY, 20, RED);
+        }
+
+        // Format chuỗi hiển thị: "Tên ván - Player 1 vs Player 2 - 1's score vs 2's score"
+        // Giả sử Progress có các trường: saveName, p1Name, p2Name, p1Score, p2Score
+        char buffer[256];
+        sprintf_s(buffer, "%d. %s: %s (%d) vs %s (%d)", i + 1,
+            history[i].gameName, history[i].playerXName, history[i].playerXScore,
+            history[i].playerOName, history[i].playerOScore);
+
+        DrawText(buffer, 170, posY, 20, textColor);
+    }
 }
 
 void GarbageCollect()
