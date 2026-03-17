@@ -26,7 +26,7 @@ int AskContinue(int pWhoWin) {
 		DrawText("Hai nguoi choi hoa, ban muon choi tiep? (ENTER/ESC)", 150, 550, 20, RED);
 
 	if (IsKeyPressed(KEY_ENTER)) return 1;
-	if (IsKeyPressed(KEY_ESCAPE)) return -1;
+	if (IsKeyPressed(KEY_SPACE)) return -1;
 
 	return 0; // Trả về 0 để vòng lặp tiếp tục chạy cho đến khi nhấn phím
 }
