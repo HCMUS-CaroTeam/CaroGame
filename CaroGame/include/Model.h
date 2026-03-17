@@ -6,6 +6,5 @@ void ResetData(bool = false);
 void SaveGameProgress(const char *filename);
 std::vector<Progress> LoadGameProgress(const char* filename);
 void DrawHistoryMenu(const std::vector<Progress>&, int );
-//void GarbageCollect();
 int TestBoard();
 int CheckBoard();
