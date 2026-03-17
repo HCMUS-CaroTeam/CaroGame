@@ -1,18 +1,22 @@
-﻿#pragma once
+﻿#ifndef COMMON_H
+#define COMMON_H
+
+// --- THƯ VIỆN BỔ SUNG TỪ NHÁNH MASTER ---
 #include <iostream>
-//#include <Windows.h>
 #include <conio.h>
 
-using namespace std;
+// Bỏ using namespace std ở đây để không làm hỏng thư viện hệ thống
 
-// ------ Hằng số ------
-#define BOARD_SIZE 12
-#define LEFT 3
-#define TOP 1
+// --- CÁC HẰNG SỐ CỦA BÀN CỜ ---
+#define BOARD_SIZE 12  // Kích thước bàn cờ (12x12)
+#define CELL_SIZE 40   // Kích thước mỗi ô vuông (40x40 pixel)
+#define OFFSET_X 100   // Khoảng cách từ mép trái màn hình đến bàn cờ (pixel)
+#define OFFSET_Y 100   // Khoảng cách từ mép trên màn hình đến bàn cờ (pixel)
 
-// ------ Khai báo biến toàn cục (Dùng extern) ------
-extern char _BOARD[BOARD_SIZE][BOARD_SIZE]; // Mảng này dùng để lưu trạng thái bàn cờ khi cần thiết (ví dụ: lưu vào file)
-extern bool _TURN;
+
+// --- BIẾN TOÀN CỤC CHUNG ---
+extern char _BOARD[BOARD_SIZE][BOARD_SIZE]; // Mảng trạng thái bàn cờ (Thay thế _A)
+extern bool _TURN;                          // Lượt đi: true (X), false (O)
 extern int _COMMAND;
 extern int _X, _Y;
 extern int _COL, _ROW;
@@ -38,4 +42,6 @@ struct Progress
     char boardState[BOARD_SIZE][BOARD_SIZE];
     bool isXTurn;
 };
-#pragma pack(pop)
+#pragma pack(pop) // <--- QUAN TRỌNG: Phải có cái này để trả lại bộ nhớ bình thường
+
+#endif#endif
