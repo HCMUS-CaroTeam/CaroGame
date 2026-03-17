@@ -1,5 +1,6 @@
 #include "../../include/Model.h"
 #include <fstream>
+using namespace std;
 
 // ĐỊNH NGHĨA BIẾN TOÀN CỤC TẠI ĐÂY (Chỉ 1 lần duy nhất)
 char _BOARD[BOARD_SIZE][BOARD_SIZE]; // Mảng này dùng để lưu trạng thái bàn cờ khi cần thiết (ví dụ: lưu vào file)
@@ -42,16 +43,18 @@ void ResetData(bool resetGame)
     _X = 100 + (_COL * 30);
     _Y = 80 + (_ROW * 30);
 }
+//
 
-void SaveGameProgress(const char *filename)
+
+void SaveGameProgress(const char* filename)
 {
+
     // Tạo một đối tượng Progress để lưu trữ thông tin hiện tại của game
     Progress progress;
     // Điền thông tin người chơi
     cout << "Nhap ten tran dau: ";
     int length = 0;
     strcpy_s(progress.gameName, sizeof(progress.gameName), "SaveGame1");
-
     strcpy_s(progress.playerXName, sizeof(progress.playerXName), "Player X"); // Có thể thay bằng tên thực tế nếu có
     strcpy_s(progress.playerOName, sizeof(progress.playerOName), "Player O"); // Có thể thay bằng tên thực tế nếu có
     
@@ -82,13 +85,14 @@ void SaveGameProgress(const char *filename)
     outFile.close();
 }
 
-void LoadGameProgress(const char *filename, vector<Progress> &history)
+vector<Progress> LoadGameProgress(const char* filename)
 {
+    vector<Progress> history;
     ifstream inFile(filename, ios::binary);
     if (!inFile)
     {
         cerr << "Khong the mo file de doc tru!" << endl;
-        return;
+        return history;
     }
 
     Progress progress;
@@ -97,22 +101,11 @@ void LoadGameProgress(const char *filename, vector<Progress> &history)
         history.push_back(progress);
     }
     inFile.close();
+    return history;
 }
 
-void PrintGameHistory()
-{
-    //vector<Progress> history;
-    //LoadGameProgress("game_progress.dat", history);
-    //cout << "Lich su tran dau:" << endl;
-    //for (const auto &progress : history)
-    //{
-    //    cout << "Ten tran dau: " << progress.gameName << endl;
-    //    cout << "Nguoi choi X: " << progress.playerXName << " - Diem: " << progress.playerXScore << endl;
-    //    cout << "Nguoi choi O: " << progress.playerOName << " - Diem: " << progress.playerOScore << endl;
-    //    cout << "So van da choi: " << progress.numberOfRounds << endl;
-    //    cout << "Luot choi hien tai: " << (progress.isXTurn ? "X" : "O") << endl;
-    //    cout << "-----------------------------" << endl;
-    //}
+void DrawHistoryMenu(const vector<Progress>& history, int x = 0) {
+
 }
 
 void GarbageCollect()
