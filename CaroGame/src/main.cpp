@@ -55,6 +55,12 @@ int main() {
                     }
                 }
             }
+
+            if (IsKeyPressed(KEY_SPACE)) {
+                StartGame(true);
+                gameState = 0;
+            }
+
             if (IsKeyPressed(KEY_S)) {
 				gameState = 4; // Chuyển sang trạng thái hiển thị thông báo lưu
             }
