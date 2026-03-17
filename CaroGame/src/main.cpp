@@ -55,17 +55,30 @@ int main() {
                     }
                 }
             }
+
+            if (IsKeyPressed(KEY_SPACE)) {
+                StartGame(true);
+                gameState = 0;
+            }
+
             if (IsKeyPressed(KEY_S)) {
                 SaveGameProgress("game_progress.dat");
             }
-            if (IsKeyPressed(KEY_ESCAPE)) gameState = 0;
+            if (IsKeyPressed(KEY_SPACE)) {
+                StartGame(true);
+                gameState = 0;
+            }
+
         }
         else if (gameState == 2) {
             if (IsKeyPressed(KEY_S)) {
                 SaveGameProgress("game_progress.dat");
             }
             if (IsKeyPressed(KEY_ENTER)) { StartGame(); gameState = 1; }
-            if (IsKeyPressed(KEY_ESCAPE)) gameState = 0;
+            if (IsKeyPressed(KEY_SPACE)) {
+                StartGame(true);
+                gameState = 0;
+            }
         }
 
         // --- VẼ GIAO DIỆN ---
@@ -77,7 +90,7 @@ int main() {
         }
         else if (gameState == 1 || gameState == 2) {
             // 1. Vẽ thông tin hướng dẫn
-            DrawText("ESC: Menu | Chuot trai: Danh co", 50, 20, 20, DARKGRAY);
+            DrawText("SPACE: Menu | Chuot trai: Danh co", 50, 20, 20, DARKGRAY);
 
             // 2. VẼ BẢNG ĐIỂM (Từ File 2)
             // Hàm này thường vẽ ở phía bên phải màn hình dựa trên logic trong View.cpp của bạn
@@ -115,7 +128,10 @@ int main() {
         else if (gameState == 3) {
             std::vector<Progress> history = LoadGameProgress("game_progress.dat");
             DrawHistoryMenu(history, 0);
-            if (IsKeyPressed(KEY_ESCAPE)) gameState = 0;
+            if (IsKeyPressed(KEY_SPACE)) {
+                StartGame(true);
+                gameState = 0;
+            }
         }
 
         EndDrawing();
