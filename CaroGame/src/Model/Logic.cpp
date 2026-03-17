@@ -1,67 +1,90 @@
 #include "../../include/Model.h"
 
-int TestBoard()
-{
-	bool hasEmptyCell = false;
+// Các biến _ROW, _COL giờ chỉ cần khai báo cục bộ ở Logic.cpp để dùng tạm
+static int _CURRENT_ROW = -1;
+static int _CURRENT_COL = -1;
 
-	for (int i = 0; i < BOARD_SIZE; i++)
-	{
-		for (int j = 0; j < BOARD_SIZE; j++)
-		{
-			if (_BOARD[i][j] != 0) // Nếu ô có quân cờ
-			{
-				char current = _BOARD[i][j];
+// Hàm phụ trợ: phóng tia kiểm tra 1 hướng (dx, dy)
+int CountPieces(int row, int col, int dx, int dy, int& blocks) {
+	int current = _BOARD[row][col];
+	int count = 0;
+	blocks = 0;
 
-				// 1. Kiểm tra hàng ngang
-				if (j <= BOARD_SIZE - 5 &&
-					_BOARD[i][j + 1] == current && _BOARD[i][j + 2] == current &&
-					_BOARD[i][j + 3] == current && _BOARD[i][j + 4] == current)
-					return current;
+	for (int step = 1; step <= 5; step++) {
+		int r = row + step * dy;
+		int c = col + step * dx;
 
-				// 2. Kiểm tra hàng dọc
-				if (i <= BOARD_SIZE - 5 &&
-					_BOARD[i + 1][j] == current && _BOARD[i + 2][j] == current &&
-					_BOARD[i + 3][j] == current && _BOARD[i + 4][j] == current)
-					return current;
+		// Nếu đụng vách bàn cờ -> Tính là 1 đầu bị chặn
+		if (r < 0 || r >= BOARD_SIZE || c < 0 || c >= BOARD_SIZE) {
+			blocks++;
+			break;
+		}
 
-				// 3. Kiểm tra chéo xuôi (\)
-				if (i <= BOARD_SIZE - 5 && j <= BOARD_SIZE - 5 &&
-					_BOARD[i + 1][j + 1] == current && _BOARD[i + 2][j + 2] == current &&
-					_BOARD[i + 3][j + 3] == current && _BOARD[i + 4][j + 4] == current)
-					return current;
+		// Đếm quân cùng màu
+		if (_BOARD[r][c] == current) count++;
+		// Đụng quân địch -> Tính là 1 đầu bị chặn
+		else if (_BOARD[r][c] != 0) {
+			blocks++;
+			break;
+		}
+		// Đụng ô trống -> Đường mở, không bị chặn
+		else break;
+	}
+	return count;
+}
 
-				// 4. Kiểm tra chéo ngược (/)
-				if (i >= 4 && j <= BOARD_SIZE - 5 &&
-					_BOARD[i - 1][j + 1] == current && _BOARD[i - 2][j + 2] == current &&
-					_BOARD[i - 3][j + 3] == current && _BOARD[i - 4][j + 4] == current)
-					return current;
-			}
-			else
-			{
-				hasEmptyCell = true; // Ghi nhận vẫn còn ô trống
-			}
+int TestBoard() {
+	if (_CURRENT_ROW < 0 || _CURRENT_COL < 0) return 0;
+
+	int current = _BOARD[_ROW][_COL];
+	if (current == 0) return 0;
+
+	// Mảng 4 hướng: Ngang (1,0), Dọc (0,1), Chéo chính (1,1), Chéo phụ (1,-1)
+	int directions[4][2] = { {1,0}, {0,1}, {1,1}, {1,-1} };
+
+	for (int i = 0; i < 4; i++) {
+		int dx = directions[i][0];
+		int dy = directions[i][1];
+
+		int blocks1 = 0, blocks2 = 0;
+
+		// Quét tới và quét lùi trên cùng 1 trục từ vị trí (_ROW, _COL)
+		int countForward = CountPieces(_ROW, _COL, dx, dy, blocks1);
+		int countBackward = CountPieces(_ROW, _COL, -dx, -dy, blocks2);
+
+		int totalCount = 1 + countForward + countBackward;
+		int totalBlocks = blocks1 + blocks2;
+
+		// Đủ 5 quân và không bị chặn cả 2 đầu
+		if (totalCount >= 5 && totalBlocks < 2) return current; // Trả về người thắng (-1 hoặc 1)
+	}
+
+	// Kiểm tra Hòa
+	for (int i = 0; i < BOARD_SIZE; i++) {
+		for (int j = 0; j < BOARD_SIZE; j++) {
+			if (_BOARD[i][j] == 0) return 2; // Vẫn còn ô trống -> Đánh tiếp
 		}
 	}
 
-	// Nếu không ai thắng và vẫn còn ô trống -> Tiếp tục chơi
-	if (hasEmptyCell)
-		return 2;
-
-	// Nếu không ai thắng và hết ô trống -> Hòa
-	return 0;
+	return 0; // Hòa
 }
 
-int CheckBoard() // Không cần truyền pX, pY nữa vì đã dùng _ROW, _COL toàn cục
-{
-	// Kiểm tra xem ô tại vị trí con trỏ hiện tại có trống không
-	if (_BOARD[_ROW][_COL] == 0)
-	{
-		if (_TURN == true)
-			_BOARD[_ROW][_COL] = -1; // X đánh
-		else
-			_BOARD[_ROW][_COL] = 1; // O đánh
+int CheckBoard() {
+	// Nếu toạ độ ngoài bảng
+	if (_ROW < 0 || _ROW >= BOARD_SIZE || _COL < 0 || _COL >= BOARD_SIZE)
+		return 0;
 
-		return _BOARD[_ROW][_COL]; // Trả về giá trị vừa đánh (-1 hoặc 1)
+	// Nếu nhấp trúng ô trống
+	if (_BOARD[_ROW][_COL] == 0) {
+		// Ghi quân cờ dựa theo lượt
+		_BOARD[_ROW][_COL] = _TURN ? -1 : 1;
+
+		// Lưu lại vị trí để hàm TestBoard lát nữa có cái mà quét
+		_CURRENT_ROW = _ROW;
+		_CURRENT_COL = _COL;
+
+		// Chú ý: Việc đổi lượt (_TURN = !_TURN) sẽ để bên File chạy (main.cpp) đảm nhận
+		return _BOARD[_ROW][_COL];
 	}
-	return 0; // Ô đã có quân, không cho đánh
+	return 0; // Click vào ô có cờ
 }
