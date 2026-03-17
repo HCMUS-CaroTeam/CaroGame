@@ -48,7 +48,7 @@ int main()
                     }
                 }
             }
-            if (IsKeyPressed(KEY_ESCAPE)) gameState = 0;
+            if (IsKeyPressed(KEY_SPACE)) gameState = 0;
         }
         else if (gameState == 2) {
             int answer = AskContinue(TestBoard()); 
