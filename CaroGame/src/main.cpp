@@ -1,94 +1,4 @@
-﻿//#define WIN32_LEAN_AND_MEAN
-//#define NOGDI              
-//#define NOUSER
-//
-//#include <raylib.h>
-//#include "../include/View.h"
-//#include "../include/Model.h"
-//#include "../include/Control.h"
-//
-//int gameState = 0; // Trạng thái game: 0 là Menu, 1 là đang chơi, 2 là hỏi người chơi có muốn chơi tiếp không
-//int menuSelected = 0; // Lựa chọn trong menu
-//
-//int main()
-//{
-//    const int screenWidth = 800;
-//    const int screenHeight = 600;
-//    InitWindow(screenWidth, screenHeight, "Caro Game - Loi_UI Project");
-//    SetTargetFPS(60);
-//
-//    StartGame();
-//
-//    while (!WindowShouldClose())
-//    {
-//        if (gameState == 0) // Đang ở màn hình chính
-//        {
-//            if (IsKeyPressed(KEY_UP)) menuSelected = (menuSelected - 1 + 3) % 3;
-//            if (IsKeyPressed(KEY_DOWN)) menuSelected = (menuSelected + 1) % 3;
-//
-//            if (IsKeyPressed(KEY_ENTER)) {
-//                if (menuSelected == 0) gameState = 1; 
-//            }
-//        }
-//        else if (gameState == 1)
-//        {
-//            if (IsKeyPressed(KEY_A) || IsKeyPressed(KEY_LEFT))  MoveLeft();
-//            if (IsKeyPressed(KEY_D) || IsKeyPressed(KEY_RIGHT)) MoveRight();
-//            if (IsKeyPressed(KEY_W) || IsKeyPressed(KEY_UP))    MoveUp();
-//            if (IsKeyPressed(KEY_S) || IsKeyPressed(KEY_DOWN))  MoveDown();
-//
-//            if (IsKeyPressed(KEY_ENTER))
-//            {
-//                if (CheckBoard() != 0)
-//                {
-//                    int result = TestBoard();
-//                    if (ProcessFinish(result) != 2)
-//                    {
-//                        gameState = 2;
-//                    }
-//                }
-//            }
-//            if (IsKeyPressed(KEY_ESCAPE)) gameState = 0;
-//        }
-//        else if (gameState == 2) {
-//            int answer = AskContinue(TestBoard()); 
-//            if (answer == 1) {
-//                StartGame();
-//                gameState = 1;
-//            }
-//            else if (answer == -1) {
-//                gameState = 0;
-//                ResetData(true);
-//            }
-//        }
-//
-//        BeginDrawing();
-//        ClearBackground(RAYWHITE);
-//
-//        if (gameState == 0)
-//        {
-//            DrawMainMenu(menuSelected); 
-//        }
-//        else
-//        {
-//            DrawBoard(15);      // Vẽ lưới & tọa độ
-//            DrawPieces();       // Vẽ X và O từ mảng _BOARD
-//            DrawPlayerStats();  // Vẽ bảng điểm bên phải
-//
-//            // Vẽ con trỏ tại vị trí hiện tại
-//            DrawRectangleLinesEx({ (float)_X, (float)_Y, 30, 30 }, 3, GREEN);
-//
-//            DrawText("Di chuyen: WASD | Danh: ENTER | Menu: ESC", 10, 10, 20, DARKGRAY);
-//        }
-//        EndDrawing();
-//    }
-//
-//    CloseWindow();
-//    return 0;
-//}
-
-
-#define WIN32_LEAN_AND_MEAN
+﻿#define WIN32_LEAN_AND_MEAN
 #define NOGDI              
 #define NOUSER
 
@@ -138,15 +48,23 @@ int main() {
 
                     if (CheckBoard() != 0) {
                         int result = TestBoard();
-                        if (result != 2) gameState = 2;
-                        else _TURN = !_TURN;
+                        if (ProcessFinish(result) != 2)
+                        {
+                            gameState = 2;
+                        }
                     }
                 }
+            }
+            if (IsKeyPressed(KEY_S)) {
+                SaveGameProgress("game_progress.dat");
             }
             if (IsKeyPressed(KEY_ESCAPE)) gameState = 0;
         }
         else if (gameState == 2) {
-            if (IsKeyPressed(KEY_ENTER)) { StartGame(true); gameState = 1; }
+            if (IsKeyPressed(KEY_S)) {
+                SaveGameProgress("game_progress.dat");
+            }
+            if (IsKeyPressed(KEY_ENTER)) { StartGame(); gameState = 1; }
             if (IsKeyPressed(KEY_ESCAPE)) gameState = 0;
         }
 
@@ -182,10 +100,16 @@ int main() {
 
             // 4. Thông báo kết thúc (Nếu có)
             if (gameState == 2) {
-                int res = TestBoard();
-                const char* msg = (res == -1) ? "X THANG!" : ((res == 1) ? "O THANG!" : "HOA NHAU!");
-                DrawRectangle(0, screenHeight / 2 - 50, 700, 100, Fade(BLACK, 0.8f));
-                DrawText(msg, 350 - MeasureText(msg, 40) / 2, screenHeight / 2 - 20, 40, GREEN);
+
+                int answer = AskContinue(TestBoard());
+                if (answer == 1) {
+                    StartGame();
+                    gameState = 1;
+                }
+                else if (answer == -1) {
+                    gameState = 0;
+                    ResetData(true);
+                }
             }
         }
         else if (gameState == 3) {
