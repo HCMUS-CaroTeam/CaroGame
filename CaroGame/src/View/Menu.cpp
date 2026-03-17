@@ -17,6 +17,8 @@ void GotoXY(int x, int y)
 	//SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE), coord);
 }
 
+
+
 int AskContinue(int pWhoWin) {
 	if(pWhoWin == -1)
 		DrawText("Nguoi choi X thang, ban muon choi tiep? (ENTER/SPACE)", 150, 550, 20, RED);

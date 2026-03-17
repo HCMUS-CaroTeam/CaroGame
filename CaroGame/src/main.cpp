@@ -8,7 +8,7 @@
 #include "../include/Model.h"
 #include "../include/Control.h"
 
-int gameState = 0;
+int gameState = 0;// 0 = Menu, 1 = Playing, 2 = Game Over, 3 = History, 4 = Save Confirmation
 int menuSelected = 0;
 
 // Cấu hình kích thước để có chỗ cho bảng điểm bên phải
@@ -62,20 +62,21 @@ int main() {
             }
 
             if (IsKeyPressed(KEY_S)) {
-                SaveGameProgress("game_progress.dat");
+				gameState = 4; // Chuyển sang trạng thái hiển thị thông báo lưu
             }
-            if (IsKeyPressed(KEY_SPACE)) {
+            if (IsKeyPressed(KEY_SPACE))
+            {
                 StartGame(true);
                 gameState = 0;
             }
-
         }
         else if (gameState == 2) {
             if (IsKeyPressed(KEY_S)) {
-                SaveGameProgress("game_progress.dat");
+                gameState = 4; // Chuyển sang trạng thái hiển thị thông báo lưu
             }
             if (IsKeyPressed(KEY_ENTER)) { StartGame(); gameState = 1; }
-            if (IsKeyPressed(KEY_SPACE)) {
+            if (IsKeyPressed(KEY_SPACE)) 
+            {
                 StartGame(true);
                 gameState = 0;
             }
@@ -88,9 +89,9 @@ int main() {
         if (gameState == 0) {
             DrawMainMenu(menuSelected);
         }
-        else if (gameState == 1 || gameState == 2) {
+        else if (gameState == 1 || gameState == 2||gameState==4) {
             // 1. Vẽ thông tin hướng dẫn
-            DrawText("SPACE: Menu | Chuot trai: Danh co", 50, 20, 20, DARKGRAY);
+            DrawText("SPACE: Menu | Chuot trai: Danh co | S: Save game", 50, 20, 20, DARKGRAY);
 
             // 2. VẼ BẢNG ĐIỂM (Từ File 2)
             // Hàm này thường vẽ ở phía bên phải màn hình dựa trên logic trong View.cpp của bạn
@@ -113,13 +114,23 @@ int main() {
 
             // 4. Thông báo kết thúc (Nếu có)
             if (gameState == 2) {
-
                 int answer = AskContinue(TestBoard());
                 if (answer == 1) {
                     StartGame();
                     gameState = 1;
                 }
                 else if (answer == -1) {
+                    gameState = 0;
+                    ResetData(true);
+                }
+            }
+
+            if (gameState == 4) {
+                int autoSaveResult = AutoSave();
+                if (autoSaveResult == 1) {
+                    gameState = 1;
+                }
+                else if (autoSaveResult == -1) {
                     gameState = 0;
                     ResetData(true);
                 }

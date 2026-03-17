@@ -61,3 +61,20 @@ int ProcessFinish(int pWhoWin)
 	}
 	return pWhoWin;
 }
+
+
+int AutoSave() {
+	// Hàm này có thể được gọi sau mỗi lượt đi để tự động lưu tiến trình trò chơi
+	// Ví dụ: SaveGameProgress("autosave.dat");
+	SaveGameProgress("game_progress.dat");
+	DrawText("Game progress saved! Press Enter to continue!", 250, 550, 20, GREEN);
+
+	if (IsKeyPressed(KEY_ENTER)) {
+		return 1;
+	}
+	else if (IsKeyPressed(KEY_SPACE)) {
+		return -1;
+	}
+	return 0;
+
+}

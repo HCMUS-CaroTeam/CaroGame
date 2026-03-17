@@ -134,8 +134,3 @@ void DrawHistoryMenu(const vector<Progress>& history, int selectedIdx) {
         DrawText(buffer, 170, posY, 20, textColor);
     }
 }
-
-void GarbageCollect()
-{
-    // Dọn dẹp tài nguyên nếu có khai báo con trỏ
-}
