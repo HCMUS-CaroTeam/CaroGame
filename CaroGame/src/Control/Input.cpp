@@ -12,8 +12,6 @@ void StartGame(bool resetAll)
 
 void ExitGame()
 {
-	SaveGameProgress("game_progress.dat"); // Lưu tiến trình game vào file trước khi thoát
-	GarbageCollect();
 	// Có thể lưu game trước khi exit
 }
 
