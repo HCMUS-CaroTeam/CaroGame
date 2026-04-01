@@ -1,52 +1,89 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <ClCompile Include="src\main.cpp" />
-    <ClCompile Include="src\Control\Input.cpp">
-      <Filter>Control</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Model\Data.cpp">
-      <Filter>Model</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Model\Logic.cpp">
-      <Filter>Model</Filter>
-    </ClCompile>
-    <ClCompile Include="src\View\Renderer.cpp">
-      <Filter>View</Filter>
-    </ClCompile>
-    <ClCompile Include="src\View\Menu.cpp">
-      <Filter>View</Filter>
-    </ClCompile>
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="include\Common.h">
-      <Filter>Header</Filter>
-    </ClInclude>
-    <ClInclude Include="include\Control.h">
-      <Filter>Header</Filter>
-    </ClInclude>
-    <ClInclude Include="include\Model.h">
-      <Filter>Header</Filter>
-    </ClInclude>
-    <ClInclude Include="include\View.h">
-      <Filter>Header</Filter>
-    </ClInclude>
-  </ItemGroup>
-  <ItemGroup>
-    <Filter Include="Model">
-      <UniqueIdentifier>{4252a550-bc15-4649-aead-00a0cad5f50c}</UniqueIdentifier>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;c++;cppm;ixx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
     </Filter>
-    <Filter Include="View">
-      <UniqueIdentifier>{a8e4f8a1-a9c5-4ec9-9477-b50890e232f3}</UniqueIdentifier>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hh;hpp;hxx;h++;hm;inl;inc;ipp;xsd</Extensions>
     </Filter>
-    <Filter Include="Control">
-      <UniqueIdentifier>{cf9e34af-e862-4084-9dc8-06e9c6aed395}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Header">
-      <UniqueIdentifier>{c60fe8db-c28c-4b38-ae53-905acea85bf2}</UniqueIdentifier>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <None Include="packages.config" />
+    <ClCompile Include="src\audio_manager.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\main.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Scenes\MainMenu\ui_background.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src/Control\input_mouse.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Scenes\MainMenu\ui_main_menu.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Control\menu_data.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="Assets\Texture\background.jpg">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="x64\Debug\Assets\Texture\background.jpg">
+      <Filter>Resource Files</Filter>
+    </Image>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="raylib\include\raymath.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="raylib\include\rlgl.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\audio_manager.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src/Control\input_mouse.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src/Model\config.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="raylib/include\raylib.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Scenes\MainMenu\ui_background.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Scenes\MainMenu\ui_main_menu.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Control\menu_data.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Model\app_settings.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <Library Include="raylib\lib\raylib.lib" />
+    <Library Include="raylib\lib\raylibdll.lib" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Assets\audio\menu_hover.ogg" />
+    <None Include="Assets\audio\menu_click.ogg" />
+  </ItemGroup>
+  <ItemGroup>
+    <Media Include="Assets\audio\lose_sound.mp3" />
+    <Media Include="Assets\audio\win_sound.mp3" />
   </ItemGroup>
 </Project>

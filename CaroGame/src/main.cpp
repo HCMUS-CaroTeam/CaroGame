@@ -1,151 +1,140 @@
-﻿#define WIN32_LEAN_AND_MEAN
-#define NOGDI              
-#define NOUSER
-
 #include "raylib.h"
-#include <vector>
-#include "../include/View.h"
-#include "../include/Model.h"
-#include "../include/Control.h"
+#include "Model/config.h"
+#include "Control/input_mouse.h"
+#include "Scenes/MainMenu/ui_main_menu.h"
+#include "Scenes/MainMenu/ui_background.h"
+#include "audio_manager.h"
+#include "Model/app_settings.h"
+#include "Control/menu_data.h"
 
-int gameState = 0;// 0 = Menu, 1 = Playing, 2 = Game Over, 3 = History, 4 = Save Confirmation
-int menuSelected = 0;
+static Font LoadFontSafe(const char* path, int size)
+{
+    if (FileExists(path))
+        return LoadFontEx(path, size, 0, 0);
 
-// Cấu hình kích thước để có chỗ cho bảng điểm bên phải
-const int screenWidth = 1000; // Tăng chiều rộng để chứa DrawPlayerStats()
-const int screenHeight = 700;
-float cellSize;
-float offsetX = 50.0f;
-float offsetY = 80.0f;
+    return GetFontDefault();
+}
 
-int main() {
-    InitWindow(screenWidth, screenHeight, "Caro Game - Stats Integrated");
-    SetTargetFPS(60);
+static void DrawCenteredText(Font font, const char* text, float y, float fontSize, Color color)
+{
+    Vector2 size = MeasureTextEx(font, text, fontSize, 1.0f);
+    DrawTextEx(
+        font,
+        text,
+        Vector2{ SCREEN_WIDTH * 0.5f - size.x * 0.5f, y },
+        fontSize,
+        1.0f,
+        color
+    );
+}
 
-    // Kích thước bàn cờ (Giả sử bàn cờ chiếm khoảng 600px chiều rộng)
-    cellSize = 35.0f;
+static void DrawSubScreen(Font fontTitle, Font fontSmall, const char* title, const char* desc)
+{
+    DrawBackgroundScene();
 
-    while (!WindowShouldClose()) {
-        // --- LOGIC (Giữ nguyên như bản trước) ---
-        if (gameState == 0) {
-            if (IsKeyPressed(KEY_UP)) menuSelected = (menuSelected - 1 + 4) % 4;
-            if (IsKeyPressed(KEY_DOWN)) menuSelected = (menuSelected + 1) % 4;
-            if (IsKeyPressed(KEY_ENTER)) {
-                if (menuSelected == 0) gameState = 1;
-                else if (menuSelected == 1) gameState = 3;
-                else if (menuSelected == 2) { StartGame(true); gameState = 1; }
-                else if (menuSelected == 3) break;
-            }
-        }
-        else if (gameState == 1) {
-            if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON)) {
-                Vector2 mousePos = GetMousePosition();
-                if (mousePos.x >= offsetX && mousePos.x <= offsetX + BOARD_SIZE * cellSize &&
-                    mousePos.y >= offsetY && mousePos.y <= offsetY + BOARD_SIZE * cellSize) {
+    Rectangle panel{
+        SCREEN_WIDTH * 0.5f - 360.0f,
+        360.0f,
+        720.0f,
+        180.0f
+    };
 
-                    _COL = (int)((mousePos.x - offsetX) / cellSize);
-                    _ROW = (int)((mousePos.y - offsetY) / cellSize);
+    DrawRectangleRounded(panel, 0.08f, 12, Color{ 28, 16, 20, 180 });
+    DrawRectangleRoundedLinesEx(panel, 0.08f, 12, 2.5f, Color{ 235, 210, 210, 200 });
 
-                    if (CheckBoard() != 0) {
-                        int result = TestBoard();
-                        if (ProcessFinish(result) != 2)
-                        {
-                            gameState = 2;
-                        }
-                    }
-                }
-            }
+    DrawCenteredText(fontTitle, title, 395.0f, 42.0f, Color{ 255, 235, 225, 255 });
+    DrawCenteredText(fontSmall, desc, 465.0f, 24.0f, Color{ 240, 225, 225, 220 });
+    DrawCenteredText(fontSmall, "PRESS ESC OR LEFT CLICK TO BACK", 515.0f, 22.0f, Color{ 220, 205, 205, 170 });
+}
 
-            if (IsKeyPressed(KEY_SPACE)) {
-                StartGame(true);
-                gameState = 0;
-            }
+int main()
+{
+    InitWindow(SCREEN_WIDTH, SCREEN_HEIGHT, "Quantum Caro");
+    SetTargetFPS(TARGET_FPS);
 
-            if (IsKeyPressed(KEY_S)) {
-				gameState = 4; // Chuyển sang trạng thái hiển thị thông báo lưu
-            }
-            if (IsKeyPressed(KEY_SPACE))
+    // === DEBUG: xóa sau khi tìm ra lỗi ===
+    // In ra thư mục làm việc hiện tại
+    TraceLog(LOG_INFO, "Working dir: %s", GetWorkingDirectory());
+
+    // Kiểm tra từng file ảnh
+    TraceLog(LOG_INFO, "button1.png (assets/bg/)  : %d", FileExists("assets/bg/button1.png"));
+    TraceLog(LOG_INFO, "button1.png (Assets/bg/)  : %d", FileExists("Assets/bg/button1.png"));
+    TraceLog(LOG_INFO, "button1.png (root)        : %d", FileExists("button1.png"));
+    TraceLog(LOG_INFO, "background.png (assets/bg): %d", FileExists("assets/bg/background.png"));
+    
+    Font fontTitle = LoadFontSafe(FONT_PATH, 64);
+    Font fontSmall = LoadFontSafe(FONT_PATH, 28);
+
+    AppSettings settings{};
+    AudioAssets audio{};
+    InitGameAudio(audio);
+    InitMainMenuUI();
+
+    ScreenState currentScreen = SCREEN_MAIN_MENU;
+    bool shouldClose = false;
+
+    bool showMenuButtons = true; // false = cất nút
+
+    while (!WindowShouldClose() && !shouldClose)
+    {
+        const MouseState mouse = GetMouseStateNow();
+        const float dt = GetFrameTime();
+
+        UpdateGameAudio(audio, settings);
+
+        if (currentScreen == SCREEN_MAIN_MENU)
+        {
+            if (showMenuButtons)
             {
-                StartGame(true);
-                gameState = 0;
+                UpdateMainMenuUI(mouse, dt, audio, settings, currentScreen, shouldClose);
             }
-        }
-        else if (gameState == 2) {
-            if (IsKeyPressed(KEY_S)) {
-                gameState = 4; // Chuyển sang trạng thái hiển thị thông báo lưu
-            }
-            if (IsKeyPressed(KEY_ENTER)) { StartGame(); gameState = 1; }
-            if (IsKeyPressed(KEY_SPACE)) 
+
+            if (IsKeyPressed(KEY_ESCAPE))
             {
-                StartGame(true);
-                gameState = 0;
+                shouldClose = true;
             }
         }
 
-        // --- VẼ GIAO DIỆN ---
         BeginDrawing();
-        ClearBackground(RAYWHITE);
 
-        if (gameState == 0) {
-            DrawMainMenu(menuSelected);
-        }
-        else if (gameState == 1 || gameState == 2||gameState==4) {
-            // 1. Vẽ thông tin hướng dẫn
-            DrawText("SPACE: Menu | Chuot trai: Danh co | S: Save game", 50, 20, 20, DARKGRAY);
-
-            // 2. VẼ BẢNG ĐIỂM (Từ File 2)
-            // Hàm này thường vẽ ở phía bên phải màn hình dựa trên logic trong View.cpp của bạn
-            DrawPlayerStats();
-
-            // 3. Vẽ bàn cờ (Style File 1)
-            for (int i = 0; i < BOARD_SIZE; i++) {
-                for (int j = 0; j < BOARD_SIZE; j++) {
-                    Rectangle cellRect = { offsetX + j * cellSize, offsetY + i * cellSize, cellSize, cellSize };
-                    DrawRectangleLinesEx(cellRect, 1.0f, LIGHTGRAY);
-
-                    if (_BOARD[i][j] == -1) {
-                        DrawText("X", (int)(cellRect.x + cellSize / 4), (int)(cellRect.y + cellSize / 8), (int)(cellSize * 0.8), RED);
-                    }
-                    else if (_BOARD[i][j] == 1) {
-                        DrawText("O", (int)(cellRect.x + cellSize / 4), (int)(cellRect.y + cellSize / 8), (int)(cellSize * 0.8), BLUE);
-                    }
-                }
+        switch (currentScreen)
+        {
+        case SCREEN_MAIN_MENU:
+            if (showMenuButtons)
+            {
+                DrawMainMenuUI(fontTitle, fontSmall, mouse);
             }
+            else
+            {
+                // chỉ vẽ background + logo
+                DrawBackgroundScene();
+            }
+            break;
 
-            // 4. Thông báo kết thúc (Nếu có)
-            if (gameState == 2) {
-                int answer = AskContinue(TestBoard());
-                if (answer == 1) {
-                    StartGame();
-                    gameState = 1;
-                }
-                else if (answer == -1) {
-                    gameState = 0;
-                    ResetData(true);
-                }
-            }
+        case SCREEN_PLAY:
+            DrawSubScreen(fontTitle, fontSmall, "PLAY", "This screen is ready for your next game scene.");
+            break;
 
-            if (gameState == 4) {
-                int autoSaveResult = AutoSave();
-                if (autoSaveResult == 1) {
-                    gameState = 1;
-                }
-                else if (autoSaveResult == -1) {
-                    gameState = 0;
-                    ResetData(true);
-                }
-            }
-        }
-        else if (gameState == 3) {
-            std::vector<Progress> history = LoadGameProgress("game_progress.dat");
-            DrawHistoryMenu(history, 0);
-            if (IsKeyPressed(KEY_SPACE)) {
-                StartGame(true);
-                gameState = 0;
-            }
+        case SCREEN_ABOUT:
+            DrawSubScreen(fontTitle, fontSmall, "ABOUT", "Introduce game information, team, rules, or credits here.");
+            break;
+
+        case SCREEN_SETTING:
+            DrawSubScreen(fontTitle, fontSmall, "SETTING", "Audio, graphics, and gameplay settings can be built here.");
+            break;
         }
 
         EndDrawing();
+    }
+
+    ShutdownMainMenuUI();
+    ShutdownGameAudio(audio);
+    UnloadBackgroundAssets();
+
+    if (FileExists(FONT_PATH))
+    {
+        UnloadFont(fontTitle);
+        UnloadFont(fontSmall);
     }
 
     CloseWindow();
