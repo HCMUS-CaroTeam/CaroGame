@@ -1,7 +1,7 @@
 #ifndef COMMON_H
 #define COMMON_H
 
-#include "raylib.h"
+#include "../raylib/include/raylib.h"
 
 // --- CÁC HẰNG SỐ CỦA BÀN CỜ ---
 #define BOARD_SIZE 12

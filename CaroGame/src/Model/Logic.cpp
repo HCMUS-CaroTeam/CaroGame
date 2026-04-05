@@ -1,9 +1,6 @@
 #include "../../Shared/Common.h"
 #include "Logic.h" // Chứa khai báo của các hàm bên dưới
 
-// --------------------------------------------------------
-// 1. HÀM QUẢN LÝ THỜI GIAN (Chỉ chạy thực sự ở Mode 2)
-// --------------------------------------------------------
 int UpdateTimer() {
     // Nếu là Mode 1 (Tiêu chuẩn) thì bỏ qua, không thèm đếm
     if (_GAME_MODE == 1) return 0;
@@ -20,9 +17,6 @@ int UpdateTimer() {
     return 0; // Đang đếm bình thường
 }
 
-// --------------------------------------------------------
-// 2. HÀM KIỂM TRA ĐÁNH CỜ
-// --------------------------------------------------------
 int CheckBoard(int pX, int pY) {
     if (pX < OFFSET_X || pY < OFFSET_Y) return 0; // Sửa lỗi tính toán sai khi click âm phía trên bên trái
 
@@ -47,9 +41,6 @@ int CheckBoard(int pX, int pY) {
     return 0; // Click trùng ô đã đánh
 }
 
-// --------------------------------------------------------
-// 3. HÀM RADAR QUÉT THẮNG THUA (Tích hợp luật 2 Mode)
-// --------------------------------------------------------
 int TestBoard(int lastRow, int lastCol) {
     // 4 hướng: Ngang, Dọc, Chéo chính, Chéo phụ
     int dx[] = { 0, 1, 1, 1 };
@@ -95,7 +86,7 @@ int TestBoard(int lastRow, int lastCol) {
                 if (blocks < 2) return player;
             }
             else {
-                // Tiêu chuẩn: Đủ 5 con là lụm, kệ xác chặn 2 đầu
+                // Tiêu chuẩn: Đủ 5 con là thắng
                 return player;
             }
         }
