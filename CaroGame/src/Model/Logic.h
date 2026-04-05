@@ -1,22 +1,36 @@
 #ifndef LOGIC_H
 #define LOGIC_H
 
-// --------------------------------------------------------
-// KHAI BÁO CÁC HÀM XỬ LÝ LOGIC CỦA TRÒ CHƠI
-// --------------------------------------------------------
+/**
+ * @file Logic.h
+ * @brief Khai báo các hàm xử lý logic của trò chơi Caro
+ */
 
-// 1. Quản lý thời gian đếm ngược (Chỉ áp dụng cho Mode 2 - Hardcore)
-// Trả về -99 nếu hết giờ, trả về 0 nếu bình thường
+ /**
+  * @brief Cập nhật thời gian đếm ngược mỗi frame (Chỉ áp dụng cho Mode Hardcore).
+  * Nếu hết giờ, tự động đổi lượt và reset lại bộ đếm thời gian.
+  * @return Trả về -99 để báo tín hiệu hết giờ (phục vụ phát âm thanh/UI), ngược lại trả về 0.
+  */
 int UpdateTimer();
 
-// 2. Kiểm tra nước đi khi người dùng click chuột
-// Nhận vào: Tọa độ pixel X, Y của chuột
-// Trả về: 0 (nếu đánh không hợp lệ), -1 (Quân X), 1 (Quân O)
+/**
+ * @brief Xử lý đặt quân cờ lên bàn cờ dựa trên tọa độ click chuột.
+ * Chuyển tọa độ pixel thành tọa độ mảng 2 chiều, kiểm tra tính hợp lệ và cập nhật mảng _BOARD.
+ * Tự động reset thời gian đếm ngược (nếu đang ở Mode 2).
+ * @param pX Tọa độ pixel X của chuột.
+ * @param pY Tọa độ pixel Y của chuột.
+ * @return Trả về cờ vừa đánh (-1 hoặc 1). Trả về 0 nếu nằm ngoài bàn cờ hoặc ô đã có sẵn cờ.
+ */
 int CheckBoard(int pX, int pY);
 
-// 3. Quét radar kiểm tra thắng thua (Có xét luật chặn 2 đầu theo Mode)
-// Nhận vào: Chỉ số dòng (row) và cột (col) của nước cờ vừa đánh
-// Trả về: 0 (Chưa ai thắng), -1 (X thắng), 1 (O thắng)
+/**
+ * @brief Quét kiểm tra có người chiến thắng hay không dựa trên vị trí quân cờ vừa được đánh.
+ * Thuật toán quét theo 4 hướng: Ngang, Dọc, Chéo chính, Chéo phụ.
+ * Áp dụng điều kiện thắng tiêu chuẩn (đủ 5 con) hoặc điều kiện Hardcore (đủ 5 con và không chặn 2 đầu).
+ * @param lastRow Vị trí dòng (row) của nước đi cuối cùng.
+ * @param lastCol Vị trí cột (col) của nước đi cuối cùng.
+ * @return Quân cờ chiến thắng (-1 hoặc 1). Trả về 0 nếu chưa thỏa mãn điều kiện thắng.
+ */
 int TestBoard(int lastRow, int lastCol);
 
 #endif // LOGIC_H
