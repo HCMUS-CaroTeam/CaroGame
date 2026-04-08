@@ -1,6 +1,12 @@
 #include "../../Shared/Common.h"
 #include "Logic.h" // Chứa khai báo của các hàm bên dưới
 
+// --- Định nghĩa các biến toàn cục từ Common.h ---
+int _BOARD[BOARD_SIZE][BOARD_SIZE] = { {0} };
+bool _TURN = true;           // true (X), false (O)
+int _GAME_MODE = 1;          // 1: Tiêu chuẩn, 2: Hardcore
+float _TIME_LEFT = TURN_TIME_LIMIT;     // Thời gian đếm ngược
+
 int UpdateTimer() {
     // Nếu là Mode 1 (Tiêu chuẩn) thì bỏ qua, không thèm đếm
     if (_GAME_MODE == 1) return 0;
