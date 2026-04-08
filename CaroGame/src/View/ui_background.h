@@ -21,5 +21,8 @@ void LoadBackgroundAssets();
 // Giải phóng texture
 void UnloadBackgroundAssets();
 
-// Vẽ background (gọi mỗi frame)
-void DrawBackgroundScene();
+// Chỉ vẽ nền
+void DrawBackgroundOnly();
+
+// Chỉ vẽ logo
+void DrawLogoOnly();
