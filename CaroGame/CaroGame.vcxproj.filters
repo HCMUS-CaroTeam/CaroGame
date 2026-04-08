@@ -45,6 +45,9 @@
     <ClCompile Include="src\Scenes\Play\ui_pause.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\Systems\audio_manager.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Image Include="Assets\Texture\background.jpg">
@@ -95,6 +98,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\Scenes\Play\ui_pause.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Systems\audio_manager.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
