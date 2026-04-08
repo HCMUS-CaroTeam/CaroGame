@@ -8,6 +8,7 @@
 #include "Control/menu_data.h"
 #include "Scenes/Setup/ui_setup.h"
 #include "Scenes/Play/ui_play.h"
+#include "View/ui_frame.h"
 
 static Font LoadFontSafe(const char* path, int size)
 {
@@ -70,6 +71,7 @@ int main()
     InitMainMenuUI();
     InitSetupUI();
     InitPlayUI();
+    InitUIFrameSystem();
 
     ScreenState currentScreen = SCREEN_MAIN_MENU;
     bool shouldClose = false;
@@ -136,6 +138,8 @@ int main()
     ShutdownMainMenuUI();
     ShutdownSetupUI();
     ShutdownGameAudio(audio);
+    ShutdownUIFrameSystem();
+
     UnloadBackgroundAssets();
 
     if (FileExists(FONT_PATH))

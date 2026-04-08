@@ -140,8 +140,16 @@
     <ClCompile Include="src\Scenes\Setup\ui_setup.cpp" />
     <ClCompile Include="src\View\ui_background.cpp" />
     <ClCompile Include="src\View\ui_button.cpp" />
+    <ClCompile Include="src\View\ui_frame.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <Image Include="Assets\bg\background.png" />
+    <Image Include="Assets\bg\button1.png" />
+    <Image Include="Assets\bg\button2.png" />
+    <Image Include="Assets\bg\game name.png" />
+    <Image Include="Assets\frame\pixil-layer-1.png" />
+    <Image Include="Assets\frame\pixil-layer-2.png" />
+    <Image Include="Assets\frame\pixil-layer-3.png" />
     <Image Include="Assets\Texture\background.jpg" />
     <Image Include="x64\Debug\Assets\Texture\background.jpg" />
   </ItemGroup>
@@ -161,6 +169,7 @@
     <ClInclude Include="src\Systems\audio_manager.h" />
     <ClInclude Include="src\View\ui_background.h" />
     <ClInclude Include="src\View\ui_button.h" />
+    <ClInclude Include="src\View\ui_frame.h" />
   </ItemGroup>
   <ItemGroup>
     <Library Include="raylib\lib\raylib.lib" />
