@@ -135,6 +135,7 @@
     <ClCompile Include="src\Control\menu_data.cpp" />
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\Scenes\MainMenu\ui_main_menu.cpp" />
+    <ClCompile Include="src\Scenes\Play\ui_pause.cpp" />
     <ClCompile Include="src\Scenes\Play\ui_play.cpp" />
     <ClCompile Include="src\Scenes\Setup\ui_setup.cpp" />
     <ClCompile Include="src\View\ui_background.cpp" />
@@ -154,6 +155,7 @@
     <ClInclude Include="src\Model\app_settings.h" />
     <ClInclude Include="src\audio_manager.h" />
     <ClInclude Include="src\Scenes\MainMenu\ui_main_menu.h" />
+    <ClInclude Include="src\Scenes\Play\ui_pause.h" />
     <ClInclude Include="src\Scenes\Play\ui_play.h" />
     <ClInclude Include="src\Scenes\Setup\ui_setup.h" />
     <ClInclude Include="src\View\ui_background.h" />
