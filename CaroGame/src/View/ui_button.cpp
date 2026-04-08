@@ -4,18 +4,28 @@
 
 using namespace std;
 
-static Texture2D gButtonIdle{};
-static Texture2D gButtonPressed{};
-static bool gButtonIdleLoaded = false;
-static bool gButtonPressedLoaded = false;
-static bool gButtonIdleAttempted = false;
-static bool gButtonPressedAttempted = false;
+struct ButtonTextureAsset
+{
+    Texture2D texture{};
+    // kiểm tra xem đã load texture chưa để tránh lỗi khi vẽ nếu texture không tồn tại hoặc chưa load được
+    bool loaded = false;
+    // Kiểm tra xem đã từng cố gắng load texture chưa để tránh việc cố gắng load lại nhiều lần nếu file không tồn tại
+    bool attempted = false;
+};
 
+static ButtonTextureAsset gButtonIdle;
+static ButtonTextureAsset gButtonPressed;
+static ButtonTextureAsset gIconArrowRightPressed;
+static ButtonTextureAsset gIconArrowLeftPressed;
+static ButtonTextureAsset gIconArrowLeftIdle;
+static ButtonTextureAsset gIconArrowRightIdle;
+
+// Lưu trạng thái hover và animation cho mỗi nút, giới hạn tối đa 32 nút để đơn giản hóa
 static bool  gWasHover[32] = {};
 static float gHoverAnim[32] = {};
 static float gPressAnim[32] = {};
 
-// Vùng pixel thật của nút trong ảnh gốc 576x324
+// Vùng pixel thật của nút trong ảnh gốc 576x324 (cắt nút từ ảnh )
 static constexpr Rectangle SRC_IDLE = { 211.0f, 180.0f, 77.0f, 33.0f };
 static constexpr Rectangle SRC_PRESSED = { 319.0f, 178.0f, 75.0f, 35.0f };
 
@@ -30,8 +40,10 @@ static bool IsTextureReadyEx(const Texture2D& tex)
 
 static Texture2D LoadTextureFromCandidates(const char* a, const char* b = nullptr)
 {
-    if (a && FileExists(a)) return LoadTexture(a);
-    if (b && FileExists(b)) return LoadTexture(b);
+    if (a && FileExists(a))
+    {
+        return LoadTexture(a);
+    }
     return Texture2D{};
 }
 
@@ -40,7 +52,7 @@ static void LoadButtonAssets()
     if (!gButtonIdleAttempted)
     {
         gButtonIdleAttempted = true;
-        gButtonIdle = LoadTextureFromCandidates("assets/bg/button1.png", "button1.png");
+        gButtonIdle = LoadTextureFromCandidates("assets/bg/button1.png");
         gButtonIdleLoaded = IsTextureReadyEx(gButtonIdle);
 
         if (!gButtonIdleLoaded)
@@ -52,7 +64,7 @@ static void LoadButtonAssets()
     if (!gButtonPressedAttempted)
     {
         gButtonPressedAttempted = true;
-        gButtonPressed = LoadTextureFromCandidates("assets/bg/button2.png", "button2.png");
+        gButtonPressed = LoadTextureFromCandidates("assets/bg/button2.png");
         gButtonPressedLoaded = IsTextureReadyEx(gButtonPressed);
 
         if (!gButtonPressedLoaded)
