@@ -33,6 +33,9 @@
     <ClCompile Include="src\Control\menu_data.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\Model\Logic.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Image Include="Assets\Texture\background.jpg">
@@ -73,6 +76,12 @@
     <ClInclude Include="src\Model\app_settings.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Shared\Common.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Model\Logic.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Library Include="raylib\lib\raylib.lib" />
@@ -81,6 +90,8 @@
   <ItemGroup>
     <None Include="Assets\audio\menu_hover.ogg" />
     <None Include="Assets\audio\menu_click.ogg" />
+    <None Include="game_progress.dat" />
+    <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
     <Media Include="Assets\audio\lose_sound.mp3" />

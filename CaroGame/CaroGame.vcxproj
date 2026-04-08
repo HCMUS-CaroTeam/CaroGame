@@ -134,6 +134,7 @@
     <ClCompile Include="src\audio_manager.cpp" />
     <ClCompile Include="src\Control\menu_data.cpp" />
     <ClCompile Include="src\main.cpp" />
+    <ClCompile Include="src\Model\Logic.cpp" />
     <ClCompile Include="src\Scenes\MainMenu\ui_background.cpp" />
     <ClCompile Include="src\Scenes\MainMenu\ui_main_menu.cpp" />
   </ItemGroup>
@@ -142,6 +143,7 @@
     <Image Include="x64\Debug\Assets\Texture\background.jpg" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Shared\Common.h" />
     <ClInclude Include="src/Control\input_mouse.h" />
     <ClInclude Include="src/Model\config.h" />
     <ClInclude Include="raylib/include\raylib.h" />
@@ -149,6 +151,7 @@
     <ClInclude Include="raylib\include\rlgl.h" />
     <ClInclude Include="src\Control\menu_data.h" />
     <ClInclude Include="src\Model\app_settings.h" />
+    <ClInclude Include="src\Model\Logic.h" />
     <ClInclude Include="src\Scenes\MainMenu\ui_background.h" />
     <ClInclude Include="src\audio_manager.h" />
     <ClInclude Include="src\Scenes\MainMenu\ui_main_menu.h" />
