@@ -21,9 +21,6 @@
     <ClCompile Include="src\main.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\Scenes\MainMenu\ui_background.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="src/Control\input_mouse.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -31,6 +28,18 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\Control\menu_data.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Scenes\Setup\ui_setup.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Scenes\Play\ui_play.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\View\ui_background.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\View\ui_button.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -61,9 +70,6 @@
     <ClInclude Include="raylib/include\raylib.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\Scenes\MainMenu\ui_background.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="src\Scenes\MainMenu\ui_main_menu.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -71,6 +77,18 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\Model\app_settings.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Scenes\Setup\ui_setup.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Scenes\Play\ui_play.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\View\ui_background.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\View\ui_button.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
