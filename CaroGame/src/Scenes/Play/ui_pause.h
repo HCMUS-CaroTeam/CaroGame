@@ -2,13 +2,17 @@
 #include "raylib.h"
 #include "Control/input_mouse.h"
 #include "Systems/audio_manager.h"
-#include "Control/menu_data.h"
 #include "Model/app_settings.h"
+#include "Control/menu_data.h"
 
-void InitMainMenuUI();
-void ShutdownMainMenuUI();
+void InitPauseUI();
+void ShutdownPauseUI();
 
-void UpdateMainMenuUI(
+void TogglePause();
+void ClosePause();
+bool IsPauseActive();
+
+void UpdatePauseUI(
     const MouseState& mouse,
     float dt,
     AudioAssets& audio,
@@ -17,4 +21,4 @@ void UpdateMainMenuUI(
     bool& shouldClose
 );
 
-void DrawMainMenuUI(Font fontTitle, Font fontSmall, const MouseState& mouse);
+void DrawPauseUI(Font fontTitle, Font fontSmall, const MouseState& mouse);

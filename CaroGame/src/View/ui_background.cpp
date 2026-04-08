@@ -55,28 +55,6 @@ void UnloadBackgroundAssets()
     gBackgroundLoaded = false;
 }
 
-static void DrawBackgroundFallback()
-{
-    ClearBackground(Color{ 10, 10, 28, 255 });
-
-    // vài lớp màu nhẹ để nền đỡ trống nếu thiếu texture
-    DrawCircleGradient(
-        SCREEN_WIDTH / 2,
-        SCREEN_HEIGHT / 3,
-        380.0f,
-        Color{ 40, 40, 90, 90 },
-        Color{ 0, 0, 0, 0 }
-    );
-
-    DrawCircleGradient(
-        SCREEN_WIDTH / 2,
-        SCREEN_HEIGHT,
-        600.0f,
-        Color{ 20, 20, 50, 120 },
-        Color{ 0, 0, 0, 0 }
-    );
-}
-
 static void DrawScaledFullScreen(const Texture2D& tex)
 {
     DrawTexturePro(
@@ -89,22 +67,13 @@ static void DrawScaledFullScreen(const Texture2D& tex)
     );
 }
 
-void DrawBackgroundScene()
+void DrawBackgroundOnly()
 {
     LoadBackgroundAssets();
+    ClearBackground(BLACK);
+    DrawScaledFullScreen(texBackground);
 
-    // 1) nền
-    if (IsTextureReadyEx(texBackground))
-    {
-        ClearBackground(BLACK);
-        DrawScaledFullScreen(texBackground);
-    }
-    else
-    {
-        DrawBackgroundFallback();
-    }
 
-    // 2) overlay tối nhẹ để UI nổi hơn
     DrawRectangle(
         0,
         0,
@@ -113,7 +82,6 @@ void DrawBackgroundScene()
         Color{ 8, 6, 20, 55 }
     );
 
-    // 3) glow nhẹ phía trên trung tâm
     DrawCircleGradient(
         SCREEN_WIDTH / 2,
         160,
@@ -121,23 +89,28 @@ void DrawBackgroundScene()
         Color{ 120, 120, 200, 28 },
         Color{ 0, 0, 0, 0 }
     );
+}
 
-    // 4) logo
+void DrawLogoOnly()
+{
+    LoadBackgroundAssets();
+
     if (IsTextureReadyEx(texLogo))
     {
         const float time = GetTime();
-        const float floatOffsetY = std::sin(time * 1.8f) * 6.0f;
+        const float floatOffsetY = sin(time * 1.8f) * 6.0f;
 
-        const float targetWidth = 900.0f;
+        const float targetWidth = SCREEN_WIDTH * 1.0f;
         const float scale = targetWidth / static_cast<float>(texLogo.width);
         const float targetHeight = static_cast<float>(texLogo.height) * scale;
 
         Rectangle dest{
             SCREEN_WIDTH * 0.5f - targetWidth * 0.5f,
-            35.0f + floatOffsetY,
+            120.0f + floatOffsetY,
             targetWidth,
             targetHeight
         };
+
         DrawTexturePro(
             texLogo,
             Rectangle{ 0.0f, 0.0f, static_cast<float>(texLogo.width), static_cast<float>(texLogo.height) },

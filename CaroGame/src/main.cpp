@@ -2,10 +2,12 @@
 #include "Model/config.h"
 #include "Control/input_mouse.h"
 #include "Scenes/MainMenu/ui_main_menu.h"
-#include "Scenes/MainMenu/ui_background.h"
-#include "audio_manager.h"
+#include "View/ui_background.h"
+#include "Systems/audio_manager.h"
 #include "Model/app_settings.h"
 #include "Control/menu_data.h"
+#include "Scenes/Setup/ui_setup.h"
+#include "Scenes/Play/ui_play.h"
 
 static Font LoadFontSafe(const char* path, int size)
 {
@@ -30,7 +32,8 @@ static void DrawCenteredText(Font font, const char* text, float y, float fontSiz
 
 static void DrawSubScreen(Font fontTitle, Font fontSmall, const char* title, const char* desc)
 {
-    DrawBackgroundScene();
+    DrawBackgroundOnly();
+    DrawLogoOnly();
 
     Rectangle panel{
         SCREEN_WIDTH * 0.5f - 360.0f,
@@ -44,24 +47,20 @@ static void DrawSubScreen(Font fontTitle, Font fontSmall, const char* title, con
 
     DrawCenteredText(fontTitle, title, 395.0f, 42.0f, Color{ 255, 235, 225, 255 });
     DrawCenteredText(fontSmall, desc, 465.0f, 24.0f, Color{ 240, 225, 225, 220 });
-    DrawCenteredText(fontSmall, "PRESS ESC OR LEFT CLICK TO BACK", 515.0f, 22.0f, Color{ 220, 205, 205, 170 });
 }
 
 int main()
 {
     InitWindow(SCREEN_WIDTH, SCREEN_HEIGHT, "Quantum Caro");
+    SetExitKey(KEY_NULL);
     SetTargetFPS(TARGET_FPS);
 
-    // === DEBUG: xóa sau khi tìm ra lỗi ===
-    // In ra thư mục làm việc hiện tại
     TraceLog(LOG_INFO, "Working dir: %s", GetWorkingDirectory());
-
-    // Kiểm tra từng file ảnh
     TraceLog(LOG_INFO, "button1.png (assets/bg/)  : %d", FileExists("assets/bg/button1.png"));
     TraceLog(LOG_INFO, "button1.png (Assets/bg/)  : %d", FileExists("Assets/bg/button1.png"));
     TraceLog(LOG_INFO, "button1.png (root)        : %d", FileExists("button1.png"));
     TraceLog(LOG_INFO, "background.png (assets/bg): %d", FileExists("assets/bg/background.png"));
-    
+
     Font fontTitle = LoadFontSafe(FONT_PATH, 64);
     Font fontSmall = LoadFontSafe(FONT_PATH, 28);
 
@@ -69,11 +68,11 @@ int main()
     AudioAssets audio{};
     InitGameAudio(audio);
     InitMainMenuUI();
+    InitSetupUI();
+    InitPlayUI();
 
     ScreenState currentScreen = SCREEN_MAIN_MENU;
     bool shouldClose = false;
-
-    bool showMenuButtons = true; // false = cất nút
 
     while (!WindowShouldClose() && !shouldClose)
     {
@@ -82,17 +81,27 @@ int main()
 
         UpdateGameAudio(audio, settings);
 
-        if (currentScreen == SCREEN_MAIN_MENU)
+        switch (currentScreen)
         {
-            if (showMenuButtons)
-            {
-                UpdateMainMenuUI(mouse, dt, audio, settings, currentScreen, shouldClose);
-            }
+        case SCREEN_MAIN_MENU:
+            UpdateMainMenuUI(mouse, dt, audio, settings, currentScreen, shouldClose);
+            break;
 
+        case SCREEN_SETUP:
+            UpdateSetupUI(mouse, dt, audio, settings, currentScreen);
+            break;
+
+        case SCREEN_PLAY:
+            UpdatePlayUI(mouse, dt, audio, settings, currentScreen, shouldClose);
+            break;
+
+        case SCREEN_ABOUT:
+        case SCREEN_SETTING:
             if (IsKeyPressed(KEY_ESCAPE))
             {
-                shouldClose = true;
+                currentScreen = SCREEN_MAIN_MENU;
             }
+            break;
         }
 
         BeginDrawing();
@@ -100,19 +109,15 @@ int main()
         switch (currentScreen)
         {
         case SCREEN_MAIN_MENU:
-            if (showMenuButtons)
-            {
-                DrawMainMenuUI(fontTitle, fontSmall, mouse);
-            }
-            else
-            {
-                // chỉ vẽ background + logo
-                DrawBackgroundScene();
-            }
+            DrawMainMenuUI(fontTitle, fontSmall, mouse);
+            break;
+
+        case SCREEN_SETUP:
+            DrawSetupUI(fontTitle, fontSmall, mouse);
             break;
 
         case SCREEN_PLAY:
-            DrawSubScreen(fontTitle, fontSmall, "PLAY", "This screen is ready for your next game scene.");
+            DrawPlayUI(fontTitle, fontSmall, mouse);
             break;
 
         case SCREEN_ABOUT:
@@ -127,7 +132,9 @@ int main()
         EndDrawing();
     }
 
+    ShutdownPlayUI();
     ShutdownMainMenuUI();
+    ShutdownSetupUI();
     ShutdownGameAudio(audio);
     UnloadBackgroundAssets();
 
