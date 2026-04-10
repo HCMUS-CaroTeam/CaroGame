@@ -60,7 +60,10 @@ Vi du:
 - Hitbox và ảnh đều lấy theo:
   + position
   + size
-
+- size tự chỉnh cho từng nút
+- fontSize tự chỉnh cho từng nút
+- textSpacing tự chỉnh cho từng nút
+- icon button thì để fontSize = 0, textSpacing = 0
 => chỉ cần khai báo đúng position và size là vùng bấm và vùng vẽ sẽ đồng bộ.
 ------------------------------------------------------------
 5. Mẫu khai báo cả mảng
@@ -81,10 +84,10 @@ int gExampleButtonCount = sizeof(gExampleButtons) / sizeof(gExampleButtons[0]);
 ------------------------------------------------------------
 
 Text button:
-{ position, size, "TEXT", id, BUTTON_VISUAL_TEXT, BUTTON_ICON_NONE }
+{ Vector2{ x, y }, Vector2{ w, h }, "TEXT", ID, BUTTON_VISUAL_TEXT, BUTTON_ICON_NONE, fontSize, textSpacing }
 
 Icon button:
-{ position, size, "", id, BUTTON_VISUAL_ICON, BUTTON_ICON_ARROW_LEFT / BUTTON_ICON_ARROW_RIGHT }
+{ Vector2{ x, y }, Vector2{ w, h }, "", ID, BUTTON_VISUAL_ICON, BUTTON_ICON_ARROW_LEFT, fontSize, textSpacing }
 
 ============================================================
 */
@@ -92,32 +95,33 @@ Icon button:
 // Main Menu Buttons
 Button gMainMenuButtons[] =
 {
-    { Vector2{ 205.0f, 690.0f },  Vector2{ 280.0f, 80.0f }, "PLAY",    BTN_PLAY,    BUTTON_VISUAL_TEXT, BUTTON_ICON_NONE },
-    { Vector2{ 510.0f, 690.0f },  Vector2{ 280.0f, 80.0f }, "ABOUT",   BTN_ABOUT,   BUTTON_VISUAL_TEXT, BUTTON_ICON_NONE },
-    { Vector2{ 815.0f, 690.0f },  Vector2{ 280.0f, 80.0f }, "SETTING", BTN_SETTING, BUTTON_VISUAL_TEXT, BUTTON_ICON_NONE },
-    { Vector2{ 1120.0f, 690.0f }, Vector2{ 280.0f, 80.0f }, "EXIT",    BTN_EXIT,    BUTTON_VISUAL_TEXT, BUTTON_ICON_NONE }
+    { Vector2{ 205.0f, 690.0f },  Vector2{ 280.0f, 80.0f }, "PLAY",    BTN_PLAY,    BUTTON_VISUAL_TEXT, BUTTON_ICON_NONE, 28.0f, 2.0f },
+    { Vector2{ 510.0f, 690.0f },  Vector2{ 280.0f, 80.0f }, "ABOUT",   BTN_ABOUT,   BUTTON_VISUAL_TEXT, BUTTON_ICON_NONE, 28.0f, 2.0f },
+    { Vector2{ 815.0f, 690.0f },  Vector2{ 280.0f, 80.0f }, "SETTING", BTN_SETTING, BUTTON_VISUAL_TEXT, BUTTON_ICON_NONE, 28.0f, 2.0f },
+    { Vector2{ 1120.0f, 690.0f }, Vector2{ 280.0f, 80.0f }, "EXIT",    BTN_EXIT,    BUTTON_VISUAL_TEXT, BUTTON_ICON_NONE, 28.0f, 2.0f }
 };
 
 int gMainMenuButtonCount = sizeof(gMainMenuButtons) / sizeof(gMainMenuButtons[0]);
 
-// Setup Screen Buttons
 Button gSetupButtons[] =
 {
-    { Vector2{ SCREEN_WIDTH * 0.5f - 140.0f, 690.0f }, Vector2{ 280.0f, 80.0f }, "PLAY", SETUP_BTN_PLAY, BUTTON_VISUAL_TEXT, BUTTON_ICON_NONE },
-    { Vector2{ SCREEN_WIDTH * 0.5f - 140.0f, 770.0f }, Vector2{ 280.0f, 80.0f }, "BACK", SETUP_BTN_BACK, BUTTON_VISUAL_TEXT, BUTTON_ICON_NONE },
+    { Vector2{ SCREEN_WIDTH * 0.5f - 140.0f, 690.0f }, Vector2{ 280.0f, 80.0f }, "PLAY", SETUP_BTN_PLAY, BUTTON_VISUAL_TEXT, BUTTON_ICON_NONE, 28.0f, 2.0f },
+    { Vector2{ SCREEN_WIDTH * 0.5f - 140.0f, 770.0f }, Vector2{ 280.0f, 80.0f }, "BACK", SETUP_BTN_BACK, BUTTON_VISUAL_TEXT, BUTTON_ICON_NONE, 28.0f, 2.0f },
+
+    { Vector2{ SCREEN_WIDTH * 0.5f - 220.0f, 560.0f }, Vector2{ 64.0f, 64.0f }, "", SETUP_BTN_ARROW_LEFT,  BUTTON_VISUAL_ICON, BUTTON_ICON_ARROW_LEFT, 0.0f, 0.0f },
+    { Vector2{ SCREEN_WIDTH * 0.5f + 156.0f, 560.0f }, Vector2{ 64.0f, 64.0f }, "", SETUP_BTN_ARROW_RIGHT, BUTTON_VISUAL_ICON, BUTTON_ICON_ARROW_RIGHT, 0.0f, 0.0f }
 };
 
 int gSetupButtonCount = sizeof(gSetupButtons) / sizeof(gSetupButtons[0]);
 
-// Pause Menu Buttons
 Button gPauseButtons[] =
 {
-    { Vector2{ SCREEN_WIDTH * 0.5f - 160.0f, 370.0f }, Vector2{ 320.0f, 50.0f }, "CONTINUE",        PAUSE_BTN_CONTINUE,     BUTTON_VISUAL_TEXT, BUTTON_ICON_NONE },
-    { Vector2{ SCREEN_WIDTH * 0.5f - 160.0f, 436.0f }, Vector2{ 320.0f, 50.0f }, "SETTING",         PAUSE_BTN_SETTING,      BUTTON_VISUAL_TEXT, BUTTON_ICON_NONE },
-    { Vector2{ SCREEN_WIDTH * 0.5f - 160.0f, 502.0f }, Vector2{ 320.0f, 50.0f }, "SAVE",            PAUSE_BTN_SAVE,         BUTTON_VISUAL_TEXT, BUTTON_ICON_NONE },
-    { Vector2{ SCREEN_WIDTH * 0.5f - 160.0f, 568.0f }, Vector2{ 320.0f, 50.0f }, "LOAD",            PAUSE_BTN_LOAD,         BUTTON_VISUAL_TEXT, BUTTON_ICON_NONE },
-    { Vector2{ SCREEN_WIDTH * 0.5f - 160.0f, 634.0f }, Vector2{ 320.0f, 50.0f }, "EXIT TO MENU",    PAUSE_BTN_EXIT_MENU,    BUTTON_VISUAL_TEXT, BUTTON_ICON_NONE },
-    { Vector2{ SCREEN_WIDTH * 0.5f - 160.0f, 700.0f }, Vector2{ 320.0f, 50.0f }, "EXIT TO DESKTOP", PAUSE_BTN_EXIT_DESKTOP, BUTTON_VISUAL_TEXT, BUTTON_ICON_NONE }
+    { Vector2{ SCREEN_WIDTH * 0.5f - 160.0f, 370.0f }, Vector2{ 320.0f, 50.0f }, "CONTINUE",        PAUSE_BTN_CONTINUE,     BUTTON_VISUAL_TEXT, BUTTON_ICON_NONE, 20.0f, 1.0f },
+    { Vector2{ SCREEN_WIDTH * 0.5f - 160.0f, 436.0f }, Vector2{ 320.0f, 50.0f }, "SETTING",         PAUSE_BTN_SETTING,      BUTTON_VISUAL_TEXT, BUTTON_ICON_NONE, 20.0f, 1.0f },
+    { Vector2{ SCREEN_WIDTH * 0.5f - 160.0f, 502.0f }, Vector2{ 320.0f, 50.0f }, "SAVE",            PAUSE_BTN_SAVE,         BUTTON_VISUAL_TEXT, BUTTON_ICON_NONE, 20.0f, 1.0f },
+    { Vector2{ SCREEN_WIDTH * 0.5f - 160.0f, 568.0f }, Vector2{ 320.0f, 50.0f }, "LOAD",            PAUSE_BTN_LOAD,         BUTTON_VISUAL_TEXT, BUTTON_ICON_NONE, 20.0f, 1.0f },
+    { Vector2{ SCREEN_WIDTH * 0.5f - 160.0f, 634.0f }, Vector2{ 320.0f, 50.0f }, "EXIT TO MENU",    PAUSE_BTN_EXIT_MENU,    BUTTON_VISUAL_TEXT, BUTTON_ICON_NONE, 20.0f, 1.0f },
+    { Vector2{ SCREEN_WIDTH * 0.5f - 160.0f, 700.0f }, Vector2{ 320.0f, 50.0f }, "EXIT TO DESKTOP", PAUSE_BTN_EXIT_DESKTOP, BUTTON_VISUAL_TEXT, BUTTON_ICON_NONE, 20.0f, 1.0f }
 };
 
 int gPauseButtonCount = sizeof(gPauseButtons) / sizeof(gPauseButtons[0]);
