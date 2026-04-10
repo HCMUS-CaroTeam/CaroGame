@@ -8,7 +8,7 @@
 #include "Control/menu_data.h"
 #include "Scenes/Setup/ui_setup.h"
 #include "Scenes/Play/ui_play.h"
-#include "View/ui_frame.h"
+#include "View/ui_button.h"
 
 static Font LoadFontSafe(const char* path, int size)
 {
@@ -56,22 +56,17 @@ int main()
     SetExitKey(KEY_NULL);
     SetTargetFPS(TARGET_FPS);
 
-    TraceLog(LOG_INFO, "Working dir: %s", GetWorkingDirectory());
-    TraceLog(LOG_INFO, "button1.png (assets/bg/)  : %d", FileExists("assets/bg/button1.png"));
-    TraceLog(LOG_INFO, "button1.png (Assets/bg/)  : %d", FileExists("Assets/bg/button1.png"));
-    TraceLog(LOG_INFO, "button1.png (root)        : %d", FileExists("button1.png"));
-    TraceLog(LOG_INFO, "background.png (assets/bg): %d", FileExists("assets/bg/background.png"));
-
     Font fontTitle = LoadFontSafe(FONT_PATH, 64);
     Font fontSmall = LoadFontSafe(FONT_PATH, 28);
 
     AppSettings settings{};
     AudioAssets audio{};
+
     InitGameAudio(audio);
+    InitUIButtonSystem();
     InitMainMenuUI();
     InitSetupUI();
     InitPlayUI();
-    InitUIFrameSystem();
 
     ScreenState currentScreen = SCREEN_MAIN_MENU;
     bool shouldClose = false;
@@ -95,14 +90,6 @@ int main()
 
         case SCREEN_PLAY:
             UpdatePlayUI(mouse, dt, audio, settings, currentScreen, shouldClose);
-            break;
-
-        case SCREEN_ABOUT:
-        case SCREEN_SETTING:
-            if (IsKeyPressed(KEY_ESCAPE))
-            {
-                currentScreen = SCREEN_MAIN_MENU;
-            }
             break;
         }
 
@@ -135,11 +122,10 @@ int main()
     }
 
     ShutdownPlayUI();
-    ShutdownMainMenuUI();
     ShutdownSetupUI();
+    ShutdownMainMenuUI();
+    ShutdownUIButtonSystem();
     ShutdownGameAudio(audio);
-    ShutdownUIFrameSystem();
-
     UnloadBackgroundAssets();
 
     if (FileExists(FONT_PATH))

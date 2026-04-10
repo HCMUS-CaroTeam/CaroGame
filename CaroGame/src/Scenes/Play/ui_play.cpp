@@ -1,7 +1,8 @@
 #include "Scenes/Play/ui_play.h"
 #include "View/ui_background.h"
+#include "View/ui_button.h"
 #include "Model/config.h"
-#include "Scenes/Play/ui_pause.h"
+#include "Control/menu_data.h"
 
 static constexpr int BOARD_SIZE = 8;
 static constexpr int CELL_SIZE = 72;
@@ -22,6 +23,8 @@ static int gBoard[BOARD_SIZE][BOARD_SIZE] = {};
 static int gCurrentPlayer = CELL_X;
 static int gWinner = CELL_EMPTY;
 static bool gDraw = false;
+static bool gPaused = false;
+static const char* gPauseMessage = "";
 
 static Rectangle GetBoardRect()
 {
@@ -46,7 +49,8 @@ static void ResetBoard()
     gCurrentPlayer = CELL_X;
     gWinner = CELL_EMPTY;
     gDraw = false;
-    ClosePause();
+    gPaused = false;
+    gPauseMessage = "";
 }
 
 static bool IsInsideBoard(Vector2 pos)
@@ -232,15 +236,114 @@ static void DrawPieces(Font fontTitle)
     }
 }
 
+static void UpdatePauseMenu(
+    const MouseState& mouse,
+    float dt,
+    AudioAssets& audio,
+    const AppSettings& settings,
+    ScreenState& currentScreen,
+    bool& shouldClose
+)
+{
+    for (int i = 0; i < gPauseButtonCount; ++i)
+    {
+        const int animIndex = 20 + i;
+
+        bool hovered = false;
+        bool pressed = false;
+
+        UpdateUIButton(
+            animIndex,
+            gPauseButtons[i],
+            mouse,
+            dt,
+            audio,
+            settings,
+            hovered,
+            pressed
+        );
+
+        if (hovered && mouse.leftPressed)
+        {
+            PlayMenuClick(audio, settings);
+
+            switch (gPauseButtons[i].id)
+            {
+            case PAUSE_BTN_CONTINUE:
+                gPaused = false;
+                gPauseMessage = "";
+                break;
+
+            case PAUSE_BTN_SETTING:
+                currentScreen = SCREEN_SETTING;
+                gPaused = false;
+                gPauseMessage = "";
+                break;
+
+            case PAUSE_BTN_SAVE:
+                gPauseMessage = "SAVE NOT IMPLEMENTED YET";
+                break;
+
+            case PAUSE_BTN_LOAD:
+                gPauseMessage = "LOAD NOT IMPLEMENTED YET";
+                break;
+
+            case PAUSE_BTN_EXIT_MENU:
+                gPaused = false;
+                gPauseMessage = "";
+                currentScreen = SCREEN_MAIN_MENU;
+                break;
+
+            case PAUSE_BTN_EXIT_DESKTOP:
+                gPaused = false;
+                gPauseMessage = "";
+                shouldClose = true;
+                break;
+            }
+        }
+    }
+}
+
+static void DrawPauseOverlay(Font fontTitle, Font fontSmall, const MouseState& mouse)
+{
+    DrawRectangle(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, Color{ 0, 0, 0, 150 });
+
+    Rectangle panel{
+        SCREEN_WIDTH * 0.5f - 240.0f,
+        SCREEN_HEIGHT * 0.5f - 250.0f,
+        480.0f,
+        500.0f
+    };
+
+    DrawRectangleRounded(panel, 0.08f, 12, Color{ 20, 16, 35, 235 });
+    DrawRectangleRoundedLinesEx(panel, 0.08f, 12, 3.0f, Color{ 220, 230, 255, 220 });
+
+    DrawCenteredText(fontTitle, "PAUSE", panel.y + 32.0f, 36.0f, Color{ 255, 235, 225, 255 });
+
+    for (int i = 0; i < gPauseButtonCount; ++i)
+    {
+        const int animIndex = 20 + i;
+
+        Rectangle hitRect = GetButtonRect(gPauseButtons[i]);
+        bool hovered = IsMouseOverRect(mouse, hitRect);
+        bool pressed = hovered && mouse.leftDown;
+
+        DrawUIButton(animIndex, gPauseButtons[i], fontSmall, hovered, pressed);
+    }
+
+    if (gPauseMessage && gPauseMessage[0] != '\0')
+    {
+        DrawCenteredText(fontSmall, gPauseMessage, panel.y + panel.height - 44.0f, 20.0f, Color{ 255, 210, 210, 220 });
+    }
+}
+
 void InitPlayUI()
 {
     ResetBoard();
-    InitPauseUI();
 }
 
 void ShutdownPlayUI()
 {
-    ShutdownPauseUI();
 }
 
 void UpdatePlayUI(
@@ -260,13 +363,14 @@ void UpdatePlayUI(
 
     if (IsKeyPressed(KEY_ESCAPE))
     {
-        TogglePause();
+        gPaused = !gPaused;
+        gPauseMessage = "";
         return;
     }
 
-    if (IsPauseActive())
+    if (gPaused)
     {
-        UpdatePauseUI(mouse, dt, audio, settings, currentScreen, shouldClose);
+        UpdatePauseMenu(mouse, dt, audio, settings, currentScreen, shouldClose);
         return;
     }
 
@@ -327,8 +431,8 @@ void DrawPlayUI(Font fontTitle, Font fontSmall, const MouseState& mouse)
     DrawBoardGrid();
     DrawPieces(fontTitle);
 
-    if (IsPauseActive())
+    if (gPaused)
     {
-        DrawPauseUI(fontTitle, fontSmall, mouse);
+        DrawPauseOverlay(fontTitle, fontSmall, mouse);
     }
 }
