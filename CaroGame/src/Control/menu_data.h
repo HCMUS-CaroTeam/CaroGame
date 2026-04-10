@@ -12,19 +12,16 @@ enum ButtonVisualType
 enum ButtonIconType
 {
     BUTTON_ICON_NONE = 0,
-
-    BUTTON_ICON_ARROW_RIGHT_GREEN,
-    BUTTON_ICON_ARROW_LEFT_GREEN,
-    BUTTON_ICON_ARROW_LEFT_PINK,
-    BUTTON_ICON_ARROW_RIGHT_PINK
+    BUTTON_ICON_ARROW_RIGHT,
+    BUTTON_ICON_ARROW_LEFT
 };
+
 struct Button
 {
     Vector2 position;
     Vector2 size;
     string title;
     int id;
-
     ButtonVisualType visualType;
     ButtonIconType iconType;
 };
@@ -40,7 +37,9 @@ enum MainMenuButtonId
 enum SetupButtonId
 {
     SETUP_BTN_PLAY = 100,
-    SETUP_BTN_BACK
+    SETUP_BTN_BACK,
+    SETUP_BTN_ARROW_LEFT,
+    SETUP_BTN_ARROW_RIGHT
 };
 
 enum PauseButtonId

@@ -1,32 +1,123 @@
 #include "Control/menu_data.h"
 #include "Model/config.h"
 
+/*
+============================================================
+HUONG DAN KHAI BAO BUTTON TRONG PROJECT
+============================================================
+
+1. Cau truc Button
+
+struct Button
+{
+    Vector2 position;         // toa do goc trai tren cua nut
+    Vector2 size;             // kich thuoc nut
+    string title;             // text hien thi, icon button thi de ""
+    int id;                   // ma nut de xu ly click
+    ButtonVisualType visualType; // loai nut: text hoac icon
+    ButtonIconType iconType;     // loai icon, text button thi de BUTTON_ICON_NONE
+};
+
+------------------------------------------------------------
+2. Template TEXT BUTTON
+------------------------------------------------------------
+
+{ Vector2{ posX, posY }, Vector2{ width, height }, "TEXT", BUTTON_ID, BUTTON_VISUAL_TEXT, BUTTON_ICON_NONE }
+
+Vi du:
+{ Vector2{ 205.0f, 690.0f }, Vector2{ 280.0f, 80.0f }, "PLAY", BTN_PLAY, BUTTON_VISUAL_TEXT, BUTTON_ICON_NONE }
+
+------------------------------------------------------------
+3. Template ICON BUTTON
+------------------------------------------------------------
+
+{ Vector2{ posX, posY }, Vector2{ width, height }, "", BUTTON_ID, BUTTON_VISUAL_ICON, BUTTON_ICON_ARROW_LEFT }
+
+hoac
+
+{ Vector2{ posX, posY }, Vector2{ width, height }, "", BUTTON_ID, BUTTON_VISUAL_ICON, BUTTON_ICON_ARROW_RIGHT }
+
+Vi du:
+{ Vector2{ SCREEN_WIDTH * 0.5f - 220.0f, 560.0f }, Vector2{ 64.0f, 64.0f }, "", SETUP_BTN_ARROW_LEFT, BUTTON_VISUAL_ICON, BUTTON_ICON_ARROW_LEFT }
+
+{ Vector2{ SCREEN_WIDTH * 0.5f + 156.0f, 560.0f }, Vector2{ 64.0f, 64.0f }, "", SETUP_BTN_ARROW_RIGHT, BUTTON_VISUAL_ICON, BUTTON_ICON_ARROW_RIGHT }
+
+------------------------------------------------------------
+4. Quy tac dung
+------------------------------------------------------------
+
+- Text button:
+  + có chữ
+  + visualType = BUTTON_VISUAL_TEXT
+  + iconType = BUTTON_ICON_NONE
+
+- Icon button:
+  + không có chữ
+  + title = ""
+  + visualType = BUTTON_VISUAL_ICON
+  + iconType phải chọn đúng mũi tên trái / phải
+
+- Hitbox và ảnh đều lấy theo:
+  + position
+  + size
+
+=> chỉ cần khai báo đúng position và size là vùng bấm và vùng vẽ sẽ đồng bộ.
+------------------------------------------------------------
+5. Mẫu khai báo cả mảng
+------------------------------------------------------------
+
+Button gExampleButtons[] =
+{
+    { Vector2{ 200.0f, 700.0f }, Vector2{ 280.0f, 80.0f }, "PLAY", BTN_PLAY, BUTTON_VISUAL_TEXT, BUTTON_ICON_NONE },
+    { Vector2{ 500.0f, 700.0f }, Vector2{ 280.0f, 80.0f }, "BACK", BTN_BACK, BUTTON_VISUAL_TEXT, BUTTON_ICON_NONE },
+    { Vector2{ 900.0f, 560.0f }, Vector2{ 64.0f, 64.0f }, "", BTN_LEFT, BUTTON_VISUAL_ICON, BUTTON_ICON_ARROW_LEFT },
+    { Vector2{ 980.0f, 560.0f }, Vector2{ 64.0f, 64.0f }, "", BTN_RIGHT, BUTTON_VISUAL_ICON, BUTTON_ICON_ARROW_RIGHT }
+};
+
+int gExampleButtonCount = sizeof(gExampleButtons) / sizeof(gExampleButtons[0]);
+
+------------------------------------------------------------
+6. Tom tat nhanh
+------------------------------------------------------------
+
+Text button:
+{ position, size, "TEXT", id, BUTTON_VISUAL_TEXT, BUTTON_ICON_NONE }
+
+Icon button:
+{ position, size, "", id, BUTTON_VISUAL_ICON, BUTTON_ICON_ARROW_LEFT / BUTTON_ICON_ARROW_RIGHT }
+
+============================================================
+*/
+
+// Main Menu Buttons
 Button gMainMenuButtons[] =
 {
-    { Vector2{ 205.0f, 690.0f }, "PLAY",    BTN_PLAY    },
-    { Vector2{ 510.0f, 690.0f }, "ABOUT",   BTN_ABOUT   },
-    { Vector2{ 815.0f, 690.0f }, "SETTING", BTN_SETTING },
-    { Vector2{ 1120.0f, 690.0f }, "EXIT",   BTN_EXIT    }
+    { Vector2{ 205.0f, 690.0f },  Vector2{ 280.0f, 80.0f }, "PLAY",    BTN_PLAY,    BUTTON_VISUAL_TEXT, BUTTON_ICON_NONE },
+    { Vector2{ 510.0f, 690.0f },  Vector2{ 280.0f, 80.0f }, "ABOUT",   BTN_ABOUT,   BUTTON_VISUAL_TEXT, BUTTON_ICON_NONE },
+    { Vector2{ 815.0f, 690.0f },  Vector2{ 280.0f, 80.0f }, "SETTING", BTN_SETTING, BUTTON_VISUAL_TEXT, BUTTON_ICON_NONE },
+    { Vector2{ 1120.0f, 690.0f }, Vector2{ 280.0f, 80.0f }, "EXIT",    BTN_EXIT,    BUTTON_VISUAL_TEXT, BUTTON_ICON_NONE }
 };
 
 int gMainMenuButtonCount = sizeof(gMainMenuButtons) / sizeof(gMainMenuButtons[0]);
 
+// Setup Screen Buttons
 Button gSetupButtons[] =
 {
-    { Vector2{ SCREEN_WIDTH * 0.5f - 140.0f, 690.0f }, "PLAY", SETUP_BTN_PLAY },
-    { Vector2{ SCREEN_WIDTH * 0.5f - 140.0f, 770.0f }, "BACK", SETUP_BTN_BACK }
+    { Vector2{ SCREEN_WIDTH * 0.5f - 140.0f, 690.0f }, Vector2{ 280.0f, 80.0f }, "PLAY", SETUP_BTN_PLAY, BUTTON_VISUAL_TEXT, BUTTON_ICON_NONE },
+    { Vector2{ SCREEN_WIDTH * 0.5f - 140.0f, 770.0f }, Vector2{ 280.0f, 80.0f }, "BACK", SETUP_BTN_BACK, BUTTON_VISUAL_TEXT, BUTTON_ICON_NONE },
 };
 
 int gSetupButtonCount = sizeof(gSetupButtons) / sizeof(gSetupButtons[0]);
 
+// Pause Menu Buttons
 Button gPauseButtons[] =
 {
-    { Vector2{ SCREEN_WIDTH * 0.5f - 140.0f, 270.0f }, "CONTINUE",        PAUSE_BTN_CONTINUE     },
-    { Vector2{ SCREEN_WIDTH * 0.5f - 140.0f, 340.0f }, "SETTING",         PAUSE_BTN_SETTING      },
-    { Vector2{ SCREEN_WIDTH * 0.5f - 140.0f, 410.0f }, "SAVE",            PAUSE_BTN_SAVE         },
-    { Vector2{ SCREEN_WIDTH * 0.5f - 140.0f, 480.0f }, "LOAD",            PAUSE_BTN_LOAD         },
-    { Vector2{ SCREEN_WIDTH * 0.5f - 140.0f, 550.0f }, "EXIT TO MENU",    PAUSE_BTN_EXIT_MENU    },
-    { Vector2{ SCREEN_WIDTH * 0.5f - 140.0f, 620.0f }, "EXIT TO DESKTOP", PAUSE_BTN_EXIT_DESKTOP }
+    { Vector2{ SCREEN_WIDTH * 0.5f - 160.0f, 370.0f }, Vector2{ 320.0f, 50.0f }, "CONTINUE",        PAUSE_BTN_CONTINUE,     BUTTON_VISUAL_TEXT, BUTTON_ICON_NONE },
+    { Vector2{ SCREEN_WIDTH * 0.5f - 160.0f, 436.0f }, Vector2{ 320.0f, 50.0f }, "SETTING",         PAUSE_BTN_SETTING,      BUTTON_VISUAL_TEXT, BUTTON_ICON_NONE },
+    { Vector2{ SCREEN_WIDTH * 0.5f - 160.0f, 502.0f }, Vector2{ 320.0f, 50.0f }, "SAVE",            PAUSE_BTN_SAVE,         BUTTON_VISUAL_TEXT, BUTTON_ICON_NONE },
+    { Vector2{ SCREEN_WIDTH * 0.5f - 160.0f, 568.0f }, Vector2{ 320.0f, 50.0f }, "LOAD",            PAUSE_BTN_LOAD,         BUTTON_VISUAL_TEXT, BUTTON_ICON_NONE },
+    { Vector2{ SCREEN_WIDTH * 0.5f - 160.0f, 634.0f }, Vector2{ 320.0f, 50.0f }, "EXIT TO MENU",    PAUSE_BTN_EXIT_MENU,    BUTTON_VISUAL_TEXT, BUTTON_ICON_NONE },
+    { Vector2{ SCREEN_WIDTH * 0.5f - 160.0f, 700.0f }, Vector2{ 320.0f, 50.0f }, "EXIT TO DESKTOP", PAUSE_BTN_EXIT_DESKTOP, BUTTON_VISUAL_TEXT, BUTTON_ICON_NONE }
 };
 
 int gPauseButtonCount = sizeof(gPauseButtons) / sizeof(gPauseButtons[0]);
