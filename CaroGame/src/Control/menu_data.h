@@ -24,6 +24,9 @@ struct Button
     int id;
     ButtonVisualType visualType;
     ButtonIconType iconType;
+
+    float fontSize;
+    float textSpacing;
 };
 
 enum MainMenuButtonId

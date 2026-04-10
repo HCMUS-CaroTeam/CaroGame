@@ -271,8 +271,8 @@ void DrawUIButton(
     }
 
     const char* text = button.title.c_str();
-    const float fontSize = 28.0f;
-    const float spacing = 2.0f;
+    const float fontSize = button.fontSize;
+    const float spacing = button.textSpacing;
 
     Vector2 textSize = MeasureTextEx(fontTitle, text, fontSize, spacing);
     Vector2 textPos{
