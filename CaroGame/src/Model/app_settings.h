@@ -14,4 +14,8 @@ struct AppSettings
     bool highlightLastMove = true;
     bool winLineAnimation = true;
     bool showCoordinates = false;
+
+	int gameMode = 1; // 1: PvP, 2: PvE
+	int botDifficulty = 1; // 1: Easy, 2: Medium, 3: Hard
+	int pvpMode = 1; // 1: Classic, 2: Tournament
 };

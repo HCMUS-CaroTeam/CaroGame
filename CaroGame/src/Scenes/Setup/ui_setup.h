@@ -12,7 +12,7 @@ void UpdateSetupUI(
     const MouseState& mouse,
     float dt,
     AudioAssets& audio,
-    const AppSettings& settings,
+    AppSettings& settings,
     ScreenState& currentScreen
 );
 

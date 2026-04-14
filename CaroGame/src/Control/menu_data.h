@@ -21,6 +21,10 @@ enum MainMenuButtonId
 enum SetupButtonId
 {
     SETUP_BTN_PLAY = 100,
+	SETUP_BTN_PVP,
+	SETUP_BTN_PVE,
+    SETUP_BTN_PREV,
+	SETUP_BTN_NEXT,
     SETUP_BTN_BACK
 };
 

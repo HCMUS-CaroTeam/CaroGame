@@ -1,4 +1,4 @@
-#include "Scenes/Setup/ui_setup.h"
+﻿#include "Scenes/Setup/ui_setup.h"
 #include "View/ui_background.h"
 #include "View/ui_button.h"
 #include "Model/config.h"
@@ -28,7 +28,7 @@ void UpdateSetupUI(
     const MouseState& mouse,
     float dt,
     AudioAssets& audio,
-    const AppSettings& settings,
+    AppSettings& settings,
     ScreenState& currentScreen
 )
 {
@@ -56,8 +56,40 @@ void UpdateSetupUI(
 
             switch (gSetupButtons[i].id)
             {
+            case SETUP_BTN_PVE: // Người chơi bấm chuyển tab PVE
+                settings.gameMode = 1;
+                break;
+
+            case SETUP_BTN_PVP: // Người chơi bấm chuyển tab PVP
+                settings.gameMode = 2;
+                break;
+
+            case SETUP_BTN_PREV: // NÚT MŨI TÊN TRÁI (<)
+                if (settings.gameMode == 1) {
+                    // Đang ở tab PVE -> Xoay vòng Boss (1 đến 3)
+                    settings.botDifficulty--;
+                    if (settings.botDifficulty < 1) settings.botDifficulty = 3;
+                }
+                else if (settings.gameMode == 2) {
+                    // Đang ở tab PVP -> Xoay vòng chế độ PvP (1 đến 2)
+                    settings.pvpMode--;
+                    if (settings.pvpMode < 1) settings.pvpMode = 2;
+                }
+                break;
+
+            case SETUP_BTN_NEXT: // NÚT MŨI TÊN PHẢI (>)
+                if (settings.gameMode == 1) {
+                    settings.botDifficulty++;
+                    if (settings.botDifficulty > 3) settings.botDifficulty = 1;
+                }
+                else if (settings.gameMode == 2) {
+                    settings.pvpMode++;
+                    if (settings.pvpMode > 2) settings.pvpMode = 1;
+                }
+                break;
+
             case SETUP_BTN_PLAY:
-                currentScreen = SCREEN_PLAY;
+                currentScreen = SCREEN_PLAY; // Xong xuôi thì bay vào game
                 break;
 
             case SETUP_BTN_BACK:

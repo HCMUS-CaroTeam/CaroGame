@@ -14,6 +14,10 @@ int gMainMenuButtonCount = sizeof(gMainMenuButtons) / sizeof(gMainMenuButtons[0]
 Button gSetupButtons[] =
 {
     { Vector2{ SCREEN_WIDTH * 0.5f - 140.0f, 690.0f }, "PLAY", SETUP_BTN_PLAY },
+    { Vector2{ SCREEN_WIDTH * 0.5f - 140.0f, 690.0f }, "PVP", SETUP_BTN_PVP },
+    { Vector2{ SCREEN_WIDTH * 0.5f - 140.0f, 690.0f }, "PVE", SETUP_BTN_PVE },
+    { Vector2{ SCREEN_WIDTH * 0.5f - 140.0f, 690.0f }, "PREV", SETUP_BTN_PREV },
+    { Vector2{ SCREEN_WIDTH * 0.5f - 140.0f, 690.0f }, "NEXT", SETUP_BTN_NEXT },
     { Vector2{ SCREEN_WIDTH * 0.5f - 140.0f, 770.0f }, "BACK", SETUP_BTN_BACK }
 };
 
