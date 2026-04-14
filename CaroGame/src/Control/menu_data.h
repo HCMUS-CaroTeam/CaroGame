@@ -3,11 +3,30 @@
 #include <string>
 using namespace std;
 
+enum ButtonVisualType
+{
+    BUTTON_VISUAL_TEXT = 0,
+    BUTTON_VISUAL_ICON
+};
+
+enum ButtonIconType
+{
+    BUTTON_ICON_NONE = 0,
+    BUTTON_ICON_ARROW_RIGHT,
+    BUTTON_ICON_ARROW_LEFT
+};
+
 struct Button
 {
     Vector2 position;
+    Vector2 size;
     string title;
     int id;
+    ButtonVisualType visualType;
+    ButtonIconType iconType;
+
+    float fontSize;
+    float textSpacing;
 };
 
 enum MainMenuButtonId
@@ -21,10 +40,10 @@ enum MainMenuButtonId
 enum SetupButtonId
 {
     SETUP_BTN_PLAY = 100,
-	SETUP_BTN_PVP,
-	SETUP_BTN_PVE,
+    SETUP_BTN_PVP,
+    SETUP_BTN_PVE,
     SETUP_BTN_PREV,
-	SETUP_BTN_NEXT,
+    SETUP_BTN_NEXT,
     SETUP_BTN_BACK
 };
 

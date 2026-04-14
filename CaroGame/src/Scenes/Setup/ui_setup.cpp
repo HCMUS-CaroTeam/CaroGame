@@ -105,12 +105,36 @@ void UpdateSetupUI(
     }
 }
 
-void DrawSetupUI(Font fontTitle, Font fontSmall, const MouseState& mouse)
+void DrawSetupUI(Font fontTitle, Font fontSmall, const MouseState& mouse, const AppSettings& settings)
 {
     DrawBackgroundOnly();
     DrawLogoOnly();
 
-    DrawCenteredText(fontSmall, "SETUP SCREEN PLACEHOLDER", 610.0f, 24.0f, Color{ 235, 225, 230, 210 });
+    // --- BẮT ĐẦU VẼ CAROUSEL ---
+    const char* carouselText = "";
+    Color textColor = WHITE;
+
+    if (settings.gameMode == 1)
+    {
+        // CHẾ ĐỘ PVE
+        if (settings.botDifficulty == 1) carouselText = "BOSS 1: KE TAU HAI";
+        else if (settings.botDifficulty == 2) carouselText = "BOSS 2: KE HUY DIET";
+        else if (settings.botDifficulty == 3) carouselText = "BOSS 3: CHUA TE CARO";
+
+        textColor = GREEN;
+    }
+    else if (settings.gameMode == 2)
+    {
+        // CHẾ ĐỘ PVP
+        if (settings.pvpMode == 1) carouselText = "MODE: CLASSIC (TRUYEN THONG)";
+        else if (settings.pvpMode == 2) carouselText = "MODE: TOURNAMENT (CHAN 2 DAU)";
+
+        textColor = RED;
+    }
+
+    // Đẩy chữ ra giữa màn hình
+    DrawCenteredText(fontSmall, carouselText, 610.0f, 30.0f, textColor);
+    // --- KẾT THÚC VẼ CAROUSEL ---
 
     for (int i = 0; i < gSetupButtonCount; ++i)
     {
