@@ -275,9 +275,14 @@ void DrawUIButton(
     const float spacing = button.textSpacing;
 
     Vector2 textSize = MeasureTextEx(fontTitle, text, fontSize, spacing);
+
+    // Font pixel art thường có padding dưới trong bounding box khiến chữ lệch xuống
+    // Chỉnh TEXT_OFFSET_Y để căn chữ đúng giữa nút (âm = lên trên, dương = xuống dưới)
+    static constexpr float TEXT_OFFSET_Y = -6.0f;
+
     Vector2 textPos{
-        drawRect.x + drawRect.width * 0.5f - textSize.x * 0.5f,
-        drawRect.y + drawRect.height * 0.5f - textSize.y * 0.5f
+        drawRect.x + drawRect.width  * 0.5f - textSize.x * 0.5f,
+        drawRect.y + drawRect.height * 0.5f - textSize.y * 0.5f + TEXT_OFFSET_Y
     };
 
     if (hovered && !pressed)

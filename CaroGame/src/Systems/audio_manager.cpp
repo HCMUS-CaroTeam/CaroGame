@@ -69,7 +69,7 @@ void ShutdownGameAudio(AudioAssets& audio)
 
 void PlayMenuClick(AudioAssets& audio, const AppSettings& settings)
 {
-    if (!settings.menuClickSound) return;
+    (void)settings;
     if (!audio.clickLoaded) return;
 
     StopSound(audio.clickSound);
