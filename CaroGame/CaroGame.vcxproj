@@ -131,6 +131,8 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="src/Control\input_mouse.cpp" />
+    <ClCompile Include="src\Scenes\About\ui_about.cpp" />
+    <ClCompile Include="src\Scenes\Setting\ui_setting.cpp" />
     <ClCompile Include="src\Systems\audio_manager.cpp" />
     <ClCompile Include="src\Control\menu_data.cpp" />
     <ClCompile Include="src\main.cpp" />
@@ -165,6 +167,8 @@
     <ClInclude Include="src\Scenes\MainMenu\ui_main_menu.h" />
     <ClInclude Include="src\Scenes\Play\ui_pause.h" />
     <ClInclude Include="src\Scenes\Play\ui_play.h" />
+    <ClInclude Include="src\Scenes\About\ui_about.h" />
+    <ClInclude Include="src\Scenes\Setting\ui_setting.h" />
     <ClInclude Include="src\Scenes\Setup\ui_setup.h" />
     <ClInclude Include="src\Systems\audio_manager.h" />
     <ClInclude Include="src\View\ui_background.h" />

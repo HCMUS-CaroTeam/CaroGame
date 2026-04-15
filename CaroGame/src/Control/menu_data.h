@@ -72,3 +72,19 @@ extern int gSetupButtonCount;
 
 extern Button gPauseButtons[];
 extern int gPauseButtonCount;
+
+enum SettingButtonId
+{
+    SETTING_BTN_BACK = 300
+};
+
+extern Button gSettingButtons[];
+extern int gSettingButtonCount;
+
+enum AboutButtonId
+{
+    ABOUT_BTN_BACK = 400
+};
+
+extern Button gAboutButtons[];
+extern int gAboutButtonCount;

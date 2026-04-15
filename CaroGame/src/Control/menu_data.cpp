@@ -116,12 +116,27 @@ int gSetupButtonCount = sizeof(gSetupButtons) / sizeof(gSetupButtons[0]);
 
 Button gPauseButtons[] =
 {
-    { Vector2{ SCREEN_WIDTH * 0.5f - 160.0f, 370.0f }, Vector2{ 320.0f, 50.0f }, "CONTINUE",        PAUSE_BTN_CONTINUE,     BUTTON_VISUAL_TEXT, BUTTON_ICON_NONE, 20.0f, 1.0f },
-    { Vector2{ SCREEN_WIDTH * 0.5f - 160.0f, 436.0f }, Vector2{ 320.0f, 50.0f }, "SETTING",         PAUSE_BTN_SETTING,      BUTTON_VISUAL_TEXT, BUTTON_ICON_NONE, 20.0f, 1.0f },
-    { Vector2{ SCREEN_WIDTH * 0.5f - 160.0f, 502.0f }, Vector2{ 320.0f, 50.0f }, "SAVE",            PAUSE_BTN_SAVE,         BUTTON_VISUAL_TEXT, BUTTON_ICON_NONE, 20.0f, 1.0f },
-    { Vector2{ SCREEN_WIDTH * 0.5f - 160.0f, 568.0f }, Vector2{ 320.0f, 50.0f }, "LOAD",            PAUSE_BTN_LOAD,         BUTTON_VISUAL_TEXT, BUTTON_ICON_NONE, 20.0f, 1.0f },
-    { Vector2{ SCREEN_WIDTH * 0.5f - 160.0f, 634.0f }, Vector2{ 320.0f, 50.0f }, "EXIT TO MENU",    PAUSE_BTN_EXIT_MENU,    BUTTON_VISUAL_TEXT, BUTTON_ICON_NONE, 20.0f, 1.0f },
-    { Vector2{ SCREEN_WIDTH * 0.5f - 160.0f, 700.0f }, Vector2{ 320.0f, 50.0f }, "EXIT TO DESKTOP", PAUSE_BTN_EXIT_DESKTOP, BUTTON_VISUAL_TEXT, BUTTON_ICON_NONE, 20.0f, 1.0f }
+    { Vector2{ SCREEN_WIDTH * 0.5f - 160.0f, 280.0f }, Vector2{ 320.0f, 50.0f }, "CONTINUE",        PAUSE_BTN_CONTINUE,     BUTTON_VISUAL_TEXT, BUTTON_ICON_NONE, 20.0f, 1.0f },
+    { Vector2{ SCREEN_WIDTH * 0.5f - 160.0f, 346.0f }, Vector2{ 320.0f, 50.0f }, "SETTING",         PAUSE_BTN_SETTING,      BUTTON_VISUAL_TEXT, BUTTON_ICON_NONE, 20.0f, 1.0f },
+    { Vector2{ SCREEN_WIDTH * 0.5f - 160.0f, 412.0f }, Vector2{ 320.0f, 50.0f }, "SAVE",            PAUSE_BTN_SAVE,         BUTTON_VISUAL_TEXT, BUTTON_ICON_NONE, 20.0f, 1.0f },
+    { Vector2{ SCREEN_WIDTH * 0.5f - 160.0f, 478.0f }, Vector2{ 320.0f, 50.0f }, "LOAD",            PAUSE_BTN_LOAD,         BUTTON_VISUAL_TEXT, BUTTON_ICON_NONE, 20.0f, 1.0f },
+    { Vector2{ SCREEN_WIDTH * 0.5f - 160.0f, 544.0f }, Vector2{ 320.0f, 50.0f }, "EXIT TO MENU",    PAUSE_BTN_EXIT_MENU,    BUTTON_VISUAL_TEXT, BUTTON_ICON_NONE, 20.0f, 1.0f },
+    { Vector2{ SCREEN_WIDTH * 0.5f - 160.0f, 610.0f }, Vector2{ 320.0f, 50.0f }, "EXIT TO DESKTOP", PAUSE_BTN_EXIT_DESKTOP, BUTTON_VISUAL_TEXT, BUTTON_ICON_NONE, 20.0f, 1.0f }
 };
 
 int gPauseButtonCount = sizeof(gPauseButtons) / sizeof(gPauseButtons[0]);
+
+Button gSettingButtons[] =
+{
+    { Vector2{ 660.0f, 710.0f }, Vector2{ 280.0f, 62.0f }, "BACK", SETTING_BTN_BACK, BUTTON_VISUAL_TEXT, BUTTON_ICON_NONE, 26.0f, 2.0f }
+};
+
+int gSettingButtonCount = sizeof(gSettingButtons) / sizeof(gSettingButtons[0]);
+
+// animIndex = 31
+Button gAboutButtons[] =
+{
+    { Vector2{ 660.0f, 715.0f }, Vector2{ 280.0f, 62.0f }, "BACK", ABOUT_BTN_BACK, BUTTON_VISUAL_TEXT, BUTTON_ICON_NONE, 26.0f, 2.0f }
+};
+
+int gAboutButtonCount = sizeof(gAboutButtons) / sizeof(gAboutButtons[0]);
