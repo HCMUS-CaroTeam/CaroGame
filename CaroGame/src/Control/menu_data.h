@@ -3,11 +3,30 @@
 #include <string>
 using namespace std;
 
+enum ButtonVisualType
+{
+    BUTTON_VISUAL_TEXT = 0,
+    BUTTON_VISUAL_ICON
+};
+
+enum ButtonIconType
+{
+    BUTTON_ICON_NONE = 0,
+    BUTTON_ICON_ARROW_RIGHT,
+    BUTTON_ICON_ARROW_LEFT
+};
+
 struct Button
 {
     Vector2 position;
+    Vector2 size;
     string title;
     int id;
+    ButtonVisualType visualType;
+    ButtonIconType iconType;
+
+    float fontSize;
+    float textSpacing;
 };
 
 enum MainMenuButtonId
@@ -21,7 +40,9 @@ enum MainMenuButtonId
 enum SetupButtonId
 {
     SETUP_BTN_PLAY = 100,
-    SETUP_BTN_BACK
+    SETUP_BTN_BACK,
+    SETUP_BTN_ARROW_LEFT,
+    SETUP_BTN_ARROW_RIGHT
 };
 
 enum PauseButtonId
@@ -51,3 +72,19 @@ extern int gSetupButtonCount;
 
 extern Button gPauseButtons[];
 extern int gPauseButtonCount;
+
+enum SettingButtonId
+{
+    SETTING_BTN_BACK = 300
+};
+
+extern Button gSettingButtons[];
+extern int gSettingButtonCount;
+
+enum AboutButtonId
+{
+    ABOUT_BTN_BACK = 400
+};
+
+extern Button gAboutButtons[];
+extern int gAboutButtonCount;

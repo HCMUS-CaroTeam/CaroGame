@@ -73,7 +73,6 @@ void DrawBackgroundOnly()
     ClearBackground(BLACK);
     DrawScaledFullScreen(texBackground);
 
-
     DrawRectangle(
         0,
         0,
@@ -89,6 +88,7 @@ void DrawBackgroundOnly()
         Color{ 120, 120, 200, 28 },
         Color{ 0, 0, 0, 0 }
     );
+
 }
 
 void DrawLogoOnly()
