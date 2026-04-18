@@ -4,6 +4,10 @@
 
 static constexpr int BOARD_SIZE = 15;
 static constexpr float CELL_SIZE = 48.0f;
+static constexpr float BOARD_PIXEL_SIZE = BOARD_SIZE * CELL_SIZE; // Kích thước bàn cờ tính bằng pixel
+static constexpr float BOARD_START_X = SCREEN_WIDTH * 0.5f - BOARD_PIXEL_SIZE * 0.5f; // Tính toán để bàn cờ nằm chính giữa
+static constexpr float BOARD_START_Y = 120.0f; // Vị trí Y cố định để bàn cờ nằm ở phần trên màn hình
+static constexpr int WIN_LENGTH = 5; // Số quân cần có liên tiếp để thắng
 
 enum CellValue {
     CELL_EMPTY = 0,
@@ -43,10 +47,6 @@ enum TimeLimit {
 	TIME_LIMIT_15S = 3
 };
 
-static constexpr float BOARD_PIXEL_SIZE = BOARD_SIZE * CELL_SIZE; // Kích thước bàn cờ tính bằng pixel
-static constexpr float BOARD_START_X = SCREEN_WIDTH * 0.5f - BOARD_PIXEL_SIZE * 0.5f; // Tính toán để bàn cờ nằm chính giữa
-static constexpr float BOARD_START_Y = 120.0f; // Vị trí Y cố định để bàn cờ nằm ở phần trên màn hình
-static constexpr int WIN_LENGTH = 5; // Số quân cần có liên tiếp để thắng
 
 #pragma pack(push, 1)
 struct DataGame {
