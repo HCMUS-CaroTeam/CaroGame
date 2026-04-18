@@ -15,9 +15,6 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="src\audio_manager.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="src\main.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -48,12 +45,39 @@
     <ClCompile Include="src\Systems\audio_manager.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\View\ui_frame.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Scenes\Setting\ui_setting.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Image Include="Assets\Texture\background.jpg">
       <Filter>Resource Files</Filter>
     </Image>
     <Image Include="x64\Debug\Assets\Texture\background.jpg">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Assets\bg\background.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Assets\bg\button1.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Assets\bg\button2.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Assets\bg\game name.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Assets\frame\pixil-layer-1.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Assets\frame\pixil-layer-2.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Assets\frame\pixil-layer-3.png">
       <Filter>Resource Files</Filter>
     </Image>
   </ItemGroup>
@@ -101,6 +125,12 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\Systems\audio_manager.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\View\ui_frame.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Scenes\Setting\ui_setting.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

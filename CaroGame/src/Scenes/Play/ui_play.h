@@ -17,4 +17,4 @@ void UpdatePlayUI(
     bool& shouldClose
 );
 
-void DrawPlayUI(Font fontTitle, Font fontSmall, const MouseState& mouse);
+void DrawPlayUI(Font fontTitle, Font fontSmall, const MouseState& mouse, const AppSettings& settings);
