@@ -5,33 +5,13 @@
 #include "View/ui_frame.h"
 #include "Model/config.h"
 #include "Control/menu_data.h"
+#include "Model/Logic.h"
+#include "Model/game_data.h"
 #include <cmath>
 
-static constexpr int BOARD_SIZE = 8;
-static constexpr int CELL_SIZE  = 72;
-static constexpr int WIN_LENGTH = 5;
-
-static constexpr float BOARD_PIXEL_SIZE = BOARD_SIZE * CELL_SIZE;
-static constexpr float BOARD_START_X    = SCREEN_WIDTH  * 0.5f - BOARD_PIXEL_SIZE * 0.5f;
-static constexpr float BOARD_START_Y    = 220.0f;
-
-enum CellValue
-{
-    CELL_EMPTY = 0,
-    CELL_X,
-    CELL_O
-};
-
-static int  gBoard[BOARD_SIZE][BOARD_SIZE] = {};
-static int  gCurrentPlayer = CELL_X;
-static int  gWinner        = CELL_EMPTY;
-static bool gDraw          = false;
-static bool gPaused        = false;
+static bool gPaused = false;
 static const char* gPauseMessage = "";
 
-// Last placed piece (for highlight last move)
-static int gLastRow = -1;
-static int gLastCol = -1;
 
 // Winning cells (filled when gWinner != CELL_EMPTY)
 static int gWinCells[WIN_LENGTH][2] = {};
@@ -40,21 +20,6 @@ static int gWinCells[WIN_LENGTH][2] = {};
 static Rectangle GetBoardRect()
 {
     return { BOARD_START_X, BOARD_START_Y, BOARD_PIXEL_SIZE, BOARD_PIXEL_SIZE };
-}
-
-static void ResetBoard()
-{
-    for (int r = 0; r < BOARD_SIZE; ++r)
-        for (int c = 0; c < BOARD_SIZE; ++c)
-            gBoard[r][c] = CELL_EMPTY;
-
-    gCurrentPlayer = CELL_X;
-    gWinner        = CELL_EMPTY;
-    gDraw          = false;
-    gPaused        = false;
-    gPauseMessage  = "";
-    gLastRow       = -1;
-    gLastCol       = -1;
 }
 
 static bool IsInsideBoard(Vector2 pos)
@@ -73,52 +38,14 @@ static bool GetCellFromMouse(Vector2 pos, int& outRow, int& outCol)
     return true;
 }
 
-static bool IsBoardFull()
-{
-    for (int r = 0; r < BOARD_SIZE; ++r)
-        for (int c = 0; c < BOARD_SIZE; ++c)
-            if (gBoard[r][c] == CELL_EMPTY) return false;
-    return true;
-}
-
-// Checks 5-in-a-row in one direction; if found and outCells != nullptr, stores positions
-static bool CheckDirectionWin(int startRow, int startCol, int dRow, int dCol, int player, int (*outCells)[2] = nullptr)
-{
-    for (int step = 0; step < WIN_LENGTH; ++step)
-    {
-        int r = startRow + dRow * step;
-        int c = startCol + dCol * step;
-        if (r < 0 || r >= BOARD_SIZE || c < 0 || c >= BOARD_SIZE) return false;
-        if (gBoard[r][c] != player) return false;
-    }
-    if (outCells)
-        for (int step = 0; step < WIN_LENGTH; ++step)
-        {
-            outCells[step][0] = startRow + dRow * step;
-            outCells[step][1] = startCol + dCol * step;
-        }
-    return true;
-}
-
-static bool CheckFiveInRow(int player)
-{
-    for (int r = 0; r < BOARD_SIZE; ++r)
-        for (int c = 0; c < BOARD_SIZE; ++c)
-        {
-            if (gBoard[r][c] != player) continue;
-            if (CheckDirectionWin(r, c, 0,  1, player, gWinCells)) return true;
-            if (CheckDirectionWin(r, c, 1,  0, player, gWinCells)) return true;
-            if (CheckDirectionWin(r, c, 1,  1, player, gWinCells)) return true;
-            if (CheckDirectionWin(r, c, 1, -1, player, gWinCells)) return true;
-        }
-    return false;
-}
-
 static void UpdateGameStateAfterMove()
 {
-    if (CheckFiveInRow(CELL_X)) { gWinner = CELL_X; return; }
-    if (CheckFiveInRow(CELL_O)) { gWinner = CELL_O; return; }
-    if (IsBoardFull())           { gDraw = true; }
+   current().result = TestBoard(current().lastMoveRow, current().lastMoveCol, gWinCells);
+   if (current().result == CELL_EMPTY)
+       if (IsBoardFull())
+       {
+           current().result = RESULT_DRAW;
+	   }
 }
 
 // ─── Draw helpers ─────────────────────────────────────────────────────
@@ -153,10 +80,10 @@ static void DrawBoardGrid(const AppSettings& settings)
 // Draws a soft highlight on the last placed cell
 static void DrawHighlightCell(const AppSettings& settings)
 {
-    if (!settings.highlightLastMove || gLastRow < 0) return;
+    if (!settings.highlightLastMove || current().lastMoveRow < 0) return;
 
-    float x = BOARD_START_X + gLastCol * CELL_SIZE + 1.0f;
-    float y = BOARD_START_Y + gLastRow * CELL_SIZE + 1.0f;
+    float x = BOARD_START_X + current().lastMoveCol * CELL_SIZE + 1.0f;
+    float y = BOARD_START_Y + current().lastMoveRow * CELL_SIZE + 1.0f;
     float s = (float)CELL_SIZE - 2.0f;
 
     DrawRectangle((int)x, (int)y, (int)s, (int)s, Color{ 255, 245, 160, 35 });
@@ -165,9 +92,8 @@ static void DrawHighlightCell(const AppSettings& settings)
 
 static void DrawWinLine(const AppSettings& settings)
 {
-    if (gWinner == CELL_EMPTY) return;
-
-    Color col = (gWinner == CELL_X)
+    if (current().result == CELL_EMPTY) return;
+    Color col = (current().result == CELL_X)
         ? Color{ 120, 220, 255, 220 }
         : Color{ 255, 150, 200, 220 };
 
@@ -196,10 +122,10 @@ static void DrawPieces(Font fontTitle, const AppSettings& settings)
     {
         for (int c = 0; c < BOARD_SIZE; ++c)
         {
-            if (gBoard[r][c] == CELL_EMPTY) continue;
+            if (current().board[r][c] == CELL_EMPTY) continue;
 
-            const char* text  = (gBoard[r][c] == CELL_X) ? "X" : "O";
-            Color        color = (gBoard[r][c] == CELL_X)
+            const char* text  = (current().board[r][c] == CELL_X) ? "X" : "O";
+            Color color = (current().board[r][c] == CELL_X)
                 ? Color{ 120, 220, 255, 255 }
                 : Color{ 255, 150, 200, 255 };
 
@@ -307,7 +233,10 @@ static void DrawPauseOverlay(Font fontTitle, Font fontSmall, const MouseState& m
 }
 
 // ─── Public API ───────────────────────────────────────────────────────
-void InitPlayUI()  { ResetBoard(); }
+void InitPlayUI()  { 
+	ResetBoard(); // Tạm thời có thể gọi hàm này để khởi tạo game data.
+                  // Sau này có thể gọi hàm khác nếu cần thiết
+}
 void ShutdownPlayUI() {}
 
 void UpdatePlayUI(
@@ -334,21 +263,21 @@ void UpdatePlayUI(
         return;
     }
 
-    if (gWinner != CELL_EMPTY || gDraw) return;
+    if (current().result != CELL_EMPTY || current().result == RESULT_DRAW) return;
 
     if (mouse.leftPressed)
     {
         int row = -1, col = -1;
-        if (GetCellFromMouse(mouse.position, row, col) && gBoard[row][col] == CELL_EMPTY)
+        if (GetCellFromMouse(mouse.position, row, col) && current().board[row][col] == CELL_EMPTY)
         {
-            gBoard[row][col] = gCurrentPlayer;
-            gLastRow = row;
-            gLastCol = col;
+            current().board[row][col] = current().turn;
+            current().lastMoveRow = row;
+            current().lastMoveCol = col;
 
             UpdateGameStateAfterMove();
 
-            if (gWinner == CELL_EMPTY && !gDraw)
-                gCurrentPlayer = (gCurrentPlayer == CELL_X) ? CELL_O : CELL_X;
+            if (current().result == RESULT_ONGOING)
+                current().turn = (current().turn == CELL_X) ? CELL_O : CELL_X;
         }
     }
 }
@@ -357,18 +286,16 @@ void DrawPlayUI(Font fontTitle, Font fontSmall, const MouseState& mouse, const A
 {
     DrawBackgroundOnly();
 
-    DrawCenteredText(fontTitle, "PLAY", 130.0f, 42.0f, Color{ 255, 235, 225, 255 });
-
-    if (gWinner == CELL_X)
-        DrawCenteredText(fontSmall, "WINNER: X  |  R: RESET  |  ESC: PAUSE", 180.0f, 24.0f, Color{ 120, 220, 255, 255 });
-    else if (gWinner == CELL_O)
-        DrawCenteredText(fontSmall, "WINNER: O  |  R: RESET  |  ESC: PAUSE", 180.0f, 24.0f, Color{ 255, 150, 200, 255 });
-    else if (gDraw)
-        DrawCenteredText(fontSmall, "DRAW  |  R: RESET  |  ESC: PAUSE", 180.0f, 24.0f, Color{ 240, 225, 225, 220 });
-    else if (gCurrentPlayer == CELL_X)
-        DrawCenteredText(fontSmall, "TURN: X  |  5 IN A ROW TO WIN  |  R: RESET  |  ESC: PAUSE", 180.0f, 24.0f, Color{ 120, 220, 255, 255 });
+    if (current().result == RESULT_X_WINS)
+        DrawCenteredText(fontSmall, "WINNER: X  |  R: RESET  |  ESC: PAUSE", 70.0f, 24.0f, Color{ 120, 220, 255, 255 });
+    else if (current().result == RESULT_O_WINS)
+        DrawCenteredText(fontSmall, "WINNER: O  |  R: RESET  |  ESC: PAUSE", 70.0f, 24.0f, Color{ 255, 150, 200, 255 });
+    else if (current().result == RESULT_DRAW)
+        DrawCenteredText(fontSmall, "DRAW  |  R: RESET  |  ESC: PAUSE", 70.0f, 24.0f, Color{ 240, 225, 225, 220 });
+    else if (current().turn == CELL_X)
+        DrawCenteredText(fontSmall, "TURN: X  |  5 IN A ROW TO WIN  |  R: RESET  |  ESC: PAUSE", 70.0f, 24.0f, Color{ 120, 220, 255, 255 });
     else
-        DrawCenteredText(fontSmall, "TURN: O  |  5 IN A ROW TO WIN  |  R: RESET  |  ESC: PAUSE", 180.0f, 24.0f, Color{ 255, 150, 200, 255 });
+        DrawCenteredText(fontSmall, "TURN: O  |  5 IN A ROW TO WIN  |  R: RESET  |  ESC: PAUSE", 70.0f, 24.0f, Color{ 255, 150, 200, 255 });
 
     DrawBoardGrid(settings);
     DrawHighlightCell(settings);
