@@ -18,4 +18,5 @@ struct AppSettings
 	int gameMode = 1; // 1: PvP, 2: PvE
 	int botDifficulty = 1; // 1: Easy, 2: Medium, 3: Hard
 	int pvpMode = 1; // 1: Classic, 2: Tournament
+	int boardSize = 15; // Kích thước bàn cờ (mặc định 15x15)
 };
