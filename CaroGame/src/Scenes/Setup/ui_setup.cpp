@@ -65,34 +65,47 @@ void UpdateSetupUI(
             switch (gSetupButtons[i].id)
             {
             case SETUP_BTN_PVE: // Người chơi bấm chuyển tab PVE
-                settings.gameMode = 1;
+                settings.gameMode = MODE_PVE;
                 break;
 
             case SETUP_BTN_PVP: // Người chơi bấm chuyển tab PVP
-                settings.gameMode = 2;
+                settings.gameMode = MODE_PVP;
                 break;
 
             case SETUP_BTN_PREV: // NÚT MŨI TÊN TRÁI (<)
-                if (settings.gameMode == 1) {
-                    // Đang ở tab PVE -> Xoay vòng Boss (1 đến 3)
-                    settings.botDifficulty--;
-                    if (settings.botDifficulty < 1) settings.botDifficulty = 3;
+                if (settings.gameMode == MODE_PVE) {
+                    // Ép kiểu sang int để trừ, xoay vòng từ 0 -> 2 (EASY -> HARD)
+                    int diff = static_cast<int>(settings.botDifficulty) - 1;
+                    if (diff < static_cast<int>(DIFFICULTY_EASY)) {
+                        diff = static_cast<int>(DIFFICULTY_HARD);
+                    }
+                    settings.botDifficulty = static_cast<BotDifficulty>(diff);
                 }
-                else if (settings.gameMode == 2) {
-                    // Đang ở tab PVP -> Xoay vòng chế độ PvP (1 đến 2)
-                    settings.pvpMode--;
-                    if (settings.pvpMode < 1) settings.pvpMode = 2;
+                else if (settings.gameMode == MODE_PVP) {
+                    // Xoay vòng từ 0 -> 1 (CLASSIC -> TOURNAMENT)
+                    int mode = static_cast<int>(settings.pvpMode) - 1;
+                    if (mode < static_cast<int>(CLASSIC)) {
+                        mode = static_cast<int>(TOURNAMENT);
+                    }
+                    settings.pvpMode = static_cast<PVPMode>(mode);
                 }
                 break;
 
             case SETUP_BTN_NEXT: // NÚT MŨI TÊN PHẢI (>)
-                if (settings.gameMode == 1) {
-                    settings.botDifficulty++;
-                    if (settings.botDifficulty > 3) settings.botDifficulty = 1;
+                if (settings.gameMode == MODE_PVE) {
+                    // Ép kiểu sang int để cộng
+                    int diff = static_cast<int>(settings.botDifficulty) + 1;
+                    if (diff > static_cast<int>(DIFFICULTY_HARD)) {
+                        diff = static_cast<int>(DIFFICULTY_EASY);
+                    }
+                    settings.botDifficulty = static_cast<BotDifficulty>(diff);
                 }
-                else if (settings.gameMode == 2) {
-                    settings.pvpMode++;
-                    if (settings.pvpMode > 2) settings.pvpMode = 1;
+                else if (settings.gameMode == MODE_PVP) {
+                    int mode = static_cast<int>(settings.pvpMode) + 1;
+                    if (mode > static_cast<int>(TOURNAMENT)) {
+                        mode = static_cast<int>(CLASSIC);
+                    }
+                    settings.pvpMode = static_cast<PVPMode>(mode);
                 }
                 break;
 
@@ -106,7 +119,6 @@ void UpdateSetupUI(
             }
         }
     }
-
     if (IsKeyPressed(KEY_ESCAPE))
     {
         currentScreen = SCREEN_MAIN_MENU;
@@ -118,17 +130,18 @@ void DrawSetupUI(Font fontTitle, Font fontSmall, const MouseState& mouse, const 
     DrawBackgroundOnly();
 
     // ==========================================
-    // 1. GỌI THƯ VIỆN VIEW ĐỂ VẼ 3 CÁI KHUNG
-    // (Tọa độ tui ước lượng, ông tự canh lại cho khít nha)
+    // 1. VẼ 3 CÁI KHUNG (Đã căn chỉnh lại layout)
     // ==========================================
-    // Khung bự chảng ở dưới
+
+    // Khung nền chính: Căn giữa màn hình 1600x900
     DrawPanelFrame({ 200.0f, 150.0f, 1200.0f, 600.0f });
 
-    // Khung vàng bự chứa Boss
-    DrawCardFrame({ 420.0f, 250.0f, 700.0f, 350.0f });
+    // Khung vàng (Card) chứa nội dung: Thu gọn lại, đẩy lên trên một chút để không đè nút PLAY
+    Rectangle cardRect = { 350.0f, 220.0f, 600.0f, 320.0f };
+    DrawCardFrame(cardRect);
 
-    // Khung nhỏ chứa chữ X 
-    DrawSmallFrame({ 620.0f, 450.0f, 200.0f, 400.0f });
+    // Khung nhỏ chứa kích thước bàn cờ (Cao 60 pixel thôi, đừng để 400 nữa nha ông!)
+
 
     // ==========================================
     // 2. XỬ LÝ LOGIC CHỮ (Controller)
@@ -137,39 +150,38 @@ void DrawSetupUI(Font fontTitle, Font fontSmall, const MouseState& mouse, const 
     const char* descText = "";
     const char* detailText = "";
 
-    if (settings.gameMode == 1) {
-        if (settings.botDifficulty == 1) { titleText = "BOSS 1"; descText = "INTERN"; detailText = "De nhu an keo"; }
-        else if (settings.botDifficulty == 2) { titleText = "BOSS 2"; descText = "SENIOR"; detailText = "Khong de bi lua dau"; }
-        else if (settings.botDifficulty == 3) { titleText = "BOSS 3"; descText = "TECH LEAD"; detailText = "Doc co cau bai"; }
+    if (settings.gameMode == MODE_PVE) {
+        if (settings.botDifficulty == DIFFICULTY_EASY) { titleText = "BOSS 1"; descText = "INTERN"; detailText = "- De nhu an keo\n- Danh ngau nhien vui la chinh"; }
+        else if (settings.botDifficulty == DIFFICULTY_MEDIUM) { titleText = "BOSS 2"; descText = "SENIOR"; detailText = "- Biet chan 2 dau\n- Khong de bi lua dau"; }
+        else if (settings.botDifficulty == DIFFICULTY_HARD) { titleText = "BOSS 3"; descText = "TECH LEAD"; detailText = "- Nhin thau tuong lai\n- Doc co cau bai"; }
     }
-    else {
-        if (settings.pvpMode == 1) { titleText = "CLASSIC"; descText = ""; detailText = "-Du 5 quan lien tiep la thang\n-Khong ap dung luat chan 2 dau"; }
-        else if (settings.pvpMode == 2) { titleText = "TOURNAMENT"; descText = ""; detailText = "-5 quan lien tiep bi chan 2 dau khong tinh la thang\n-Het thoi gian doi luot cho doi thu"; }
+    else if (settings.gameMode == MODE_PVP) {
+        if (settings.pvpMode == CLASSIC) { titleText = "CLASSIC"; descText = ""; detailText = "- Du 5 quan lien tiep la thang\n- Khong ap dung luat chan 2 dau"; }
+        else if (settings.pvpMode == TOURNAMENT) { titleText = "TOURNAMENT"; descText = ""; detailText = "- 5 quan bi chan 2 dau khong tinh\n- Het thoi gian se bi tuoc luot"; }
     }
 
     // ==========================================
-    // 3. IN CHỮ ĐÈ LÊN KHUNG
+    // 3. IN CHỮ ĐÈ LÊN KHUNG (Tự động căn giữa)
     // ==========================================
-    DrawTextEx(fontTitle, titleText, Vector2{ 650.0f, 270.0f }, 36.0f, 2.0f, Color{ 128, 0, 32, 255 });
-    DrawTextEx(fontSmall, descText, Vector2{ 650.0f, 320.0f }, 24.0f, 2.0f, Color{ 128, 0, 32, 255 });
-    // Tọa độ in chữ = Tọa độ Khung Vàng + Padding (canh lề)
-    Vector2 textPos = { 540.0f + 40.0f, 400.0f + 40.0f };
 
-    // Gọi hàm in chữ với font nhỏ (fontSmall)
-    DrawTextEx(
-        fontSmall,
-        detailText,
-        textPos,
-        22.0f,    // Kích thước chữ (Chỉnh nhỏ lại nếu chữ bị tràn khung)
-        2.0f,     // Khoảng cách giữa các chữ
-        Color{ 130, 40, 60, 255 } // Màu đỏ đô tiệp với viền nút
-    );
+    // Căn giữa Title ("CLASSIC", "BOSS 1")
+    Vector2 titleSize = MeasureTextEx(fontTitle, titleText, 36.0f, 2.0f);
+    float titleX = cardRect.x + (cardRect.width / 2.0f) - (titleSize.x / 2.0f);
+    DrawTextEx(fontTitle, titleText, Vector2{ titleX, cardRect.y + 30.0f }, 36.0f, 2.0f, Color{ 128, 0, 32, 255 });
 
-    //const char* sizeStr = TextFormat("%dx%d", settings.boardSize, settings.boardSize);
-    //DrawTextEx(fontSmall, sizeStr, Vector2{ 440.0f, 495.0f }, 20.0f, 2.0f, Color{ 128, 0, 32, 255 });
+    // Căn giữa Desc ("INTERN")
+    Vector2 descSize = MeasureTextEx(fontSmall, descText, 24.0f, 2.0f);
+    float descX = cardRect.x + (cardRect.width / 2.0f) - (descSize.x / 2.0f);
+    DrawTextEx(fontSmall, descText, Vector2{ descX, cardRect.y + 80.0f }, 24.0f, 2.0f, Color{ 128, 0, 32, 255 });
+
+    // In detail text (Luật chơi) - Canh lề trái thụt vào 40 pixel
+    DrawTextEx(fontSmall, detailText, Vector2{ cardRect.x + 60.0f, cardRect.y + 140.0f }, 22.0f, 2.0f, Color{ 130, 40, 60, 255 });
+
+    // In kích thước bàn cờ vào Khung Nhỏ
 
     // ==========================================
-    // --- KẾT THÚC VẼ CAROUSEL ---
+    // --- VẼ NÚT BẤM VÀ CÁC THÀNH PHẦN KHÁC ---
+    // ==========================================
 
     for (int i = 0; i < gSetupButtonCount; ++i)
     {

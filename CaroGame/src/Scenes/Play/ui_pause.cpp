@@ -103,11 +103,13 @@ void UpdatePauseUI(
                 break;
 
             case PAUSE_BTN_SAVE:
-                gPauseMessage = "SAVE NOT IMPLEMENTED YET";
+                ClosePause();
+				currentScreen = SCREEN_SAVE;
                 break;
 
             case PAUSE_BTN_LOAD:
-                gPauseMessage = "LOAD NOT IMPLEMENTED YET";
+                ClosePause();
+				currentScreen = SCREEN_LOAD;
                 break;
 
             case PAUSE_BTN_EXIT_MENU:

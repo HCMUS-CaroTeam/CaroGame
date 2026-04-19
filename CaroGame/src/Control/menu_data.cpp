@@ -105,28 +105,43 @@ int gMainMenuButtonCount = sizeof(gMainMenuButtons) / sizeof(gMainMenuButtons[0]
 
 Button gSetupButtons[] =
 {
-    { Vector2{ 1000.0f, 270.0f }, Vector2{ 200.0f, 60.0f }, "PVP", SETUP_BTN_PVP, BUTTON_VISUAL_TEXT, BUTTON_ICON_NONE, 28.0f, 2.0f },
-    { Vector2{ 1000.0f, 370.0f }, Vector2{ 200.0f, 60.0f }, "PVE", SETUP_BTN_PVE, BUTTON_VISUAL_TEXT, BUTTON_ICON_NONE, 28.0f, 2.0f },
+    { Vector2{ 1050.0f, 250.0f }, Vector2{ 200.0f, 60.0f }, "PVP", SETUP_BTN_PVP, BUTTON_VISUAL_TEXT, BUTTON_ICON_NONE, 28.0f, 2.0f },
+    { Vector2{ 1050.0f, 340.0f }, Vector2{ 200.0f, 60.0f }, "PVE", SETUP_BTN_PVE, BUTTON_VISUAL_TEXT, BUTTON_ICON_NONE, 28.0f, 2.0f },
 
     // Nút Play ở giữa
-    { Vector2{ 600.0f, 580.0f }, Vector2{ 200.0f, 60.0f }, "PLAY", SETUP_BTN_PLAY, BUTTON_VISUAL_TEXT, BUTTON_ICON_NONE, 28.0f, 2.0f },
+    { Vector2{ 550.0f, 570.0f }, Vector2{ 200.0f, 60.0f }, "PLAY", SETUP_BTN_PLAY, BUTTON_VISUAL_TEXT, BUTTON_ICON_NONE, 28.0f, 2.0f },
 
     // Nút mũi tên trái / phải
-    { Vector2{ 300.0f, 290.0f }, Vector2{ 300.0f, 300.0f }, "", SETUP_BTN_PREV, BUTTON_VISUAL_ICON, BUTTON_ICON_ARROW_LEFT, 0.0f, 0.0f },
-    { Vector2{ 800.0f, 350.0f }, Vector2{ 300.0f, 300.0f }, "", SETUP_BTN_NEXT, BUTTON_VISUAL_ICON, BUTTON_ICON_ARROW_RIGHT, 0.0f, 0.0f },
+    { Vector2{ 130.0f, 300.0f }, Vector2{ 300.0f, 300.0f }, "", SETUP_BTN_PREV, BUTTON_VISUAL_ICON, BUTTON_ICON_ARROW_LEFT, 0.0f, 0.0f },
+    { Vector2{ 890.0f, 360.0f }, Vector2{ 300.0f, 300.0f }, "", SETUP_BTN_NEXT, BUTTON_VISUAL_ICON, BUTTON_ICON_ARROW_RIGHT, 0.0f, 0.0f },
 
-    { Vector2{ 1000.0f, 570.0f }, Vector2{ 200.0f, 60.0f }, "BACK", SETUP_BTN_BACK, BUTTON_VISUAL_TEXT, BUTTON_ICON_NONE, 28.0f, 2.0f }
+    { Vector2{ 1050.0f, 570.0f }, Vector2{ 200.0f, 60.0f }, "BACK", SETUP_BTN_BACK, BUTTON_VISUAL_TEXT, BUTTON_ICON_NONE, 28.0f, 2.0f }
 };
 int gSetupButtonCount = sizeof(gSetupButtons) / sizeof(gSetupButtons[0]);
 
 Button gPauseButtons[] =
 {
-    { Vector2{ SCREEN_WIDTH * 0.5f - 160.0f, 370.0f }, Vector2{ 320.0f, 50.0f }, "CONTINUE",        PAUSE_BTN_CONTINUE,     BUTTON_VISUAL_TEXT, BUTTON_ICON_NONE, 20.0f, 1.0f },
-    { Vector2{ SCREEN_WIDTH * 0.5f - 160.0f, 436.0f }, Vector2{ 320.0f, 50.0f }, "SETTING",         PAUSE_BTN_SETTING,      BUTTON_VISUAL_TEXT, BUTTON_ICON_NONE, 20.0f, 1.0f },
-    { Vector2{ SCREEN_WIDTH * 0.5f - 160.0f, 502.0f }, Vector2{ 320.0f, 50.0f }, "SAVE",            PAUSE_BTN_SAVE,         BUTTON_VISUAL_TEXT, BUTTON_ICON_NONE, 20.0f, 1.0f },
-    { Vector2{ SCREEN_WIDTH * 0.5f - 160.0f, 568.0f }, Vector2{ 320.0f, 50.0f }, "LOAD",            PAUSE_BTN_LOAD,         BUTTON_VISUAL_TEXT, BUTTON_ICON_NONE, 20.0f, 1.0f },
-    { Vector2{ SCREEN_WIDTH * 0.5f - 160.0f, 634.0f }, Vector2{ 320.0f, 50.0f }, "EXIT TO MENU",    PAUSE_BTN_EXIT_MENU,    BUTTON_VISUAL_TEXT, BUTTON_ICON_NONE, 20.0f, 1.0f },
-    { Vector2{ SCREEN_WIDTH * 0.5f - 160.0f, 700.0f }, Vector2{ 320.0f, 50.0f }, "EXIT TO DESKTOP", PAUSE_BTN_EXIT_DESKTOP, BUTTON_VISUAL_TEXT, BUTTON_ICON_NONE, 20.0f, 1.0f }
+    { Vector2{ SCREEN_WIDTH * 0.5f - 160.0f, 280.0f }, Vector2{ 320.0f, 50.0f }, "CONTINUE",        PAUSE_BTN_CONTINUE,     BUTTON_VISUAL_TEXT, BUTTON_ICON_NONE, 20.0f, 1.0f },
+    { Vector2{ SCREEN_WIDTH * 0.5f - 160.0f, 346.0f }, Vector2{ 320.0f, 50.0f }, "SETTING",         PAUSE_BTN_SETTING,      BUTTON_VISUAL_TEXT, BUTTON_ICON_NONE, 20.0f, 1.0f },
+    { Vector2{ SCREEN_WIDTH * 0.5f - 160.0f, 412.0f }, Vector2{ 320.0f, 50.0f }, "SAVE",            PAUSE_BTN_SAVE,         BUTTON_VISUAL_TEXT, BUTTON_ICON_NONE, 20.0f, 1.0f },
+    { Vector2{ SCREEN_WIDTH * 0.5f - 160.0f, 478.0f }, Vector2{ 320.0f, 50.0f }, "LOAD",            PAUSE_BTN_LOAD,         BUTTON_VISUAL_TEXT, BUTTON_ICON_NONE, 20.0f, 1.0f },
+    { Vector2{ SCREEN_WIDTH * 0.5f - 160.0f, 544.0f }, Vector2{ 320.0f, 50.0f }, "EXIT TO MENU",    PAUSE_BTN_EXIT_MENU,    BUTTON_VISUAL_TEXT, BUTTON_ICON_NONE, 20.0f, 1.0f },
+    { Vector2{ SCREEN_WIDTH * 0.5f - 160.0f, 610.0f }, Vector2{ 320.0f, 50.0f }, "EXIT TO DESKTOP", PAUSE_BTN_EXIT_DESKTOP, BUTTON_VISUAL_TEXT, BUTTON_ICON_NONE, 20.0f, 1.0f }
 };
 
 int gPauseButtonCount = sizeof(gPauseButtons) / sizeof(gPauseButtons[0]);
+
+Button gSettingButtons[] =
+{
+    { Vector2{ 660.0f, 710.0f }, Vector2{ 280.0f, 62.0f }, "BACK", SETTING_BTN_BACK, BUTTON_VISUAL_TEXT, BUTTON_ICON_NONE, 26.0f, 2.0f }
+};
+
+int gSettingButtonCount = sizeof(gSettingButtons) / sizeof(gSettingButtons[0]);
+
+// animIndex = 31
+Button gAboutButtons[] =
+{
+    { Vector2{ 660.0f, 715.0f }, Vector2{ 280.0f, 62.0f }, "BACK", ABOUT_BTN_BACK, BUTTON_VISUAL_TEXT, BUTTON_ICON_NONE, 26.0f, 2.0f }
+};
+
+int gAboutButtonCount = sizeof(gAboutButtons) / sizeof(gAboutButtons[0]);

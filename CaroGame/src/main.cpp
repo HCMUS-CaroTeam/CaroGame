@@ -3,12 +3,17 @@
 #include "Control/input_mouse.h"
 #include "Scenes/MainMenu/ui_main_menu.h"
 #include "View/ui_background.h"
+#include "View/ui_frame.h"
 #include "Systems/audio_manager.h"
 #include "Model/app_settings.h"
 #include "Control/menu_data.h"
 #include "Scenes/Setup/ui_setup.h"
 #include "Scenes/Play/ui_play.h"
+#include "Scenes/Setting/ui_setting.h"
+#include "Scenes/About/ui_about.h"
 #include "View/ui_button.h"
+#include "Scenes/Save_Load/ui_save.h"
+#include "Scenes/Save_Load/ui_load.h"
 
 static Font LoadFontSafe(const char* path, int size)
 {
@@ -18,37 +23,6 @@ static Font LoadFontSafe(const char* path, int size)
     return GetFontDefault();
 }
 
-static void DrawCenteredText(Font font, const char* text, float y, float fontSize, Color color)
-{
-    Vector2 size = MeasureTextEx(font, text, fontSize, 1.0f);
-    DrawTextEx(
-        font,
-        text,
-        Vector2{ SCREEN_WIDTH * 0.5f - size.x * 0.5f, y },
-        fontSize,
-        1.0f,
-        color
-    );
-}
-
-static void DrawSubScreen(Font fontTitle, Font fontSmall, const char* title, const char* desc)
-{
-    DrawBackgroundOnly();
-    DrawLogoOnly();
-
-    Rectangle panel{
-        SCREEN_WIDTH * 0.5f - 360.0f,
-        360.0f,
-        720.0f,
-        180.0f
-    };
-
-    DrawRectangleRounded(panel, 0.08f, 12, Color{ 28, 16, 20, 180 });
-    DrawRectangleRoundedLinesEx(panel, 0.08f, 12, 2.5f, Color{ 235, 210, 210, 200 });
-
-    DrawCenteredText(fontTitle, title, 395.0f, 42.0f, Color{ 255, 235, 225, 255 });
-    DrawCenteredText(fontSmall, desc, 465.0f, 24.0f, Color{ 240, 225, 225, 220 });
-}
 
 int main()
 {
@@ -57,16 +31,22 @@ int main()
     SetTargetFPS(TARGET_FPS);
 
     Font fontTitle = LoadFontSafe(FONT_PATH, 64);
-    Font fontSmall = LoadFontSafe(FONT_PATH, 28);
+    Font fontSmall = LoadFontSafe(FONT_PATH, 23);
+    Font fontMini  = LoadFontSafe(FONT_PATH, 16);
 
     AppSettings settings{};
+    LoadSettings(settings);
+
     AudioAssets audio{};
 
     InitGameAudio(audio);
     InitUIButtonSystem();
+    InitUIFrameSystem();
     InitMainMenuUI();
     InitSetupUI();
     InitPlayUI();
+    InitSettingUI();
+    InitAboutUI();
 
     ScreenState currentScreen = SCREEN_MAIN_MENU;
     bool shouldClose = false;
@@ -91,6 +71,14 @@ int main()
         case SCREEN_PLAY:
             UpdatePlayUI(mouse, dt, audio, settings, currentScreen, shouldClose);
             break;
+
+        case SCREEN_SETTING:
+            UpdateSettingUI(mouse, dt, audio, settings, currentScreen);
+            break;
+
+        case SCREEN_ABOUT:
+            UpdateAboutUI(mouse, dt, audio, settings, currentScreen);
+            break;
         }
 
         BeginDrawing();
@@ -106,24 +94,45 @@ int main()
             break;
 
         case SCREEN_PLAY:
-            DrawPlayUI(fontTitle, fontSmall, mouse);
+            DrawPlayUI(fontTitle, fontSmall, mouse, settings);
             break;
 
         case SCREEN_ABOUT:
-            DrawSubScreen(fontTitle, fontSmall, "ABOUT", "Introduce game information, team, rules, or credits here.");
+            DrawAboutUI(fontTitle, fontSmall, mouse);
             break;
 
         case SCREEN_SETTING:
-            DrawSubScreen(fontTitle, fontSmall, "SETTING", "Audio, graphics, and gameplay settings can be built here.");
+            DrawSettingUI(fontTitle, fontSmall, fontMini, mouse, settings);
             break;
+        case SCREEN_SAVE:
+            // DrawSaveUI(fontTitle, fontSmall, mouse); dang loi
+			break;
+        case SCREEN_LOAD:
+			// DrawLoadUI(fontTitle, fontSmall, mouse); chua lam 
+			break;
+        }
+
+        // UI brightness overlay (darkens the scene; 1.0=brightest, 0.0=very dark)
+        if (settings.uiBrightness < 0.999f)
+        {
+            unsigned char alpha = (unsigned char)((1.0f - settings.uiBrightness) * 200.0f);
+            DrawRectangle(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, Color{ 0, 0, 0, alpha });
         }
 
         EndDrawing();
     }
 
+    SaveSettings(settings);
+
+    ShutdownAboutUI();
+    ShutdownSettingUI();
     ShutdownPlayUI();
     ShutdownSetupUI();
+	ShutdownAboutUI();
+    // ShutdownSaveUI(); dang loi
+	// ShutdownLoadUI(); chua lam
     ShutdownMainMenuUI();
+    ShutdownUIFrameSystem();
     ShutdownUIButtonSystem();
     ShutdownGameAudio(audio);
     UnloadBackgroundAssets();
@@ -132,6 +141,7 @@ int main()
     {
         UnloadFont(fontTitle);
         UnloadFont(fontSmall);
+        UnloadFont(fontMini);
     }
 
     CloseWindow();
