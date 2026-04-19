@@ -61,7 +61,9 @@ enum ScreenState
     SCREEN_PLAY,
     SCREEN_ABOUT,
     SCREEN_SETTING,
-    SCREEN_SETUP
+    SCREEN_SETUP, 
+	SCREEN_SAVE,
+	SCREEN_LOAD
 };
 
 extern Button gMainMenuButtons[];
@@ -88,3 +90,10 @@ enum AboutButtonId
 
 extern Button gAboutButtons[];
 extern int gAboutButtonCount;
+
+
+enum SaveButtonId
+{
+    SAVE_BTN_CONFIRM = 0,
+    SAVE_BTN_BACK
+};
