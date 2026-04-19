@@ -12,6 +12,8 @@
 #include "Scenes/Setting/ui_setting.h"
 #include "Scenes/About/ui_about.h"
 #include "View/ui_button.h"
+#include "Scenes/Save_Load/ui_save.h"
+#include "Scenes/Save_Load/ui_load.h"
 
 static Font LoadFontSafe(const char* path, int size)
 {
@@ -102,6 +104,12 @@ int main()
         case SCREEN_SETTING:
             DrawSettingUI(fontTitle, fontSmall, fontMini, mouse, settings);
             break;
+        case SCREEN_SAVE:
+            // DrawSaveUI(fontTitle, fontSmall, mouse); dang loi
+			break;
+        case SCREEN_LOAD:
+			// DrawLoadUI(fontTitle, fontSmall, mouse); chua lam 
+			break;
         }
 
         // UI brightness overlay (darkens the scene; 1.0=brightest, 0.0=very dark)
@@ -120,6 +128,9 @@ int main()
     ShutdownSettingUI();
     ShutdownPlayUI();
     ShutdownSetupUI();
+	ShutdownAboutUI();
+    // ShutdownSaveUI(); dang loi
+	// ShutdownLoadUI(); chua lam
     ShutdownMainMenuUI();
     ShutdownUIFrameSystem();
     ShutdownUIButtonSystem();
