@@ -105,17 +105,17 @@ int gMainMenuButtonCount = sizeof(gMainMenuButtons) / sizeof(gMainMenuButtons[0]
 
 Button gSetupButtons[] =
 {
-    { Vector2{ SCREEN_WIDTH * 0.5f - 140.0f, 350.0f }, Vector2{ 280.0f, 80.0f }, "PVP", SETUP_BTN_PVP, BUTTON_VISUAL_TEXT, BUTTON_ICON_NONE, 28.0f, 2.0f },
-    { Vector2{ SCREEN_WIDTH * 0.5f - 140.0f, 450.0f }, Vector2{ 280.0f, 80.0f }, "PVE", SETUP_BTN_PVE, BUTTON_VISUAL_TEXT, BUTTON_ICON_NONE, 28.0f, 2.0f },
+    { Vector2{ 1000.0f, 270.0f }, Vector2{ 200.0f, 60.0f }, "PVP", SETUP_BTN_PVP, BUTTON_VISUAL_TEXT, BUTTON_ICON_NONE, 28.0f, 2.0f },
+    { Vector2{ 1000.0f, 370.0f }, Vector2{ 200.0f, 60.0f }, "PVE", SETUP_BTN_PVE, BUTTON_VISUAL_TEXT, BUTTON_ICON_NONE, 28.0f, 2.0f },
 
     // Nút Play ở giữa
-    { Vector2{ SCREEN_WIDTH * 0.5f - 140.0f, 690.0f }, Vector2{ 280.0f, 80.0f }, "PLAY", SETUP_BTN_PLAY, BUTTON_VISUAL_TEXT, BUTTON_ICON_NONE, 28.0f, 2.0f },
+    { Vector2{ 600.0f, 580.0f }, Vector2{ 200.0f, 60.0f }, "PLAY", SETUP_BTN_PLAY, BUTTON_VISUAL_TEXT, BUTTON_ICON_NONE, 28.0f, 2.0f },
 
     // Nút mũi tên trái / phải
-    { Vector2{ SCREEN_WIDTH * 0.5f - 220.0f, 595.0f }, Vector2{ 64.0f, 64.0f }, "", SETUP_BTN_PREV, BUTTON_VISUAL_ICON, BUTTON_ICON_ARROW_LEFT, 0.0f, 0.0f },
-    { Vector2{ SCREEN_WIDTH * 0.5f + 156.0f, 595.0f }, Vector2{ 64.0f, 64.0f }, "", SETUP_BTN_NEXT, BUTTON_VISUAL_ICON, BUTTON_ICON_ARROW_RIGHT, 0.0f, 0.0f },
+    { Vector2{ 300.0f, 290.0f }, Vector2{ 300.0f, 300.0f }, "", SETUP_BTN_PREV, BUTTON_VISUAL_ICON, BUTTON_ICON_ARROW_LEFT, 0.0f, 0.0f },
+    { Vector2{ 800.0f, 350.0f }, Vector2{ 300.0f, 300.0f }, "", SETUP_BTN_NEXT, BUTTON_VISUAL_ICON, BUTTON_ICON_ARROW_RIGHT, 0.0f, 0.0f },
 
-    { Vector2{ SCREEN_WIDTH * 0.5f - 140.0f, 770.0f }, Vector2{ 280.0f, 80.0f }, "BACK", SETUP_BTN_BACK, BUTTON_VISUAL_TEXT, BUTTON_ICON_NONE, 28.0f, 2.0f }
+    { Vector2{ 1000.0f, 570.0f }, Vector2{ 200.0f, 60.0f }, "BACK", SETUP_BTN_BACK, BUTTON_VISUAL_TEXT, BUTTON_ICON_NONE, 28.0f, 2.0f }
 };
 int gSetupButtonCount = sizeof(gSetupButtons) / sizeof(gSetupButtons[0]);
 

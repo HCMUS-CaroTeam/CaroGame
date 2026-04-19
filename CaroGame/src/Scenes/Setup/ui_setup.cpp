@@ -1,7 +1,13 @@
 ﻿#include "Scenes/Setup/ui_setup.h"
 #include "View/ui_background.h"
 #include "View/ui_button.h"
+#include "View/ui_frame.h"
 #include "Model/config.h"
+
+// Khai báo biến Texture toàn cục cho màn hình Setup
+static Texture2D texMainPanel;
+static Texture2D texBossFrame;
+static Texture2D texSizeFrame;
 
 static void DrawCenteredText(Font font, const char* text, float y, float fontSize, Color color)
 {
@@ -18,10 +24,12 @@ static void DrawCenteredText(Font font, const char* text, float y, float fontSiz
 
 void InitSetupUI()
 {
+    InitUIFrameSystem();
 }
 
 void ShutdownSetupUI()
 {
+    ShutdownUIFrameSystem();
 }
 
 void UpdateSetupUI(
@@ -108,32 +116,59 @@ void UpdateSetupUI(
 void DrawSetupUI(Font fontTitle, Font fontSmall, const MouseState& mouse, const AppSettings& settings)
 {
     DrawBackgroundOnly();
-    DrawLogoOnly();
 
-    // --- BẮT ĐẦU VẼ CAROUSEL ---
-    const char* carouselText = "";
-    Color textColor = WHITE;
+    // ==========================================
+    // 1. GỌI THƯ VIỆN VIEW ĐỂ VẼ 3 CÁI KHUNG
+    // (Tọa độ tui ước lượng, ông tự canh lại cho khít nha)
+    // ==========================================
+    // Khung bự chảng ở dưới
+    DrawPanelFrame({ 200.0f, 150.0f, 1200.0f, 600.0f });
 
-    if (settings.gameMode == 1)
-    {
-        // CHẾ ĐỘ PVE
-        if (settings.botDifficulty == 1) carouselText = "BOSS 1: KE TAU HAI";
-        else if (settings.botDifficulty == 2) carouselText = "BOSS 2: KE HUY DIET";
-        else if (settings.botDifficulty == 3) carouselText = "BOSS 3: CHUA TE CARO";
+    // Khung vàng bự chứa Boss
+    DrawCardFrame({ 420.0f, 250.0f, 700.0f, 350.0f });
 
-        textColor = GREEN;
+    // Khung nhỏ chứa chữ X 
+    DrawSmallFrame({ 620.0f, 450.0f, 200.0f, 400.0f });
+
+    // ==========================================
+    // 2. XỬ LÝ LOGIC CHỮ (Controller)
+    // ==========================================
+    const char* titleText = "";
+    const char* descText = "";
+    const char* detailText = "";
+
+    if (settings.gameMode == 1) {
+        if (settings.botDifficulty == 1) { titleText = "BOSS 1"; descText = "INTERN"; detailText = "De nhu an keo"; }
+        else if (settings.botDifficulty == 2) { titleText = "BOSS 2"; descText = "SENIOR"; detailText = "Khong de bi lua dau"; }
+        else if (settings.botDifficulty == 3) { titleText = "BOSS 3"; descText = "TECH LEAD"; detailText = "Doc co cau bai"; }
     }
-    else if (settings.gameMode == 2)
-    {
-        // CHẾ ĐỘ PVP
-        if (settings.pvpMode == 1) carouselText = "MODE: CLASSIC (TRUYEN THONG)";
-        else if (settings.pvpMode == 2) carouselText = "MODE: TOURNAMENT (CHAN 2 DAU)";
-
-        textColor = RED;
+    else {
+        if (settings.pvpMode == 1) { titleText = "CLASSIC"; descText = ""; detailText = "-Du 5 quan lien tiep la thang\n-Khong ap dung luat chan 2 dau"; }
+        else if (settings.pvpMode == 2) { titleText = "TOURNAMENT"; descText = ""; detailText = "-5 quan lien tiep bi chan 2 dau khong tinh la thang\n-Het thoi gian doi luot cho doi thu"; }
     }
 
-    // Đẩy chữ ra giữa màn hình
-    DrawCenteredText(fontSmall, carouselText, 610.0f, 30.0f, textColor);
+    // ==========================================
+    // 3. IN CHỮ ĐÈ LÊN KHUNG
+    // ==========================================
+    DrawTextEx(fontTitle, titleText, Vector2{ 650.0f, 270.0f }, 36.0f, 2.0f, Color{ 128, 0, 32, 255 });
+    DrawTextEx(fontSmall, descText, Vector2{ 650.0f, 320.0f }, 24.0f, 2.0f, Color{ 128, 0, 32, 255 });
+    // Tọa độ in chữ = Tọa độ Khung Vàng + Padding (canh lề)
+    Vector2 textPos = { 540.0f + 40.0f, 400.0f + 40.0f };
+
+    // Gọi hàm in chữ với font nhỏ (fontSmall)
+    DrawTextEx(
+        fontSmall,
+        detailText,
+        textPos,
+        22.0f,    // Kích thước chữ (Chỉnh nhỏ lại nếu chữ bị tràn khung)
+        2.0f,     // Khoảng cách giữa các chữ
+        Color{ 130, 40, 60, 255 } // Màu đỏ đô tiệp với viền nút
+    );
+
+    //const char* sizeStr = TextFormat("%dx%d", settings.boardSize, settings.boardSize);
+    //DrawTextEx(fontSmall, sizeStr, Vector2{ 440.0f, 495.0f }, 20.0f, 2.0f, Color{ 128, 0, 32, 255 });
+
+    // ==========================================
     // --- KẾT THÚC VẼ CAROUSEL ---
 
     for (int i = 0; i < gSetupButtonCount; ++i)
