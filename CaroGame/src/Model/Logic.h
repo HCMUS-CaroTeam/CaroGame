@@ -31,6 +31,23 @@ int CheckBoard(int pX, int pY);
  * @param lastCol Vị trí cột (col) của nước đi cuối cùng.
  * @return Quân cờ chiến thắng (-1 hoặc 1). Trả về 0 nếu chưa thỏa mãn điều kiện thắng.
  */
-int TestBoard(int lastRow, int lastCol);
+int TestBoard(int lastRow, int lastCol, int (*outCells)[2] = nullptr);
 
+/*
+ * @brief RESET ván game.
+ */
+
+extern void ResetBoard();
+
+/*
+ * @brief Init New Game.
+ */
+
+extern void InitNewGame();
+
+/*
+* @brief Kiểm tra xem bàn cờ đã đầy chưa (dùng để xét kết quả hòa).
+*/
+
+extern bool IsBoardFull();
 #endif // LOGIC_H

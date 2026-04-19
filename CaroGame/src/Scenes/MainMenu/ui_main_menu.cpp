@@ -1,4 +1,5 @@
 #include "Scenes/MainMenu/ui_main_menu.h"
+#include "Scenes/Setting/ui_setting.h"
 #include "View/ui_background.h"
 #include "View/ui_button.h"
 
@@ -52,6 +53,7 @@ void UpdateMainMenuUI(
                 break;
 
             case BTN_SETTING:
+                SetSettingReturnScreen(SCREEN_MAIN_MENU);
                 currentScreen = SCREEN_SETTING;
                 break;
 
