@@ -12,8 +12,8 @@ void UpdateSetupUI(
     const MouseState& mouse,
     float dt,
     AudioAssets& audio,
-    const AppSettings& settings,
+    AppSettings& settings,
     ScreenState& currentScreen
 );
 
-void DrawSetupUI(Font fontTitle, Font fontSmall, const MouseState& mouse);
+void DrawSetupUI(Font fontTitle, Font fontSmall, const MouseState& mouse, const AppSettings& settings);
