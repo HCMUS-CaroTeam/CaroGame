@@ -40,9 +40,11 @@ enum MainMenuButtonId
 enum SetupButtonId
 {
     SETUP_BTN_PLAY = 100,
-    SETUP_BTN_BACK,
-    SETUP_BTN_ARROW_LEFT,
-    SETUP_BTN_ARROW_RIGHT
+    SETUP_BTN_PVP,
+    SETUP_BTN_PVE,
+    SETUP_BTN_PREV,
+    SETUP_BTN_NEXT,
+    SETUP_BTN_BACK
 };
 
 enum PauseButtonId
@@ -61,7 +63,9 @@ enum ScreenState
     SCREEN_PLAY,
     SCREEN_ABOUT,
     SCREEN_SETTING,
-    SCREEN_SETUP
+    SCREEN_SETUP, 
+	SCREEN_SAVE,
+	SCREEN_LOAD
 };
 
 extern Button gMainMenuButtons[];
@@ -88,3 +92,10 @@ enum AboutButtonId
 
 extern Button gAboutButtons[];
 extern int gAboutButtonCount;
+
+
+enum SaveButtonId
+{
+    SAVE_BTN_CONFIRM = 0,
+    SAVE_BTN_BACK
+};

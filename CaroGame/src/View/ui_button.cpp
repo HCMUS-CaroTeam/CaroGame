@@ -83,10 +83,10 @@ static void LoadButtonAssets()
     LoadTextureAsset(gButtonIdle, "assets/buttons/button1.png", "button1.png", "button1.png");
     LoadTextureAsset(gButtonPressed, "assets/buttons/button2.png", "button2.png", "button2.png");
 
-    LoadTextureAsset(gIconArrowRightIdle, "assets/buttons/pixil-layer-10.png", "pixil-layer-10.png", "pixil-layer-10.png");
-    LoadTextureAsset(gIconArrowLeftIdle, "assets/buttons/pixil-layer-11.png", "pixil-layer-11.png", "pixil-layer-11.png");
-    LoadTextureAsset(gIconArrowLeftPressed, "assets/buttons/pixil-layer-12.png", "pixil-layer-12.png", "pixil-layer-12.png");
-    LoadTextureAsset(gIconArrowRightPressed, "assets/buttons/pixil-layer-13.png", "pixil-layer-13.png", "pixil-layer-13.png");
+    LoadTextureAsset(gIconArrowRightIdle, "assets/buttons/pixil-layer-13.png", "pixil-layer-13.png", "pixil-layer-13.png");
+    LoadTextureAsset(gIconArrowLeftIdle, "assets/buttons/pixil-layer-12.png", "pixil-layer-12.png", "pixil-layer-12.png");
+    LoadTextureAsset(gIconArrowLeftPressed, "assets/buttons/pixil-layer-11.png", "pixil-layer-11.png", "pixil-layer-11.png");
+    LoadTextureAsset(gIconArrowRightPressed, "assets/buttons/pixil-layer-10.png", "pixil-layer-10.png", "pixil-layer-10.png");
 }
 
 static Rectangle GetDrawButtonRect(const Button& button, bool hovered, bool pressed, float hoverAnim)
@@ -126,11 +126,17 @@ static void DrawButtonTextureCropped(const Texture2D& tex, Rectangle src, Rectan
 
 static void DrawButtonTextureFull(const Texture2D& tex, Rectangle dest)
 {
+    // 1. Chuyển đổi tọa độ x, y của dest (đang là góc trên bên trái) thành tọa độ TÂM
+    Rectangle centerDest = dest;
+    centerDest.x += dest.width * 0.5f;
+    centerDest.y += dest.height * 0.5f;
+
+    // 2. Vẽ với mốc (Origin) là điểm chính giữa của bức ảnh
     DrawTexturePro(
         tex,
         Rectangle{ 0.0f, 0.0f, static_cast<float>(tex.width), static_cast<float>(tex.height) },
-        dest,
-        Vector2{ 0.0f, 0.0f },
+        centerDest,                                         // Đích vẽ là tọa độ tâm
+        Vector2{ dest.width * 0.5f, dest.height * 0.5f },   // Dời Origin vào chính giữa (Width/2, Height/2)
         0.0f,
         WHITE
     );

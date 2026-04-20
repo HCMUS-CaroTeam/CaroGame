@@ -66,6 +66,7 @@ int CheckBoard(int pX, int pY) {
 
         return current().board[row][col]; // Trả về con cờ vừa đánh
     }
+
     return 0; // Click trùng ô đã đánh
 }
 
