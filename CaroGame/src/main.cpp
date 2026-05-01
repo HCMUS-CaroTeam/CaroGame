@@ -32,7 +32,7 @@ int main()
 
     Font fontTitle = LoadFontSafe(FONT_PATH, 64);
     Font fontSmall = LoadFontSafe(FONT_PATH, 23);
-    Font fontMini  = LoadFontSafe(FONT_PATH, 16);
+    Font fontMini = LoadFontSafe(FONT_PATH, 16);
 
     AppSettings settings{};
     LoadSettings(settings);
@@ -47,7 +47,8 @@ int main()
     InitPlayUI();
     InitSettingUI();
     InitAboutUI();
-
+    InitSaveUI();
+    InitLoadUI();
     ScreenState currentScreen = SCREEN_MAIN_MENU;
     bool shouldClose = false;
 
@@ -79,7 +80,22 @@ int main()
         case SCREEN_ABOUT:
             UpdateAboutUI(mouse, dt, audio, settings, currentScreen);
             break;
+
+        case SCREEN_SAVE_FIRST:
+            UpdateSaveUI(mouse, dt, audio, settings, currentScreen);
+            break;
+
+        case SCREEN_SAVE_SECOND:
+            UpdateSaveUISecond(mouse, dt, audio, settings, currentScreen);
+            break;
+
+        case SCREEN_SAVE_AS:
+            UpdateSaveAsUI(mouse, dt, audio, settings, currentScreen);
+
+        case SCREEN_LOAD:
+            UpdateLoadUI(mouse, dt, audio, settings, currentScreen);
         }
+
 
         BeginDrawing();
 
@@ -104,12 +120,22 @@ int main()
         case SCREEN_SETTING:
             DrawSettingUI(fontTitle, fontSmall, fontMini, mouse, settings);
             break;
-        case SCREEN_SAVE:
-            // DrawSaveUI(fontTitle, fontSmall, mouse); dang loi
-			break;
+
+        case SCREEN_SAVE_FIRST:
+            DrawSaveUI(fontTitle, fontSmall, mouse, settings);
+            break;
+
+        case SCREEN_SAVE_SECOND:
+            DrawSaveUISecond(fontTitle, fontSmall, mouse, settings);
+            break;
+
+        case SCREEN_SAVE_AS:
+            DrawSaveAsUI(fontTitle, fontSmall, mouse, settings);
+            break;
+
         case SCREEN_LOAD:
-			// DrawLoadUI(fontTitle, fontSmall, mouse); chua lam 
-			break;
+            DrawLoadUI(fontTitle, fontSmall, mouse, settings);
+            break;
         }
 
         // UI brightness overlay (darkens the scene; 1.0=brightest, 0.0=very dark)
@@ -122,15 +148,16 @@ int main()
         EndDrawing();
     }
 
-    SaveSettings(settings);
+    SaveGamesToFile(gameSaves);
 
+    SaveSettings(settings);
     ShutdownAboutUI();
     ShutdownSettingUI();
     ShutdownPlayUI();
     ShutdownSetupUI();
-	ShutdownAboutUI();
-    // ShutdownSaveUI(); dang loi
-	// ShutdownLoadUI(); chua lam
+    ShutdownAboutUI();
+    ShutdownSaveUI();
+    ShutdownLoadUI();
     ShutdownMainMenuUI();
     ShutdownUIFrameSystem();
     ShutdownUIButtonSystem();

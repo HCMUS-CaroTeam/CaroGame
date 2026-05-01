@@ -7,6 +7,8 @@
 #include "Control/menu_data.h"
 #include "Model/Logic.h"
 #include "Model/game_data.h"
+#include "Scenes/Save_Load/ui_save.h"
+#include "Scenes/Save_Load/ui_load.h"
 #include <cmath>
 
 static bool gPaused = false;
@@ -26,7 +28,7 @@ static bool IsInsideBoard(Vector2 pos)
 {
     Rectangle r = GetBoardRect();
     return pos.x >= r.x && pos.x <= r.x + r.width &&
-           pos.y >= r.y && pos.y <= r.y + r.height;
+        pos.y >= r.y && pos.y <= r.y + r.height;
 }
 
 static bool GetCellFromMouse(Vector2 pos, int& outRow, int& outCol)
@@ -40,12 +42,12 @@ static bool GetCellFromMouse(Vector2 pos, int& outRow, int& outCol)
 
 static void UpdateGameStateAfterMove()
 {
-   current().result = TestBoard(current().lastMoveRow, current().lastMoveCol, gWinCells);
-   if (current().result == CELL_EMPTY)
-       if (IsBoardFull())
-       {
-           current().result = RESULT_DRAW;
-	   }
+    current().result = TestBoard(current().lastMoveRow, current().lastMoveCol, gWinCells);
+    if (current().result == CELL_EMPTY)
+        if (IsBoardFull())
+        {
+            current().result = RESULT_DRAW;
+        }
 }
 
 // ─── Draw helpers ─────────────────────────────────────────────────────
@@ -95,7 +97,7 @@ static void DrawWinLine(const AppSettings& settings)
     if (current().result == CELL_EMPTY) return;
     Color col = (current().result == CELL_X)
         ? Color{ 120, 220, 255, 220 }
-        : Color{ 255, 150, 200, 220 };
+    : Color{ 255, 150, 200, 220 };
 
 
     // Highlight each winning cell
@@ -109,10 +111,10 @@ static void DrawWinLine(const AppSettings& settings)
     }
 
     // Thick line from center of first to last winning cell
-    float x1 = BOARD_START_X + gWinCells[0][1]           * CELL_SIZE + CELL_SIZE * 0.5f;
-    float y1 = BOARD_START_Y + gWinCells[0][0]           * CELL_SIZE + CELL_SIZE * 0.5f;
-    float x2 = BOARD_START_X + gWinCells[WIN_LENGTH-1][1] * CELL_SIZE + CELL_SIZE * 0.5f;
-    float y2 = BOARD_START_Y + gWinCells[WIN_LENGTH-1][0] * CELL_SIZE + CELL_SIZE * 0.5f;
+    float x1 = BOARD_START_X + gWinCells[0][1] * CELL_SIZE + CELL_SIZE * 0.5f;
+    float y1 = BOARD_START_Y + gWinCells[0][0] * CELL_SIZE + CELL_SIZE * 0.5f;
+    float x2 = BOARD_START_X + gWinCells[WIN_LENGTH - 1][1] * CELL_SIZE + CELL_SIZE * 0.5f;
+    float y2 = BOARD_START_Y + gWinCells[WIN_LENGTH - 1][0] * CELL_SIZE + CELL_SIZE * 0.5f;
     DrawLineEx({ x1, y1 }, { x2, y2 }, 5.0f, col);
 }
 
@@ -124,10 +126,10 @@ static void DrawPieces(Font fontTitle, const AppSettings& settings)
         {
             if (current().board[r][c] == CELL_EMPTY) continue;
 
-            const char* text  = (current().board[r][c] == CELL_X) ? "X" : "O";
+            const char* text = (current().board[r][c] == CELL_X) ? "X" : "O";
             Color color = (current().board[r][c] == CELL_X)
                 ? Color{ 120, 220, 255, 255 }
-                : Color{ 255, 150, 200, 255 };
+            : Color{ 255, 150, 200, 255 };
 
             float cx = BOARD_START_X + c * CELL_SIZE + CELL_SIZE * 0.5f;
             float cy = BOARD_START_Y + r * CELL_SIZE + CELL_SIZE * 0.5f;
@@ -141,7 +143,7 @@ static void DrawPieces(Font fontTitle, const AppSettings& settings)
 
             Vector2 size = MeasureTextEx(fontTitle, text, 38.0f, 2.0f);
             Vector2 pos{
-                cellRect.x + cellRect.width  * 0.5f - size.x * 0.5f,
+                cellRect.x + cellRect.width * 0.5f - size.x * 0.5f,
                 cellRect.y + cellRect.height * 0.5f - size.y * 0.5f
             };
 
@@ -182,10 +184,25 @@ static void UpdatePauseMenu(
                 gPauseMessage = "";
                 break;
             case PAUSE_BTN_SAVE:
-                gPauseMessage = "SAVE NOT IMPLEMENTED YET";
+                if (current().nameGame[0] == '\0') {
+                    currentScreen = SCREEN_SAVE_FIRST;
+                }
+                else {
+                    currentScreen = SCREEN_SAVE_SECOND;
+                }
+                break;
+            case PAUSE_BTN_SAVE_AS:
+                if (current().nameGame[0] == '\0') {
+                    currentScreen = SCREEN_SAVE_FIRST;
+                }
+                else {
+                    InitSaveUI(); // Reset trạng thái UI Save As trước khi vào
+                    currentScreen = SCREEN_SAVE_AS;
+                }
                 break;
             case PAUSE_BTN_LOAD:
-                gPauseMessage = "LOAD NOT IMPLEMENTED YET";
+                InitLoadUI(); // Reset trạng thái UI Load trước khi vào
+                currentScreen = SCREEN_LOAD;
                 break;
             case PAUSE_BTN_EXIT_MENU:
                 gPaused = false;
@@ -207,7 +224,7 @@ static void DrawPauseOverlay(Font fontTitle, Font fontSmall, const MouseState& m
     DrawRectangle(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, Color{ 0, 0, 0, 150 });
 
     Rectangle panel{
-        SCREEN_WIDTH  * 0.5f - 240.0f,
+        SCREEN_WIDTH * 0.5f - 240.0f,
         SCREEN_HEIGHT * 0.5f - 250.0f,
         480.0f,
         500.0f
@@ -221,7 +238,7 @@ static void DrawPauseOverlay(Font fontTitle, Font fontSmall, const MouseState& m
         const int animIndex = 20 + i;
         Rectangle hitRect = GetButtonRect(gPauseButtons[i]);
         bool hovered = IsMouseOverRect(mouse, hitRect);
-        bool pressed  = hovered && mouse.leftDown;
+        bool pressed = hovered && mouse.leftDown;
         DrawUIButton(animIndex, gPauseButtons[i], fontSmall, hovered, pressed);
     }
 
@@ -233,9 +250,9 @@ static void DrawPauseOverlay(Font fontTitle, Font fontSmall, const MouseState& m
 }
 
 // ─── Public API ───────────────────────────────────────────────────────
-void InitPlayUI()  { 
-	ResetBoard(); // Tạm thời có thể gọi hàm này để khởi tạo game data.
-                  // Sau này có thể gọi hàm khác nếu cần thiết
+void InitPlayUI() {
+    ResetBoard(); // Tạm thời có thể gọi hàm này để khởi tạo game data.
+    // Sau này có thể gọi hàm khác nếu cần thiết
 }
 void ShutdownPlayUI() {}
 
@@ -248,7 +265,7 @@ void UpdatePlayUI(
     bool& shouldClose
 )
 {
-    if (IsKeyPressed(KEY_R))  { ResetBoard(); return; }
+    if (IsKeyPressed(KEY_R)) { ResetBoard(); return; }
 
     if (IsKeyPressed(KEY_ESCAPE))
     {
