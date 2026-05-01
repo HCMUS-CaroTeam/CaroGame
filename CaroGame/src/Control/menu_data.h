@@ -52,6 +52,7 @@ enum PauseButtonId
     PAUSE_BTN_CONTINUE = 200,
     PAUSE_BTN_SETTING,
     PAUSE_BTN_SAVE,
+    PAUSE_BTN_SAVE_AS,
     PAUSE_BTN_LOAD,
     PAUSE_BTN_EXIT_MENU,
     PAUSE_BTN_EXIT_DESKTOP
@@ -63,9 +64,11 @@ enum ScreenState
     SCREEN_PLAY,
     SCREEN_ABOUT,
     SCREEN_SETTING,
-    SCREEN_SETUP, 
-	SCREEN_SAVE,
-	SCREEN_LOAD
+    SCREEN_SETUP,
+    SCREEN_SAVE_FIRST,
+    SCREEN_SAVE_SECOND,
+    SCREEN_SAVE_AS,
+    SCREEN_LOAD
 };
 
 extern Button gMainMenuButtons[];
@@ -99,3 +102,19 @@ enum SaveButtonId
     SAVE_BTN_CONFIRM = 0,
     SAVE_BTN_BACK
 };
+
+extern Button gSaveButtons[];
+extern int gSaveButtonCount;
+
+enum LoadButtonId
+{
+    LOAD_BTN_GN = 0,
+    LOAD_BTN_GP1,
+    LOAD_BTN_GP2,
+    LOAD_BTN_GMODE,
+    LOAD_BTN_CONFIRM,
+    LOAD_BTN_BACK
+};
+
+extern Button gLoadButtons[];
+extern int gLoadButtonCount;
