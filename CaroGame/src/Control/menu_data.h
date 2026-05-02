@@ -32,6 +32,7 @@ struct Button
 enum MainMenuButtonId
 {
     BTN_PLAY = 0,
+	BTN_LOAD,
     BTN_ABOUT,
     BTN_SETTING,
     BTN_EXIT
@@ -53,7 +54,6 @@ enum PauseButtonId
     PAUSE_BTN_SETTING,
     PAUSE_BTN_SAVE,
     PAUSE_BTN_SAVE_AS,
-    PAUSE_BTN_LOAD,
     PAUSE_BTN_EXIT_MENU,
     PAUSE_BTN_EXIT_DESKTOP
 };
@@ -117,4 +117,3 @@ enum LoadButtonId
 };
 
 extern Button gLoadButtons[];
-extern int gLoadButtonCount;

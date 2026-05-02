@@ -125,12 +125,6 @@ void UpdatePauseUI(
                 }
                 break;
 
-            case PAUSE_BTN_LOAD:
-                ClosePause();
-                InitLoadUI(); // Reset trạng thái UI Load trước khi vào
-                currentScreen = SCREEN_LOAD;
-                break;
-
             case PAUSE_BTN_EXIT_MENU:
                 ClosePause();
                 currentScreen = SCREEN_MAIN_MENU;

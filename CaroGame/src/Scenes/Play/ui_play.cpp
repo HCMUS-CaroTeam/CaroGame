@@ -177,12 +177,14 @@ static void UpdatePauseMenu(
                 gPaused = false;
                 gPauseMessage = "";
                 break;
+
             case PAUSE_BTN_SETTING:
                 SetSettingReturnScreen(SCREEN_PLAY);  // Back sẽ quay về Play (còn pause)
                 currentScreen = SCREEN_SETTING;
                 // gPaused giữ nguyên true — khi Back về Play sẽ thấy lại pause menu
                 gPauseMessage = "";
                 break;
+
             case PAUSE_BTN_SAVE:
                 if (current().nameGame[0] == '\0') {
                     currentScreen = SCREEN_SAVE_FIRST;
@@ -191,6 +193,7 @@ static void UpdatePauseMenu(
                     currentScreen = SCREEN_SAVE_SECOND;
                 }
                 break;
+
             case PAUSE_BTN_SAVE_AS:
                 if (current().nameGame[0] == '\0') {
                     currentScreen = SCREEN_SAVE_FIRST;
@@ -200,15 +203,13 @@ static void UpdatePauseMenu(
                     currentScreen = SCREEN_SAVE_AS;
                 }
                 break;
-            case PAUSE_BTN_LOAD:
-                InitLoadUI(); // Reset trạng thái UI Load trước khi vào
-                currentScreen = SCREEN_LOAD;
-                break;
+            
             case PAUSE_BTN_EXIT_MENU:
                 gPaused = false;
                 gPauseMessage = "";
                 currentScreen = SCREEN_MAIN_MENU;
                 break;
+
             case PAUSE_BTN_EXIT_DESKTOP:
                 gPaused = false;
                 gPauseMessage = "";
