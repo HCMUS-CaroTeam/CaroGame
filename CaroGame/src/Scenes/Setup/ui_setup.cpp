@@ -110,7 +110,14 @@ void UpdateSetupUI(
                 break;
 
             case SETUP_BTN_PLAY:
-                currentScreen = SCREEN_PLAY; // Xong xuôi thì bay vào game
+                // Cập nhật chế độ chơi và độ khó từ cài đặt sang core game
+                current().gameMode = settings.gameMode;
+                if (settings.gameMode == MODE_PVE) {
+                     current().botDifficulty = settings.botDifficulty;
+                }
+                
+                // Mở màn chơi
+                currentScreen = SCREEN_PLAY; 
                 break;
 
             case SETUP_BTN_BACK:

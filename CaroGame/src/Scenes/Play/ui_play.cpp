@@ -9,10 +9,14 @@
 #include "Model/game_data.h"
 #include "Scenes/Save_Load/ui_save.h"
 #include "Scenes/Save_Load/ui_load.h"
+#include "Model/ai_bot.h"
 #include <cmath>
 
 static bool gPaused = false;
 static const char* gPauseMessage = "";
+
+// Thêm biến timer dành cho AI Bot (đoạn dòng 16)
+static float gBotDelayTimer = 0.0f; 
 
 
 // Winning cells (filled when gWinner != CELL_EMPTY)
@@ -281,21 +285,58 @@ void UpdatePlayUI(
         return;
     }
 
+    // Nếu game đã có kết quả thắng hòa thì không làm gì thêm
     if (current().result != CELL_EMPTY || current().result == RESULT_DRAW) return;
 
-    if (mouse.leftPressed)
-    {
-        int row = -1, col = -1;
-        if (GetCellFromMouse(mouse.position, row, col) && current().board[row][col] == CELL_EMPTY)
-        {
-            current().board[row][col] = current().turn;
-            current().lastMoveRow = row;
-            current().lastMoveCol = col;
+    // --------- TÍCH HỢP PVE & PVP ---------
 
+    // Kiểm tra xem hiện tại đang ở chế độ PVE và đang là lượt của BOT (CELL_O) hay không
+    bool isBotTurn = (current().gameMode == MODE_PVE && current().turn == CELL_O);
+
+    if (isBotTurn)
+    {
+        // [NHÁNH 1: LƯỢT CỦA AI BOTS]
+        gBotDelayTimer += dt; // Cộng dồn delta time (khoảng cách giữa các frame)
+
+        if (gBotDelayTimer >= 0.5f) // Trễ 0.5 giây mới để AI đánh
+        {
+            // Gọi logic của Bot.
+            // LƯU Ý: Vì bạn nói BotMakeMove() đã tự đánh xuống, tự đổi turn(CELL_X), nên
+            // bạn chỉ cần gọi trực tiếp nó ở đây.
+            BotMakeMove();
+
+            // Cập nhật trạng thái thắng/thua sau nước đi của Bot
             UpdateGameStateAfterMove();
 
-            if (current().result == RESULT_ONGOING)
+            if (current().result == RESULT_ONGOING) {
                 current().turn = (current().turn == CELL_X) ? CELL_O : CELL_X;
+            }
+
+            // Đặt lại số đếm thời gian cho lượt đánh sau
+            gBotDelayTimer = 0.0f;
+        }
+    }
+    else
+    {
+        // [NHÁNH 2: LƯỢT CỦA NGƯỜI CHƠI - BLOCK MOUSE KHỎI BOT]
+        // Vì ta đặt trong cụm `else`, nên nếu là isBotTurn == true, click chuột sẽ toàn hoàn bị vô hiệu hóa!
+        if (mouse.leftPressed)
+        {
+            int row = -1, col = -1;
+            if (GetCellFromMouse(mouse.position, row, col) && current().board[row][col] == CELL_EMPTY)
+            {
+                current().board[row][col] = current().turn;
+                current().lastMoveRow = row;
+                current().lastMoveCol = col;
+
+                UpdateGameStateAfterMove();
+
+                if (current().result == RESULT_ONGOING) {
+                    current().turn = (current().turn == CELL_X) ? CELL_O : CELL_X;
+                    // Reset lại timer để chắc chắn timer bắt đầu từ độ trễ 0s ở lượt tới
+                    gBotDelayTimer = 0.0f;
+                }
+            }
         }
     }
 }
