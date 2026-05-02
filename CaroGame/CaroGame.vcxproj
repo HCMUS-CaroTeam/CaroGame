@@ -131,6 +131,10 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="src/Control\input_mouse.cpp" />
+    <ClCompile Include="src\Model\ai_bot.cpp" />
+    <ClCompile Include="src\Model\ai_easy.cpp" />
+    <ClCompile Include="src\Model\ai_hard.cpp" />
+    <ClCompile Include="src\Model\ai_medium.cpp" />
     <ClCompile Include="src\Model\game_data.cpp" />
     <ClCompile Include="src\Scenes\About\ui_about.cpp" />
     <ClCompile Include="src\Scenes\Save_Load\ui_load.cpp" />
@@ -144,8 +148,7 @@
     <ClCompile Include="src\Scenes\Play\ui_pause.cpp" />
     <ClCompile Include="src\Scenes\Play\ui_play.cpp" />
     <ClCompile Include="src\Scenes\Setup\ui_setup.cpp" />
-    <ClCompile Include="src\Systems\load.cpp" />
-    <ClCompile Include="src\Systems\save.cpp" />
+    <ClCompile Include="src\Systems\save_load.cpp" />
     <ClCompile Include="src\View\ui_background.cpp" />
     <ClCompile Include="src\View\ui_button.cpp" />
     <ClCompile Include="src\View\ui_frame.cpp" />
@@ -169,6 +172,10 @@
     <ClInclude Include="raylib\include\raymath.h" />
     <ClInclude Include="raylib\include\rlgl.h" />
     <ClInclude Include="src\Control\menu_data.h" />
+    <ClInclude Include="src\Model\ai_bot.h" />
+    <ClInclude Include="src\Model\ai_easy.h" />
+    <ClInclude Include="src\Model\ai_hard.h" />
+    <ClInclude Include="src\Model\ai_medium.h" />
     <ClInclude Include="src\Model\app_settings.h" />
     <ClInclude Include="src\Model\game_data.h" />
     <ClInclude Include="src\Model\Logic.h" />
@@ -184,6 +191,7 @@
     <ClInclude Include="src\Systems\audio_manager.h" />
     <ClInclude Include="src\Systems\load.h" />
     <ClInclude Include="src\Systems\save.h" />
+    <ClInclude Include="src\Systems\save_load.h" />
     <ClInclude Include="src\View\ui_background.h" />
     <ClInclude Include="src\View\ui_button.h" />
     <ClInclude Include="src\View\ui_frame.h" />
