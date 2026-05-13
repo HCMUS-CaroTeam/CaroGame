@@ -60,7 +60,7 @@ enum PauseButtonId
 
 enum ScreenState
 {
-    SCREEN_MAIN_MENU,
+    SCREEN_MAIN_MENU = 900,
     SCREEN_PLAY,
     SCREEN_ABOUT,
     SCREEN_SETTING,
@@ -68,7 +68,11 @@ enum ScreenState
     SCREEN_SAVE_FIRST,
     SCREEN_SAVE_SECOND,
     SCREEN_SAVE_AS,
-    SCREEN_LOAD
+    SCREEN_LOAD,
+	SCREEN_SAVE_TO_BACK_MENU,
+    SCREEN_SAVE_TO_EXIT, 
+	SCREEN_NOTIFY_EXIT,
+	SCREEN_NOTIFY_BACK_MENU
 };
 
 extern Button gMainMenuButtons[];
@@ -117,3 +121,13 @@ enum LoadButtonId
 };
 
 extern Button gLoadButtons[];
+
+enum NotifyButtonId
+{
+    NOTIFY_BTN_CONFIRM_YES = 0,
+    NOTIFY_BTN_CONFIRM_NO,
+    NOTIFY_BTN_BACK
+};
+
+extern Button gNotifyButtons[];
+extern int gNotifyButtonCount;

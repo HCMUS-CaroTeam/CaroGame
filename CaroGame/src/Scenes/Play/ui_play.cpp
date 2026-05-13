@@ -18,10 +18,6 @@ static const char* gPauseMessage = "";
 // Thêm biến timer dành cho AI Bot (đoạn dòng 16)
 static float gBotDelayTimer = 0.0f; 
 
-
-// Winning cells (filled when gWinner != CELL_EMPTY)
-static int gWinCells[WIN_LENGTH][2] = {};
-
 // ─── Board helpers ────────────────────────────────────────────────────
 static Rectangle GetBoardRect()
 {
@@ -46,7 +42,7 @@ static bool GetCellFromMouse(Vector2 pos, int& outRow, int& outCol)
 
 static void UpdateGameStateAfterMove()
 {
-    current().result = TestBoard(current().lastMoveRow, current().lastMoveCol, gWinCells);
+    current().result = TestBoard(current().lastMoveRow, current().lastMoveCol);
     if (current().result == CELL_EMPTY)
         if (IsBoardFull())
         {
@@ -107,18 +103,18 @@ static void DrawWinLine(const AppSettings& settings)
     // Highlight each winning cell
     for (int i = 0; i < WIN_LENGTH; ++i)
     {
-        float x = BOARD_START_X + gWinCells[i][1] * CELL_SIZE + 1.0f;
-        float y = BOARD_START_Y + gWinCells[i][0] * CELL_SIZE + 1.0f;
+        float x = BOARD_START_X + current().winLine[i][1] * CELL_SIZE + 1.0f;
+        float y = BOARD_START_Y + current().winLine[i][0] * CELL_SIZE + 1.0f;
         float s = (float)CELL_SIZE - 2.0f;
         DrawRectangle((int)x, (int)y, (int)s, (int)s,
             Color{ col.r, col.g, col.b, (unsigned char)(col.a / 3) });
     }
 
     // Thick line from center of first to last winning cell
-    float x1 = BOARD_START_X + gWinCells[0][1] * CELL_SIZE + CELL_SIZE * 0.5f;
-    float y1 = BOARD_START_Y + gWinCells[0][0] * CELL_SIZE + CELL_SIZE * 0.5f;
-    float x2 = BOARD_START_X + gWinCells[WIN_LENGTH - 1][1] * CELL_SIZE + CELL_SIZE * 0.5f;
-    float y2 = BOARD_START_Y + gWinCells[WIN_LENGTH - 1][0] * CELL_SIZE + CELL_SIZE * 0.5f;
+    float x1 = BOARD_START_X + current().winLine[0][1] * CELL_SIZE + CELL_SIZE * 0.5f;
+    float y1 = BOARD_START_Y + current().winLine[0][0] * CELL_SIZE + CELL_SIZE * 0.5f;
+    float x2 = BOARD_START_X + current().winLine[WIN_LENGTH - 1][1] * CELL_SIZE + CELL_SIZE * 0.5f;
+    float y2 = BOARD_START_Y + current().winLine[WIN_LENGTH - 1][0] * CELL_SIZE + CELL_SIZE * 0.5f;
     DrawLineEx({ x1, y1 }, { x2, y2 }, 5.0f, col);
 }
 
@@ -211,13 +207,13 @@ static void UpdatePauseMenu(
             case PAUSE_BTN_EXIT_MENU:
                 gPaused = false;
                 gPauseMessage = "";
-                currentScreen = SCREEN_MAIN_MENU;
+                currentScreen = SCREEN_NOTIFY_BACK_MENU;
                 break;
 
             case PAUSE_BTN_EXIT_DESKTOP:
                 gPaused = false;
                 gPauseMessage = "";
-                shouldClose = true;
+				currentScreen = SCREEN_NOTIFY_EXIT;
                 break;
             }
         }

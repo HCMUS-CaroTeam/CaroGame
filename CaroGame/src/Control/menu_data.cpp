@@ -150,7 +150,7 @@ int gAboutButtonCount = sizeof(gAboutButtons) / sizeof(gAboutButtons[0]);
 Button gSaveButtons[] =
 {
     { Vector2{ SCREEN_WIDTH * 0.5f - 160.0f, 480.0f }, Vector2{ 320.0f, 60.0f }, "CONFIRM SAVE", SAVE_BTN_CONFIRM, BUTTON_VISUAL_TEXT, BUTTON_ICON_NONE, 24.0f, 1.5f},
-    { Vector2{ SCREEN_WIDTH * 0.5f - 160.0f, 560.0f }, Vector2{ 320.0f, 60.0f }, "BACK TO GAME", SAVE_BTN_BACK, BUTTON_VISUAL_TEXT, BUTTON_ICON_NONE, 24.0f, 1.5f}
+    { Vector2{ SCREEN_WIDTH * 0.5f - 160.0f, 560.0f }, Vector2{ 320.0f, 60.0f }, "BACK", SAVE_BTN_BACK, BUTTON_VISUAL_TEXT, BUTTON_ICON_NONE, 24.0f, 1.5f}
 };
 
 int gSaveButtonCount = sizeof(gSaveButtons) / sizeof(gSaveButtons[0]);
@@ -173,3 +173,11 @@ Button gLoadButtons[] = {
     { { previewX + 20, previewY + 330 }, { btnW, 50.0f }, "CONFIRM", LOAD_BTN_CONFIRM, BUTTON_VISUAL_TEXT, BUTTON_ICON_NONE, 22.0f, 1.5f },
     { { SCREEN_WIDTH * 0.5f - 160.0f, 560.0f }, { 320.0f, 60.0f }, "BACK TO MENU", LOAD_BTN_BACK, BUTTON_VISUAL_TEXT, BUTTON_ICON_NONE, 24.0f, 1.5f }
 };
+
+Button gNotifyButtons[] = {
+    { Vector2{ SCREEN_WIDTH * 0.5f - 400.0f, 480.0f }, Vector2{ 320.0f, 60.0f }, "YES", NOTIFY_BTN_CONFIRM_YES, BUTTON_VISUAL_TEXT, BUTTON_ICON_NONE, 24.0f, 1.5f },
+	{ Vector2{ SCREEN_WIDTH * 0.5f + 80.0f, 480.0f }, Vector2{ 320.0f, 60.0f }, "NO", NOTIFY_BTN_CONFIRM_NO, BUTTON_VISUAL_TEXT, BUTTON_ICON_NONE, 24.0f, 1.5f },
+    { Vector2{ SCREEN_WIDTH * 0.5f - 160.0f, 680.0f }, Vector2{ 320.0f, 60.0f }, "BACK", NOTIFY_BTN_BACK, BUTTON_VISUAL_TEXT, BUTTON_ICON_NONE, 24.0f, 1.5f }
+};
+
+int gNotifyButtonCount = sizeof(gNotifyButtons) / sizeof(gNotifyButtons[0]);

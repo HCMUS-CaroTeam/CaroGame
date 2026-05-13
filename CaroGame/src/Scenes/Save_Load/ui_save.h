@@ -47,3 +47,21 @@ void UpdateSaveAsUI(
 );
 void DrawSaveAsUI(Font fontTitle, Font fontSmall, const MouseState& mouse, const AppSettings& settings);
 
+void UpdateSaveToBackMenuUI(
+    const MouseState& mouse,
+    float dt,
+    AudioAssets& audio,
+    const AppSettings& settings,
+    ScreenState& currentScreen
+);
+
+void UpdateSaveToExitUI(
+    const MouseState& mouse,
+    float dt,
+    AudioAssets& audio,
+    const AppSettings& settings,
+    ScreenState& currentScreen,
+	bool& shouldClose
+);
+
+void DrawSaveToExitUI(Font fontTitle, Font fontSmall, const MouseState& mouse, const AppSettings& settings, bool isShouldClose);

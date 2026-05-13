@@ -14,6 +14,7 @@
 #include "View/ui_button.h"
 #include "Scenes/Save_Load/ui_save.h"
 #include "Scenes/Save_Load/ui_load.h"
+#include "Scenes/Notify/ui_notify.h"
 
 static Font LoadFontSafe(const char* path, int size)
 {
@@ -49,6 +50,7 @@ int main()
     InitAboutUI();
     InitSaveUI();
     InitLoadUI();
+	InitNotifyUI();
     ScreenState currentScreen = SCREEN_MAIN_MENU;
     bool shouldClose = false;
 
@@ -91,11 +93,28 @@ int main()
 
         case SCREEN_SAVE_AS:
             UpdateSaveAsUI(mouse, dt, audio, settings, currentScreen);
+            break;
 
         case SCREEN_LOAD:
             UpdateLoadUI(mouse, dt, audio, settings, currentScreen);
-        }
+            break;
 
+        case SCREEN_NOTIFY_EXIT:
+            UpdateNotifyUI(mouse, dt, audio, settings, currentScreen, shouldClose, true);
+			break;
+
+        case SCREEN_NOTIFY_BACK_MENU:
+			UpdateNotifyUI(mouse, dt, audio, settings, currentScreen, shouldClose, false);
+			break;
+
+		case SCREEN_SAVE_TO_BACK_MENU:
+			UpdateSaveToBackMenuUI(mouse, dt, audio, settings, currentScreen);
+			break;
+
+		case SCREEN_SAVE_TO_EXIT:
+			UpdateSaveToExitUI(mouse, dt, audio, settings, currentScreen, shouldClose);
+			break;
+        }
 
         BeginDrawing();
 
@@ -121,12 +140,17 @@ int main()
             DrawSettingUI(fontTitle, fontSmall, fontMini, mouse, settings);
             break;
 
-        case SCREEN_SAVE_FIRST:
+		case SCREEN_SAVE_FIRST: 
+        case SCREEN_SAVE_SECOND:       
             DrawSaveUI(fontTitle, fontSmall, mouse, settings);
             break;
 
-        case SCREEN_SAVE_SECOND:
-            DrawSaveUISecond(fontTitle, fontSmall, mouse, settings);
+        case SCREEN_SAVE_TO_BACK_MENU:
+            DrawSaveToExitUI(fontTitle, fontSmall, mouse, settings, false);
+			break;
+
+        case SCREEN_SAVE_TO_EXIT:
+			DrawSaveToExitUI(fontTitle, fontSmall, mouse, settings, true);
             break;
 
         case SCREEN_SAVE_AS:
@@ -136,6 +160,10 @@ int main()
         case SCREEN_LOAD:
             DrawLoadUI(fontTitle, fontSmall, mouse, settings);
             break;
+
+		case SCREEN_NOTIFY_EXIT: 
+        case SCREEN_NOTIFY_BACK_MENU:
+			DrawNotifyUI(fontTitle, fontSmall, mouse, settings, shouldClose, currentScreen);
         }
 
         // UI brightness overlay (darkens the scene; 1.0=brightest, 0.0=very dark)
@@ -159,6 +187,7 @@ int main()
     ShutdownSaveUI();
     ShutdownLoadUI();
     ShutdownMainMenuUI();
+    ShutdownNotifyUI();
     ShutdownUIFrameSystem();
     ShutdownUIButtonSystem();
     ShutdownGameAudio(audio);
