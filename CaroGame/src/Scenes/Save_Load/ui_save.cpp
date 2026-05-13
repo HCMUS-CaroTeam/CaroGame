@@ -1,4 +1,5 @@
 #include "ui_save.h" 
+#include "Model/Logic.h"
 #include <cmath> 
 #include <iostream>
 
@@ -142,50 +143,64 @@ void DrawSaveUI(Font fontTitle, Font fontSmall, const MouseState& mouse, const A
         SAVE_PANEL_W, SAVE_PANEL_H
     };
     DrawPanelFrame(panel);
-
-    // 1. Tiêu đề
-    DrawCenteredText(fontTitle, "SAVE GAME", panel.y + 35.0f, 40.0f, Color{ 255, 235, 225, 255 });
-
-    // 2. Thông báo trạng thái (Hiện ra khi có gStatusMsg)
-    if (gStatusMsg[0] != '\0')
+	if (current().nameGame[0] == '\0') // Nếu chưa có tên game (lần đầu lưu), hiển thị giao diện nhập tên 
     {
-        // Màu đỏ cho lỗi (chữ N trong Name), màu xanh cho thành công
-        Color msgColor = (gStatusMsg[0] == 'N') ? RED : LIME;
-        DrawCenteredText(fontSmall, gStatusMsg, panel.y + 85.0f, 28.0f, msgColor);
+        // 1. Tiêu đề
+        DrawCenteredText(fontTitle, "SAVE GAME", panel.y + 35.0f, 40.0f, Color{ 255, 235, 225, 255 });
+
+        // 2. Thông báo trạng thái (Hiện ra khi có gStatusMsg)
+        if (gStatusMsg[0] != '\0')
+        {
+            // Màu đỏ cho lỗi (chữ N trong Name), màu xanh cho thành công
+            Color msgColor = (gStatusMsg[0] == 'N') ? RED : LIME;
+            DrawCenteredText(fontSmall, gStatusMsg, panel.y + 85.0f, 28.0f, msgColor);
+        }
+
+        // 3. Khung nhập liệu
+        Rectangle inputBox = { panel.x + 100, panel.y + 130, 400, 50 };
+        DrawRectangleRec(inputBox, Color{ 20, 20, 30, 255 });
+        DrawRectangleLinesEx(inputBox, 2.0f, RAYWHITE);
+
+        Vector2 textPos = { inputBox.x + 15, inputBox.y + 12 };
+        if (gLetterCount == 0)
+        {
+            DrawTextEx(fontSmall, " Enter save name...", textPos, 24.0f, 1.0f, GRAY);
+        }
+        else
+        {
+            DrawTextEx(fontSmall, gInputBuffer, textPos, 24.0f, 1.0f, GOLD);
+        }
+
+        // 4. Con trỏ nhấp nháy (Cursor)
+        if (fmodf(gCursorBlinkTimer, 1.0f) < 0.5f /* &&!gShouldExitAfterSave */)
+        {
+            Vector2 textSize = MeasureTextEx(fontSmall, gInputBuffer, 24.0f, 1.0f);
+            DrawTextEx(fontSmall, "_", Vector2{ textPos.x + textSize.x + 2.0f, textPos.y }, 24.0f, 1.0f, GOLD);
+        }
+
+        // 5. Hướng dẫn
+        DrawCenteredText(fontSmall, "Press CONFIRM to save your progress", panel.y + 200.0f, 20.0f, LIGHTGRAY);
+
+        // 6. Vẽ các nút bấm
+        for (int i = 0; i < gSaveButtonCount; ++i)
+        {
+            Rectangle hitRect = GetButtonRect(gSaveButtons[i]);
+            bool hov = IsMouseOverRect(mouse, hitRect);
+            bool prs = hov && mouse.leftDown;
+            DrawUIButton(50 + i, gSaveButtons[i], fontSmall, hov, prs);
+        }
     }
-
-    // 3. Khung nhập liệu
-    Rectangle inputBox = { panel.x + 100, panel.y + 130, 400, 50 };
-    DrawRectangleRec(inputBox, Color{ 20, 20, 30, 255 });
-    DrawRectangleLinesEx(inputBox, 2.0f, RAYWHITE);
-
-    Vector2 textPos = { inputBox.x + 15, inputBox.y + 12 };
-    if (gLetterCount == 0)
+	else // Nếu đã có tên game (đã lưu ít nhất 1 lần), hiển thị giao diện thông báo lưu thành công 
     {
-        DrawTextEx(fontSmall, " Enter save name...", textPos, 24.0f, 1.0f, GRAY);
-    }
-    else
-    {
-        DrawTextEx(fontSmall, gInputBuffer, textPos, 24.0f, 1.0f, GOLD);
-    }
-
-    // 4. Con trỏ nhấp nháy (Cursor)
-    if (fmodf(gCursorBlinkTimer, 1.0f) < 0.5f /* &&!gShouldExitAfterSave */)
-    {
-        Vector2 textSize = MeasureTextEx(fontSmall, gInputBuffer, 24.0f, 1.0f);
-        DrawTextEx(fontSmall, "_", Vector2{ textPos.x + textSize.x + 2.0f, textPos.y }, 24.0f, 1.0f, GOLD);
-    }
-
-    // 5. Hướng dẫn
-    DrawCenteredText(fontSmall, "Press CONFIRM to save your progress", panel.y + 200.0f, 20.0f, LIGHTGRAY);
-
-    // 6. Vẽ các nút bấm
-    for (int i = 0; i < gSaveButtonCount; ++i)
-    {
-        Rectangle hitRect = GetButtonRect(gSaveButtons[i]);
+        DrawCenteredText(fontTitle, "GAME SAVED SUCCESSFULLY!", panel.y + 150.0f, 32.0f, LIME);
+        // Hướng dẫn tiếp theo
+        DrawCenteredText(fontSmall, "Press OK", panel.y + 220.0f, 20.0f, LIGHTGRAY);
+		SaveData(current()); // Đảm bảo lưu lại dữ liệu trước khi vẽ nút OK
+        // Vẽ nút Back to Game
+        Rectangle hitRect = GetButtonRect(gSaveButtons[1]); // Nút BACK
         bool hov = IsMouseOverRect(mouse, hitRect);
         bool prs = hov && mouse.leftDown;
-        DrawUIButton(50 + i, gSaveButtons[i], fontSmall, hov, prs);
+        DrawUIButton(51, gSaveButtons[1], fontSmall, hov, prs);
     }
 }
 
@@ -199,6 +214,7 @@ void UpdateSaveUISecond(
 {
     if (IsKeyPressed(KEY_ESCAPE)) currentScreen = SCREEN_PLAY;
     // Chỉ cần xử lý nút Back to Game
+	SaveData(current()); // Đảm bảo lưu lại dữ liệu trước khi quay về Play
     Rectangle hitRect = GetButtonRect(gSaveButtons[1]); // Nút BACK
     bool hovered = IsMouseOverRect(mouse, hitRect);
     bool pressed = hovered && mouse.leftPressed;
@@ -208,27 +224,6 @@ void UpdateSaveUISecond(
         currentScreen = SCREEN_PLAY;
     }
 }
-
-void DrawSaveUISecond(Font fontTitle, Font fontSmall, const MouseState& mouse, const AppSettings& settings) {
-    DrawBackgroundOnly();
-    // Vẽ Panel chính
-    Rectangle panel = {
-        SCREEN_WIDTH * 0.5f - SAVE_PANEL_W * 0.5f,
-        SCREEN_HEIGHT * 0.5f - SAVE_PANEL_H * 0.5f,
-        SAVE_PANEL_W, SAVE_PANEL_H
-    };
-    DrawPanelFrame(panel);
-    // Thông báo lưu thành công
-    DrawCenteredText(fontTitle, "GAME SAVED SUCCESSFULLY!", panel.y + 150.0f, 32.0f, LIME);
-    // Hướng dẫn tiếp theo
-    DrawCenteredText(fontSmall, "Press BACK TO GAME to return", panel.y + 220.0f, 20.0f, LIGHTGRAY);
-    // Vẽ nút Back to Game
-    Rectangle hitRect = GetButtonRect(gSaveButtons[1]); // Nút BACK
-    bool hov = IsMouseOverRect(mouse, hitRect);
-    bool prs = hov && mouse.leftDown;
-    DrawUIButton(51, gSaveButtons[1], fontSmall, hov, prs);
-}
-
 
 //
 void UpdateSaveAsUI(
@@ -384,4 +379,176 @@ void DrawSaveAsUI(Font fontTitle, Font fontSmall, const MouseState& mouse, const
         bool prs = hov && mouse.leftDown;
         DrawUIButton(50 + i, gSaveButtons[i], fontSmall, hov, prs);
     }
+}
+
+void UpdateSaveToBackMenuUI(
+    const MouseState& mouse,
+    float dt,
+    AudioAssets& audio,
+    const AppSettings& settings,
+    ScreenState& currentScreen
+)
+{
+    if (current().nameGame[0] == '\0') // Nếu chưa có tên game (lần đầu lưu), hiển thị giao diện nhập tên
+    {
+        char key = GetCharPressed();
+        while (key > 0)
+        {
+            if (key >= 32 && key <= 126 && gLetterCount < (int)sizeof(gInputBuffer) - 1)
+            {
+                gInputBuffer[gLetterCount] = key;
+                gLetterCount++;
+                gInputBuffer[gLetterCount] = '\0';
+            }
+            key = GetCharPressed();
+        }
+
+        if (IsKeyPressed(KEY_BACKSPACE) && gLetterCount > 0)
+        {
+            gLetterCount--;
+            gInputBuffer[gLetterCount] = '\0';
+        }
+        //}
+
+        // 3. Xử lý logic các nút bấm
+        for (int i = 0; i < gSaveButtonCount; ++i)
+        {
+            bool hovered = false, pressed = false;
+            UpdateUIButton(50 + i, gSaveButtons[i], mouse, dt, audio, settings, hovered, pressed);
+
+            if (hovered && mouse.leftPressed)
+            {
+                PlayMenuClick(audio, settings);
+
+                if (gSaveButtons[i].id == SAVE_BTN_CONFIRM)
+                {
+                    if (gLetterCount > 0)
+                    {
+                        // LOGIC LƯU THÀNH CÔNG
+                        strcpy_s(current().nameGame, sizeof(current().nameGame), gInputBuffer);
+                        current().nameGame[sizeof(current().nameGame) - 1] = '\0'; // Đảm bảo null-terminated
+                        gStatusMsg = "GAME SAVED SUCCESSFULLY! BACK TO MENU...";
+                        SaveData(current()); // Giả định hàm lưu của bạn nhận tên file
+
+                        InitNewGame();
+                        currentScreen = SCREEN_MAIN_MENU; // Quay về menu chính sau khi lưu
+
+                        //gMessageTimer = MESSAGE_LIMIT; // Bắt đầu đếm ngược 3s
+                        //gShouldExitAfterSave = true;   // Đặt lệnh chờ thoát
+                    }
+                    else
+                    {
+                        // LOGIC LỖI
+                        gStatusMsg = "NAME CANNOT BE EMPTY!";
+                        //gMessageTimer = MESSAGE_LIMIT; // Hiện lỗi 3s rồi mất
+                        //gShouldExitAfterSave = false;
+                    }
+                }
+                else if (gSaveButtons[i].id == SAVE_BTN_BACK)
+                {
+                    currentScreen = SCREEN_PLAY;
+                }
+            }
+        }
+    }
+
+    else {
+		SaveData(current()); // Đảm bảo lưu lại dữ liệu trước khi quay về menu
+        Rectangle hitRect = GetButtonRect(gSaveButtons[1]); // Nút BACK
+        bool hovered = IsMouseOverRect(mouse, hitRect);
+        bool pressed = hovered && mouse.leftPressed;
+        if (pressed)
+        {
+            PlayMenuClick(audio, settings);
+            currentScreen = SCREEN_MAIN_MENU;
+        }
+    }
+
+    if (IsKeyPressed(KEY_ESCAPE)) currentScreen = SCREEN_PLAY;
+}
+
+void UpdateSaveToExitUI(
+    const MouseState& mouse,
+    float dt,
+    AudioAssets& audio,
+    const AppSettings& settings,
+	ScreenState& currentScreen, 
+    bool& shouldClose
+)
+{
+    // Xử lý nút bấm
+    if (current().nameGame[0] == '\0') // Nếu chưa có tên game (lần đầu lưu), hiển thị giao diện nhập tên
+    {
+        char key = GetCharPressed();
+        while (key > 0)
+        {
+            if (key >= 32 && key <= 126 && gLetterCount < (int)sizeof(gInputBuffer) - 1)
+            {
+                gInputBuffer[gLetterCount] = key;
+                gLetterCount++;
+                gInputBuffer[gLetterCount] = '\0';
+            }
+            key = GetCharPressed();
+        }
+
+        if (IsKeyPressed(KEY_BACKSPACE) && gLetterCount > 0)
+        {
+            gLetterCount--;
+            gInputBuffer[gLetterCount] = '\0';
+        }
+        //}
+
+        // 3. Xử lý logic các nút bấm
+        for (int i = 0; i < gSaveButtonCount; ++i)
+        {
+            bool hovered = false, pressed = false;
+            UpdateUIButton(50 + i, gSaveButtons[i], mouse, dt, audio, settings, hovered, pressed);
+
+            if (hovered && mouse.leftPressed)
+            {
+                PlayMenuClick(audio, settings);
+
+                if (gSaveButtons[i].id == SAVE_BTN_CONFIRM)
+                {
+                    if (gLetterCount > 0)
+                    {
+                        // LOGIC LƯU THÀNH CÔNG
+                        strcpy_s(current().nameGame, sizeof(current().nameGame), gInputBuffer);
+                        current().nameGame[sizeof(current().nameGame) - 1] = '\0'; // Đảm bảo null-terminated
+                        gStatusMsg = "GAME SAVED SUCCESSFULLY! BACK TO MENU...";
+                        SaveData(current()); // Giả định hàm lưu của bạn nhận tên file 
+                        shouldClose = true; // Đặt cờ để thoát game sau khi lưu
+
+                        //gMessageTimer = MESSAGE_LIMIT; // Bắt đầu đếm ngược 3s
+                        //gShouldExitAfterSave = true;   // Đặt lệnh chờ thoát
+                    }
+                    else
+                    {
+                        // LOGIC LỖI
+                        gStatusMsg = "NAME CANNOT BE EMPTY!";
+                        //gMessageTimer = MESSAGE_LIMIT; // Hiện lỗi 3s rồi mất
+                        //gShouldExitAfterSave = false;
+                    }
+                }
+                else if (gSaveButtons[i].id == SAVE_BTN_BACK)
+                {
+                    currentScreen = SCREEN_PLAY;
+                }
+            }
+        }
+    }
+
+    else {
+		SaveData(current()); // Đảm bảo lưu lại dữ liệu trước khi thoát game
+        Rectangle hitRect = GetButtonRect(gSaveButtons[1]); // Nút BACK
+        bool hovered = IsMouseOverRect(mouse, hitRect);
+        bool pressed = hovered && mouse.leftPressed;
+        if (pressed)
+        {
+            PlayMenuClick(audio, settings);
+            shouldClose = true; // Đặt cờ để thoát game mà không lưu
+		}
+    }
+
+    if (IsKeyPressed(KEY_ESCAPE)) currentScreen = SCREEN_PLAY;
 }

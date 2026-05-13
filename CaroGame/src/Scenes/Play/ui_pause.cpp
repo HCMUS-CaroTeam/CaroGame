@@ -125,20 +125,14 @@ void UpdatePauseUI(
                 }
                 break;
 
-            case PAUSE_BTN_LOAD:
-                ClosePause();
-                InitLoadUI(); // Reset trạng thái UI Load trước khi vào
-                currentScreen = SCREEN_LOAD;
-                break;
-
             case PAUSE_BTN_EXIT_MENU:
                 ClosePause();
-                currentScreen = SCREEN_MAIN_MENU;
+                currentScreen = SCREEN_NOTIFY_BACK_MENU;
                 break;
 
             case PAUSE_BTN_EXIT_DESKTOP:
                 ClosePause();
-                shouldClose = true;
+				currentScreen = SCREEN_NOTIFY_EXIT;
                 break;
             }
         }

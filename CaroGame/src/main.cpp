@@ -14,6 +14,7 @@
 #include "View/ui_button.h"
 #include "Scenes/Save_Load/ui_save.h"
 #include "Scenes/Save_Load/ui_load.h"
+#include "Scenes/Notify/ui_notify.h"
 
 static Font LoadFontSafe(const char* path, int size)
 {
@@ -49,6 +50,7 @@ int main()
     InitAboutUI();
     InitSaveUI();
     InitLoadUI();
+	InitNotifyUI();
     ScreenState currentScreen = SCREEN_MAIN_MENU;
     bool shouldClose = false;
 
@@ -80,20 +82,6 @@ int main()
         case SCREEN_ABOUT:
             UpdateAboutUI(mouse, dt, audio, settings, currentScreen);
             break;
-
-        case SCREEN_SAVE_FIRST:
-            UpdateSaveUI(mouse, dt, audio, settings, currentScreen);
-            break;
-
-        case SCREEN_SAVE_SECOND:
-            UpdateSaveUISecond(mouse, dt, audio, settings, currentScreen);
-            break;
-
-        case SCREEN_SAVE_AS:
-            UpdateSaveAsUI(mouse, dt, audio, settings, currentScreen);
-
-        case SCREEN_LOAD:
-            UpdateLoadUI(mouse, dt, audio, settings, currentScreen);
         }
 
 
@@ -120,22 +108,12 @@ int main()
         case SCREEN_SETTING:
             DrawSettingUI(fontTitle, fontSmall, fontMini, mouse, settings);
             break;
-
-        case SCREEN_SAVE_FIRST:
-            DrawSaveUI(fontTitle, fontSmall, mouse, settings);
-            break;
-
-        case SCREEN_SAVE_SECOND:
-            DrawSaveUISecond(fontTitle, fontSmall, mouse, settings);
-            break;
-
-        case SCREEN_SAVE_AS:
-            DrawSaveAsUI(fontTitle, fontSmall, mouse, settings);
-            break;
-
+        case SCREEN_SAVE:
+            // DrawSaveUI(fontTitle, fontSmall, mouse); dang loi
+			break;
         case SCREEN_LOAD:
-            DrawLoadUI(fontTitle, fontSmall, mouse, settings);
-            break;
+			// DrawLoadUI(fontTitle, fontSmall, mouse); chua lam 
+			break;
         }
 
         // UI brightness overlay (darkens the scene; 1.0=brightest, 0.0=very dark)
@@ -159,6 +137,7 @@ int main()
     ShutdownSaveUI();
     ShutdownLoadUI();
     ShutdownMainMenuUI();
+    ShutdownNotifyUI();
     ShutdownUIFrameSystem();
     ShutdownUIButtonSystem();
     ShutdownGameAudio(audio);

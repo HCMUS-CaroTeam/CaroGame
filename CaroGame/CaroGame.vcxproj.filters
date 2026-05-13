@@ -81,6 +81,9 @@
     <ClCompile Include="src\Model\ai_hard.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\Scenes\Notify\ui_notify.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Image Include="Assets\Texture\background.jpg">
@@ -202,6 +205,9 @@
     <ClInclude Include="src\Model\ai_hard.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="src\Scenes\Notify\ui_notify.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Library Include="raylib\lib\raylib.lib" />
@@ -213,6 +219,7 @@
     <None Include="game_progress.dat" />
     <None Include="packages.config" />
     <None Include="settings.cfg" />
+    <None Include="saves.dat" />
   </ItemGroup>
   <ItemGroup>
     <Media Include="Assets\audio\lose_sound.mp3" />
