@@ -52,17 +52,20 @@ enum TimeLimit {
 struct DataGame {
 	char nameGame[50];				  // Tên game, dùng để hiển thị trong danh sách save
 	char namePlayer1[50];			  // Tên người chơi 1, dùng để hiển thị trong danh sách save và khi load game
+	int scorePlayer1;				  // Điểm số của người chơi 1, dùng để hiển thị trong danh sách save và khi load game
 	char namePlayer2[50];			  // Tên người chơi 2, dùng để hiển thị trong danh sách save và khi load game
+	int scorePlayer2;				  // Điểm số của người chơi 2, dùng để hiển thị trong danh sách save và khi load game
 	int board[BOARD_SIZE][BOARD_SIZE];// Mảng lưu trạng thái bàn cờ, 0: trống, -1: O, 1: X
 	int turn;                         // Lượt đi hiện tại, -1: O đi trước, 1: X đi sau
 	int result;                       // Kết quả hiện tại của trò chơi
 	int gameMode;                     // Chế độ chơi hiện tại
 	int botDifficulty;                // Mức độ khó của Bot (chỉ áp dụng khi GAME_MODE là MODE_PVE)
 	int pvpMode;                      // Chế độ chơi PVP (chỉ áp dụng khi GAME_MODE là MODE_PVP)
-	int timeLeft;                   // Thời gian còn lại cho lượt đi hiện tại (chỉ áp dụng khi GAME_MODE là MODE_PVE)
+	int timeLeft;                     // Thời gian còn lại cho lượt đi hiện tại (chỉ áp dụng khi GAME_MODE là MODE_PVE)
 	time_t saveTime;				  // Thời gian lưu game
-	int lastMoveRow;				  // Dòng của nước đi cuối cùng, dùng để vẽ highlight
-	int lastMoveCol;				  // Cột của nước đi cuối cùng, dùng để vẽ highlight
+	int lastMoveRow;				  // Dòng của nước đi cuối cùng, dùng để kiểm tra thắng thua và vẽ đường thắng
+	int lastMoveCol;				  // Cột của nước đi cuối cùng, dùng để kiểm tra thắng thua và vẽ đường thắng
+	int winLine[WIN_LENGTH][2];       // Mảng lưu tọa độ của các ô tạo thành đường thắng, chỉ có giá trị khi result là RESULT_X_WINS hoặc RESULT_O_WINS
 };
 #pragma pack(pop)
 

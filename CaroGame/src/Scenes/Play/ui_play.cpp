@@ -7,14 +7,16 @@
 #include "Control/menu_data.h"
 #include "Model/Logic.h"
 #include "Model/game_data.h"
+#include "Scenes/Save_Load/ui_save.h"
+#include "Scenes/Save_Load/ui_load.h"
+#include "Model/ai_bot.h"
 #include <cmath>
 
 static bool gPaused = false;
 static const char* gPauseMessage = "";
 
-
-// Winning cells (filled when gWinner != CELL_EMPTY)
-static int gWinCells[WIN_LENGTH][2] = {};
+// Thêm biến timer dành cho AI Bot (đoạn dòng 16)
+static float gBotDelayTimer = 0.0f; 
 
 // ─── Board helpers ────────────────────────────────────────────────────
 static Rectangle GetBoardRect()
@@ -26,7 +28,7 @@ static bool IsInsideBoard(Vector2 pos)
 {
     Rectangle r = GetBoardRect();
     return pos.x >= r.x && pos.x <= r.x + r.width &&
-           pos.y >= r.y && pos.y <= r.y + r.height;
+        pos.y >= r.y && pos.y <= r.y + r.height;
 }
 
 static bool GetCellFromMouse(Vector2 pos, int& outRow, int& outCol)
@@ -40,12 +42,12 @@ static bool GetCellFromMouse(Vector2 pos, int& outRow, int& outCol)
 
 static void UpdateGameStateAfterMove()
 {
-   current().result = TestBoard(current().lastMoveRow, current().lastMoveCol, gWinCells);
-   if (current().result == CELL_EMPTY)
-       if (IsBoardFull())
-       {
-           current().result = RESULT_DRAW;
-	   }
+    current().result = TestBoard(current().lastMoveRow, current().lastMoveCol);
+    if (current().result == CELL_EMPTY)
+        if (IsBoardFull())
+        {
+            current().result = RESULT_DRAW;
+        }
 }
 
 // ─── Draw helpers ─────────────────────────────────────────────────────
@@ -95,24 +97,24 @@ static void DrawWinLine(const AppSettings& settings)
     if (current().result == CELL_EMPTY) return;
     Color col = (current().result == CELL_X)
         ? Color{ 120, 220, 255, 220 }
-        : Color{ 255, 150, 200, 220 };
+    : Color{ 255, 150, 200, 220 };
 
 
     // Highlight each winning cell
     for (int i = 0; i < WIN_LENGTH; ++i)
     {
-        float x = BOARD_START_X + gWinCells[i][1] * CELL_SIZE + 1.0f;
-        float y = BOARD_START_Y + gWinCells[i][0] * CELL_SIZE + 1.0f;
+        float x = BOARD_START_X + current().winLine[i][1] * CELL_SIZE + 1.0f;
+        float y = BOARD_START_Y + current().winLine[i][0] * CELL_SIZE + 1.0f;
         float s = (float)CELL_SIZE - 2.0f;
         DrawRectangle((int)x, (int)y, (int)s, (int)s,
             Color{ col.r, col.g, col.b, (unsigned char)(col.a / 3) });
     }
 
     // Thick line from center of first to last winning cell
-    float x1 = BOARD_START_X + gWinCells[0][1]           * CELL_SIZE + CELL_SIZE * 0.5f;
-    float y1 = BOARD_START_Y + gWinCells[0][0]           * CELL_SIZE + CELL_SIZE * 0.5f;
-    float x2 = BOARD_START_X + gWinCells[WIN_LENGTH-1][1] * CELL_SIZE + CELL_SIZE * 0.5f;
-    float y2 = BOARD_START_Y + gWinCells[WIN_LENGTH-1][0] * CELL_SIZE + CELL_SIZE * 0.5f;
+    float x1 = BOARD_START_X + current().winLine[0][1] * CELL_SIZE + CELL_SIZE * 0.5f;
+    float y1 = BOARD_START_Y + current().winLine[0][0] * CELL_SIZE + CELL_SIZE * 0.5f;
+    float x2 = BOARD_START_X + current().winLine[WIN_LENGTH - 1][1] * CELL_SIZE + CELL_SIZE * 0.5f;
+    float y2 = BOARD_START_Y + current().winLine[WIN_LENGTH - 1][0] * CELL_SIZE + CELL_SIZE * 0.5f;
     DrawLineEx({ x1, y1 }, { x2, y2 }, 5.0f, col);
 }
 
@@ -124,10 +126,10 @@ static void DrawPieces(Font fontTitle, const AppSettings& settings)
         {
             if (current().board[r][c] == CELL_EMPTY) continue;
 
-            const char* text  = (current().board[r][c] == CELL_X) ? "X" : "O";
+            const char* text = (current().board[r][c] == CELL_X) ? "X" : "O";
             Color color = (current().board[r][c] == CELL_X)
                 ? Color{ 120, 220, 255, 255 }
-                : Color{ 255, 150, 200, 255 };
+            : Color{ 255, 150, 200, 255 };
 
             float cx = BOARD_START_X + c * CELL_SIZE + CELL_SIZE * 0.5f;
             float cy = BOARD_START_Y + r * CELL_SIZE + CELL_SIZE * 0.5f;
@@ -141,7 +143,7 @@ static void DrawPieces(Font fontTitle, const AppSettings& settings)
 
             Vector2 size = MeasureTextEx(fontTitle, text, 38.0f, 2.0f);
             Vector2 pos{
-                cellRect.x + cellRect.width  * 0.5f - size.x * 0.5f,
+                cellRect.x + cellRect.width * 0.5f - size.x * 0.5f,
                 cellRect.y + cellRect.height * 0.5f - size.y * 0.5f
             };
 
@@ -175,27 +177,43 @@ static void UpdatePauseMenu(
                 gPaused = false;
                 gPauseMessage = "";
                 break;
+
             case PAUSE_BTN_SETTING:
                 SetSettingReturnScreen(SCREEN_PLAY);  // Back sẽ quay về Play (còn pause)
                 currentScreen = SCREEN_SETTING;
                 // gPaused giữ nguyên true — khi Back về Play sẽ thấy lại pause menu
                 gPauseMessage = "";
                 break;
+
             case PAUSE_BTN_SAVE:
-                gPauseMessage = "SAVE NOT IMPLEMENTED YET";
+                if (current().nameGame[0] == '\0') {
+                    currentScreen = SCREEN_SAVE_FIRST;
+                }
+                else {
+                    currentScreen = SCREEN_SAVE_SECOND;
+                }
                 break;
-            case PAUSE_BTN_LOAD:
-                gPauseMessage = "LOAD NOT IMPLEMENTED YET";
+
+            case PAUSE_BTN_SAVE_AS:
+                if (current().nameGame[0] == '\0') {
+                    currentScreen = SCREEN_SAVE_FIRST;
+                }
+                else {
+                    InitSaveUI(); // Reset trạng thái UI Save As trước khi vào
+                    currentScreen = SCREEN_SAVE_AS;
+                }
                 break;
+            
             case PAUSE_BTN_EXIT_MENU:
                 gPaused = false;
                 gPauseMessage = "";
-                currentScreen = SCREEN_MAIN_MENU;
+                currentScreen = SCREEN_NOTIFY_BACK_MENU;
                 break;
+
             case PAUSE_BTN_EXIT_DESKTOP:
                 gPaused = false;
                 gPauseMessage = "";
-                shouldClose = true;
+				currentScreen = SCREEN_NOTIFY_EXIT;
                 break;
             }
         }
@@ -207,7 +225,7 @@ static void DrawPauseOverlay(Font fontTitle, Font fontSmall, const MouseState& m
     DrawRectangle(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, Color{ 0, 0, 0, 150 });
 
     Rectangle panel{
-        SCREEN_WIDTH  * 0.5f - 240.0f,
+        SCREEN_WIDTH * 0.5f - 240.0f,
         SCREEN_HEIGHT * 0.5f - 250.0f,
         480.0f,
         500.0f
@@ -221,7 +239,7 @@ static void DrawPauseOverlay(Font fontTitle, Font fontSmall, const MouseState& m
         const int animIndex = 20 + i;
         Rectangle hitRect = GetButtonRect(gPauseButtons[i]);
         bool hovered = IsMouseOverRect(mouse, hitRect);
-        bool pressed  = hovered && mouse.leftDown;
+        bool pressed = hovered && mouse.leftDown;
         DrawUIButton(animIndex, gPauseButtons[i], fontSmall, hovered, pressed);
     }
 
@@ -233,9 +251,9 @@ static void DrawPauseOverlay(Font fontTitle, Font fontSmall, const MouseState& m
 }
 
 // ─── Public API ───────────────────────────────────────────────────────
-void InitPlayUI()  { 
-	ResetBoard(); // Tạm thời có thể gọi hàm này để khởi tạo game data.
-                  // Sau này có thể gọi hàm khác nếu cần thiết
+void InitPlayUI() {
+    ResetBoard(); // Tạm thời có thể gọi hàm này để khởi tạo game data.
+    // Sau này có thể gọi hàm khác nếu cần thiết
 }
 void ShutdownPlayUI() {}
 
@@ -248,7 +266,7 @@ void UpdatePlayUI(
     bool& shouldClose
 )
 {
-    if (IsKeyPressed(KEY_R))  { ResetBoard(); return; }
+    if (IsKeyPressed(KEY_R)) { ResetBoard(); return; }
 
     if (IsKeyPressed(KEY_ESCAPE))
     {
@@ -263,21 +281,58 @@ void UpdatePlayUI(
         return;
     }
 
+    // Nếu game đã có kết quả thắng hòa thì không làm gì thêm
     if (current().result != CELL_EMPTY || current().result == RESULT_DRAW) return;
 
-    if (mouse.leftPressed)
-    {
-        int row = -1, col = -1;
-        if (GetCellFromMouse(mouse.position, row, col) && current().board[row][col] == CELL_EMPTY)
-        {
-            current().board[row][col] = current().turn;
-            current().lastMoveRow = row;
-            current().lastMoveCol = col;
+    // --------- TÍCH HỢP PVE & PVP ---------
 
+    // Kiểm tra xem hiện tại đang ở chế độ PVE và đang là lượt của BOT (CELL_O) hay không
+    bool isBotTurn = (current().gameMode == MODE_PVE && current().turn == CELL_O);
+
+    if (isBotTurn)
+    {
+        // [NHÁNH 1: LƯỢT CỦA AI BOTS]
+        gBotDelayTimer += dt; // Cộng dồn delta time (khoảng cách giữa các frame)
+
+        if (gBotDelayTimer >= 0.5f) // Trễ 0.5 giây mới để AI đánh
+        {
+            // Gọi logic của Bot.
+            // LƯU Ý: Vì bạn nói BotMakeMove() đã tự đánh xuống, tự đổi turn(CELL_X), nên
+            // bạn chỉ cần gọi trực tiếp nó ở đây.
+            BotMakeMove();
+
+            // Cập nhật trạng thái thắng/thua sau nước đi của Bot
             UpdateGameStateAfterMove();
 
-            if (current().result == RESULT_ONGOING)
+            if (current().result == RESULT_ONGOING) {
                 current().turn = (current().turn == CELL_X) ? CELL_O : CELL_X;
+            }
+
+            // Đặt lại số đếm thời gian cho lượt đánh sau
+            gBotDelayTimer = 0.0f;
+        }
+    }
+    else
+    {
+        // [NHÁNH 2: LƯỢT CỦA NGƯỜI CHƠI - BLOCK MOUSE KHỎI BOT]
+        // Vì ta đặt trong cụm `else`, nên nếu là isBotTurn == true, click chuột sẽ toàn hoàn bị vô hiệu hóa!
+        if (mouse.leftPressed)
+        {
+            int row = -1, col = -1;
+            if (GetCellFromMouse(mouse.position, row, col) && current().board[row][col] == CELL_EMPTY)
+            {
+                current().board[row][col] = current().turn;
+                current().lastMoveRow = row;
+                current().lastMoveCol = col;
+
+                UpdateGameStateAfterMove();
+
+                if (current().result == RESULT_ONGOING) {
+                    current().turn = (current().turn == CELL_X) ? CELL_O : CELL_X;
+                    // Reset lại timer để chắc chắn timer bắt đầu từ độ trễ 0s ở lượt tới
+                    gBotDelayTimer = 0.0f;
+                }
+            }
         }
     }
 }

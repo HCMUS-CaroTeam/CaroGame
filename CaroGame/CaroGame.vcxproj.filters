@@ -27,31 +27,61 @@
     <ClCompile Include="src\Control\menu_data.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-<ClCompile Include="src\Model\Logic.cpp">
-  <Filter>Source Files</Filter>
-</ClCompile>
-<ClCompile Include="src\Scenes\Setup\ui_setup.cpp">
-  <Filter>Source Files</Filter>
-</ClCompile>
-<ClCompile Include="src\Scenes\Play\ui_play.cpp">
-  <Filter>Source Files</Filter>
-</ClCompile>
-<ClCompile Include="src\View\ui_background.cpp">
-  <Filter>Source Files</Filter>
-</ClCompile>
-<ClCompile Include="src\View\ui_button.cpp">
-  <Filter>Source Files</Filter>
-</ClCompile>
-<ClCompile Include="src\Scenes\Play\ui_pause.cpp">
-  <Filter>Source Files</Filter>
-</ClCompile>
-<ClCompile Include="src\Systems\audio_manager.cpp">
+    <ClCompile Include="src\Model\Logic.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Scenes\Setup\ui_setup.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Scenes\Play\ui_play.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\View\ui_background.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\View\ui_button.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Scenes\Play\ui_pause.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Systems\audio_manager.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\View\ui_frame.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\Scenes\Setting\ui_setting.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Model\ai_bot.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Model\ai_easy.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Model\ai_medium.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Model\game_data.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Scenes\About\ui_about.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Scenes\Save_Load\ui_load.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Scenes\Save_Load\ui_save.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Systems\save_load.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Model\ai_hard.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Scenes\Notify\ui_notify.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -112,34 +142,70 @@
     <ClInclude Include="src\Model\app_settings.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-<ClInclude Include="Shared\Common.h">
-  <Filter>Header Files</Filter>
-</ClInclude>
-<ClInclude Include="src\Model\Logic.h">
-  <Filter>Header Files</Filter>
-</ClInclude>
-<ClInclude Include="src\Scenes\Setup\ui_setup.h">
-  <Filter>Header Files</Filter>
-</ClInclude>
-<ClInclude Include="src\Scenes\Play\ui_play.h">
-  <Filter>Header Files</Filter>
-</ClInclude>
-<ClInclude Include="src\View\ui_background.h">
-  <Filter>Header Files</Filter>
-</ClInclude>
-<ClInclude Include="src\View\ui_button.h">
-  <Filter>Header Files</Filter>
-</ClInclude>
-<ClInclude Include="src\Scenes\Play\ui_pause.h">
-  <Filter>Header Files</Filter>
-</ClInclude>
-<ClInclude Include="src\Systems\audio_manager.h">
+    <ClInclude Include="Shared\Common.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Model\Logic.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Scenes\Setup\ui_setup.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Scenes\Play\ui_play.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\View\ui_background.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\View\ui_button.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Scenes\Play\ui_pause.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Systems\audio_manager.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\View\ui_frame.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\Scenes\Setting\ui_setting.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Model\ai_bot.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Model\ai_easy.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Model\ai_medium.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Model\game_data.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Scenes\About\ui_about.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Scenes\Save_Load\ui_load.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Scenes\Save_Load\ui_save.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Systems\load.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Systems\save.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Systems\save_load.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Model\ai_hard.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Scenes\Notify\ui_notify.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -152,6 +218,8 @@
     <None Include="Assets\audio\menu_click.ogg" />
     <None Include="game_progress.dat" />
     <None Include="packages.config" />
+    <None Include="settings.cfg" />
+    <None Include="saves.dat" />
   </ItemGroup>
   <ItemGroup>
     <Media Include="Assets\audio\lose_sound.mp3" />
