@@ -155,26 +155,71 @@ void DrawLoadUI(Font fontTitle, Font fontSmall, const MouseState& mouse, const A
 
     BeginScissorMode((int)container.x, (int)container.y, (int)container.width, (int)container.height);
     int i = 0;
-    for (auto const& [name, data] : gameSaves) {
-        if (name == "" || name[0] == '\0')
-        {
-            continue;
-        }
-        Rectangle itemRect = { container.x + 10, container.y + 10 + (i * ITEM_HEIGHT) + gScrollY, container.width - 30, ITEM_HEIGHT - 10 };
-        bool isSelected = (gSelectedKey == name);
-        Color boxColor = isSelected ? Color{ 50, 60, 100, 255 } : Color{ 35, 35, 50, 255 };
+    for (auto& pair : gameSaves) {
+        DataGame& d = pair.second;
+        Rectangle itemRect = { container.x, container.y + i * ITEM_HEIGHT + gScrollY, container.width, ITEM_HEIGHT };
 
-        DrawRectangleRounded(itemRect, 0.1f, 8, boxColor);
-        if (isSelected) DrawRectangleRoundedLinesEx(itemRect, 0.1f, 8, 2.0f, GOLD);
-        DrawTextEx(fontSmall, name.c_str(), { itemRect.x + 15, itemRect.y + 15 }, 24, 1.0f, WHITE);
-        DrawTextEx(fontSmall, TextFormat("%s vs %s", data.namePlayer1, data.namePlayer2), { itemRect.x + 15, itemRect.y + 45 }, 18, 1.0f, LIGHTGRAY);
+        // Chỉ vẽ nếu item nằm trong vùng nhìn thấy của container
+        if (itemRect.y + ITEM_HEIGHT > container.y && itemRect.y < container.y + container.height) {
+            bool hovered = IsMouseOverRect(mouse, itemRect);
+            bool selected = (gSelectedKey == pair.first);
+
+            // Vẽ nền và khung cho Item
+            DrawRectangleRec(itemRect, selected ? Color{ 45, 50, 65, 255 } : (hovered ? Color{ 35, 40, 50, 255 } : Color{ 25, 30, 40, 255 }));
+            DrawRectangleLinesEx(itemRect, 1.0f, selected ? GOLD : DARKGRAY);
+
+            float startX = itemRect.x + 15;
+            float currY = itemRect.y + 10;
+            float lineSpacing = 25.0f; // Khoảng cách giữa các dòng
+
+            // --- DÒNG 1: TÊN VÁN & THỜI GIAN ---
+            DrawTextEx(fontSmall, TextFormat("SAVE: %s", d.nameGame), { startX, currY }, 22, 1, GOLD);
+            // Giả sử bạn có biến d.saveTime, nếu chưa có hãy dùng tạm text mặc định
+            struct tm timeInfo;
+            localtime_s(&timeInfo, &d.saveTime); // Sử dụng localtime_s cho an toàn trên Windows
+
+            // 2. Tạo buffer để chứa chuỗi thời gian đã định dạng
+            char timeBuffer[20];
+            // Định dạng: %d (ngày), %m (tháng), %Y (năm), %H (giờ), %M (phút)
+            strftime(timeBuffer, sizeof(timeBuffer), "%d/%m/%Y %H:%M", &timeInfo);
+
+            DrawTextEx(fontSmall, timeBuffer, { itemRect.x + itemRect.width - 150, currY + 25.0f }, 18, 1, GRAY);
+
+            // --- DÒNG 2: NGƯỜI CHƠI 1 & NGƯỜI CHƠI 2 (KÈM ĐIỂM) ---
+            currY += lineSpacing;
+            DrawTextEx(fontSmall, TextFormat("P1: %s (%d)", d.namePlayer1, d.scorePlayer1), { startX, currY }, 18, 1, WHITE);
+            DrawTextEx(fontSmall, TextFormat("P2: %s (%d)", d.namePlayer2, d.scorePlayer2), { startX + 200, currY }, 18, 1, WHITE);
+
+            // --- DÒNG 3: CHẾ ĐỘ CHƠI & ĐỘ KHÓ BOT ---
+            currY += lineSpacing;
+            const char* modeStr = (d.gameMode == MODE_PVP) ? "Mode: PVP (2 Player)" : "Mode: PVE (vs Bot)";
+            DrawTextEx(fontSmall, modeStr, { startX, currY }, 18, 1, LIGHTGRAY);
+
+            if (d.gameMode == MODE_PVE) {
+                const char* diffStr = TextFormat("Bot: %s", (d.botDifficulty == DIFFICULTY_EASY ? "Easy" : (d.botDifficulty == DIFFICULTY_HARD ? "Hard" : "Medium")));
+                DrawTextEx(fontSmall, diffStr, { startX + 250, currY }, 18, 1, SKYBLUE);
+            }
+
+            // --- DÒNG 4: KẾT QUẢ (NẾU CÓ) ---
+            currY += lineSpacing;
+            if (d.scorePlayer1 >= 5 || d.scorePlayer2 >= 5 || d.result != RESULT_ONGOING) {
+                const char* resStr = (d.scorePlayer1 >= 5) ? "WINNER: PLAYER 1" : (d.scorePlayer2 >= 5 ? "WINNER: PLAYER 2" : "DRAW");
+                DrawTextEx(fontSmall, resStr, { startX, currY }, 18, 1, LIME);
+            }
+            else {
+                DrawTextEx(fontSmall, "Status: In Progress...", { startX, currY }, 18, 1, ORANGE);
+            }
+
+            // Click để chọn
+            if (hovered && mouse.leftPressed) gSelectedKey = pair.first;
+        }
         i++;
     }
+    
     EndScissorMode();
 
     // Khung Preview & Nút Confirm
     Rectangle previewBox = { container.x + container.width + 20, container.y, 220, VIEW_HEIGHT };
-    DrawRectangleLinesEx(previewBox, 1.0f, GRAY);
 
     if (!gSelectedKey.empty()) {
         DataGame& d = gameSaves[gSelectedKey];

@@ -1,9 +1,11 @@
 #include "save_load.h"
-#include<fstream>
+#include <ctime>
+#include <fstream>
 
 unordered_map<string, DataGame> gameSaves = {};
 
-void SaveData(const DataGame& gameData) {
+void SaveData(DataGame& gameData) {
+	gameData.saveTime = time(nullptr); // Cập nhật thời gian lưu hiện tại
 	// Use the name of the game as the key for saving
 	gameSaves[string(gameData.nameGame)] = gameData;
 }

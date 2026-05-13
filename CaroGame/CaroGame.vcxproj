@@ -137,6 +137,7 @@
     <ClCompile Include="src\Model\ai_medium.cpp" />
     <ClCompile Include="src\Model\game_data.cpp" />
     <ClCompile Include="src\Scenes\About\ui_about.cpp" />
+    <ClCompile Include="src\Scenes\Notify\ui_notify.cpp" />
     <ClCompile Include="src\Scenes\Save_Load\ui_load.cpp" />
     <ClCompile Include="src\Scenes\Save_Load\ui_save.cpp" />
     <ClCompile Include="src\Scenes\Setting\ui_setting.cpp" />
@@ -181,6 +182,7 @@
     <ClInclude Include="src\Model\Logic.h" />
     <ClInclude Include="src\audio_manager.h" />
     <ClInclude Include="src\Scenes\MainMenu\ui_main_menu.h" />
+    <ClInclude Include="src\Scenes\Notify\ui_notify.h" />
     <ClInclude Include="src\Scenes\Play\ui_pause.h" />
     <ClInclude Include="src\Scenes\Play\ui_play.h" />
     <ClInclude Include="src\Scenes\About\ui_about.h" />
@@ -205,6 +207,7 @@
     <None Include="Assets\audio\menu_hover.ogg" />
     <None Include="game_progress.dat" />
     <None Include="packages.config" />
+    <None Include="saves.dat" />
     <None Include="settings.cfg" />
   </ItemGroup>
   <ItemGroup>
