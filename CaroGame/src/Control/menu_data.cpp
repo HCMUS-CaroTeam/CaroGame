@@ -113,8 +113,8 @@ Button gSetupButtons[] =
     { Vector2{ 550.0f, 570.0f }, Vector2{ 200.0f, 60.0f }, "PLAY", SETUP_BTN_PLAY, BUTTON_VISUAL_TEXT, BUTTON_ICON_NONE, 28.0f, 2.0f },
 
     // Nút mũi tên trái / phải
-    { Vector2{ 130.0f, 300.0f }, Vector2{ 300.0f, 300.0f }, "", SETUP_BTN_PREV, BUTTON_VISUAL_ICON, BUTTON_ICON_ARROW_LEFT, 0.0f, 0.0f },
-    { Vector2{ 890.0f, 360.0f }, Vector2{ 300.0f, 300.0f }, "", SETUP_BTN_NEXT, BUTTON_VISUAL_ICON, BUTTON_ICON_ARROW_RIGHT, 0.0f, 0.0f },
+    { Vector2{ 258.0f, 336.0f }, Vector2{ 72.0f, 88.0f }, "", SETUP_BTN_PREV, BUTTON_VISUAL_ICON, BUTTON_ICON_ARROW_LEFT, 0.0f, 0.0f },
+    { Vector2{ 970.0f, 336.0f }, Vector2{ 72.0f, 88.0f }, "", SETUP_BTN_NEXT, BUTTON_VISUAL_ICON, BUTTON_ICON_ARROW_RIGHT, 0.0f, 0.0f },
 
     { Vector2{ 1050.0f, 570.0f }, Vector2{ 200.0f, 60.0f }, "BACK", SETUP_BTN_BACK, BUTTON_VISUAL_TEXT, BUTTON_ICON_NONE, 28.0f, 2.0f }
 };
@@ -142,7 +142,7 @@ int gSettingButtonCount = sizeof(gSettingButtons) / sizeof(gSettingButtons[0]);
 // animIndex = 31
 Button gAboutButtons[] =
 {
-    { Vector2{ 660.0f, 715.0f }, Vector2{ 280.0f, 62.0f }, "BACK", ABOUT_BTN_BACK, BUTTON_VISUAL_TEXT, BUTTON_ICON_NONE, 26.0f, 2.0f }
+    { Vector2{ SCREEN_WIDTH * 0.5f - 75.0f, 800.0f }, Vector2{ 150.0f, 62.0f }, "BACK", ABOUT_BTN_BACK, BUTTON_VISUAL_TEXT, BUTTON_ICON_NONE, 26.0f, 2.0f }
 };
 
 int gAboutButtonCount = sizeof(gAboutButtons) / sizeof(gAboutButtons[0]);
