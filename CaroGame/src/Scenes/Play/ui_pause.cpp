@@ -1,6 +1,8 @@
 #include "Scenes/Play/ui_pause.h"
 #include "View/ui_button.h"
 #include "Model/config.h"
+#include "Scenes/Save_Load/ui_save.h"
+#include "Scenes/Save_Load/ui_load.h"
 
 static bool gPaused = false;
 static const char* gPauseMessage = "";
@@ -22,9 +24,9 @@ static Rectangle GetPausePanelRect()
 {
     return Rectangle{
         SCREEN_WIDTH * 0.5f - 240.0f,
-        SCREEN_HEIGHT * 0.5f - 250.0f,
+        SCREEN_HEIGHT * 0.5f - 400.0f,
         480.0f,
-        500.0f
+        800.0f
     };
 }
 
@@ -104,22 +106,33 @@ void UpdatePauseUI(
 
             case PAUSE_BTN_SAVE:
                 ClosePause();
-				currentScreen = SCREEN_SAVE;
+                if (current().nameGame[0] == '\0') {
+                    currentScreen = SCREEN_SAVE_FIRST;
+                }
+                else {
+                    currentScreen = SCREEN_SAVE_SECOND;
+                }
                 break;
 
-            case PAUSE_BTN_LOAD:
+            case PAUSE_BTN_SAVE_AS:
                 ClosePause();
-				currentScreen = SCREEN_LOAD;
+                if (current().nameGame[0] == '\0') {
+                    currentScreen = SCREEN_SAVE_FIRST;
+                }
+                else {
+                    InitSaveUI();
+                    currentScreen = SCREEN_SAVE_AS;
+                }
                 break;
 
             case PAUSE_BTN_EXIT_MENU:
                 ClosePause();
-                currentScreen = SCREEN_MAIN_MENU;
+                currentScreen = SCREEN_NOTIFY_BACK_MENU;
                 break;
 
             case PAUSE_BTN_EXIT_DESKTOP:
                 ClosePause();
-                shouldClose = true;
+				currentScreen = SCREEN_NOTIFY_EXIT;
                 break;
             }
         }

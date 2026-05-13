@@ -48,6 +48,10 @@ void UpdateMainMenuUI(
                 currentScreen = SCREEN_SETUP;
                 break;
 
+            case BTN_LOAD:
+                currentScreen = SCREEN_LOAD;
+				break;
+
             case BTN_ABOUT:
                 currentScreen = SCREEN_ABOUT;
                 break;

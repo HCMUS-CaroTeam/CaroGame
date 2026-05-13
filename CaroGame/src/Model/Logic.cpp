@@ -70,7 +70,7 @@ int CheckBoard(int pX, int pY) {
     return 0; // Click trùng ô đã đánh
 }
 
-int TestBoard(int lastRow, int lastCol, int (*outCells)[2]) {
+int TestBoard(int lastRow, int lastCol) {
     // 4 hướng: Ngang, Dọc, Chéo chính, Chéo phụ
     int dx[] = { 0, 1, 1, 1 };
     int dy[] = { 1, 0, 1, -1 };
@@ -119,27 +119,37 @@ int TestBoard(int lastRow, int lastCol, int (*outCells)[2]) {
             }
 
             if (isWin) {
-                // Nếu người dùng truyền mảng vào, ta nạp 5 tọa độ thắng cuộc
-                if (outCells != nullptr) {
-                    // Tìm quân đầu tiên của chuỗi thắng (quét ngược lại từ hướng lùi)
-                    int startStep = 0;
-                    for (int s = 1; s <= 5; s++) {
-                        int nr = lastRow - s * dx[dir];
-                        int nc = lastCol - s * dy[dir];
-                        if (nr >= 0 && nr < BOARD_SIZE && nc >= 0 && nc < BOARD_SIZE && current().board[nr][nc] == player)
-                            startStep = s;
-                        else break;
-                    }
-
-                    // Nạp 5 quân liên tiếp từ vị trí bắt đầu đó
-                    int startR = lastRow - startStep * dx[dir];
-                    int startC = lastCol - startStep * dy[dir];
-                    for (int i = 0; i < 5; i++) {
-                        outCells[i][0] = startR + i * dx[dir];
-                        outCells[i][1] = startC + i * dy[dir];
-                    }
+				// Nếu nthắng thì lưu lại đường thắng vào current().winLine để UI có thể vẽ đường thắng
+                
+                // Tìm phạm vi của chuỗi quân cờ liên tiếp (để tránh lấy nhầm quân không liền kề hoặc vượt quá mảng)
+                int startStep = 0;
+                while (true) {
+                    int nr = lastRow + (startStep - 1) * dx[dir];
+                    int nc = lastCol + (startStep - 1) * dy[dir];
+                    if (nr < 0 || nr >= BOARD_SIZE || nc < 0 || nc >= BOARD_SIZE) break;
+                    if (current().board[nr][nc] == player) startStep--;
+                    else break;
                 }
-                return player;
+
+                int endStep = 0;
+                while (true) {
+                    int nr = lastRow + (endStep + 1) * dx[dir];
+                    int nc = lastCol + (endStep + 1) * dy[dir];
+                    if (nr < 0 || nr >= BOARD_SIZE || nc < 0 || nc >= BOARD_SIZE) break;
+                    if (current().board[nr][nc] == player) endStep++;
+                    else break;
+                }
+
+                int idx = 0;
+                for (int step = startStep; step <= endStep; step++) {
+                    if (idx >= WIN_LENGTH) break;
+                    int nr = lastRow + step * dx[dir];
+                    int nc = lastCol + step * dy[dir];
+                    current().winLine[idx][0] = nr;
+                    current().winLine[idx][1] = nc;
+                    idx++;
+                }
+				return (player == CELL_X) ? RESULT_X_WINS : RESULT_O_WINS;
             }
         }
     }
@@ -153,15 +163,18 @@ void ResetBoard() {
     current().turn = CELL_X; // Mặc định X đi trước
 	current().result = RESULT_ONGOING; // Reset kết quả về ongoing khi reset bàn cờ
     timerInitialized = false; // Reset trạng thái khởi tạo timer khi reset bàn cờ
-	current().lastMoveRow = -1; // Reset vị trí nước đi cuối cùng
-	current().lastMoveCol = -1; 
+	current().lastMoveRow = -1; // Reset vị trí nước đi cuối cùng về giá trị không hợp lệ
+	current().lastMoveCol = -1; // Reset vị trí nước đi cuối cùng về giá trị không hợp lệ
+	current().winLine[0][0] = -1; // Reset đường thắng về giá trị không hợp lệ
 }
 
 void InitNewGame() {
     ResetBoard();
 	current().nameGame[0] = '\0'; // Reset tên game
 	current().namePlayer1[0] = '\0'; // Reset tên người chơi 1
+	current().scorePlayer1 = 0; // Reset điểm số người chơi 1
 	current().namePlayer2[0] = '\0'; // Reset tên người chơi 2
+	current().scorePlayer2 = 0; // Reset điểm số người chơi 2
 	current().gameMode = MODE_PVP; // Mặc định chế độ chơi là PVP
 	current().botDifficulty = DIFFICULTY_NONE; // Mặc định không có Bot
 	current().pvpMode = NONE; // Mặc định không có chế độ PVP đặc biệt
