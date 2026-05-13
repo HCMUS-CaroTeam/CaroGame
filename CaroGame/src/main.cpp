@@ -16,10 +16,42 @@
 #include "Scenes/Save_Load/ui_load.h"
 #include "Scenes/Notify/ui_notify.h"
 
+static int* GetVietnameseCodepoints(int& codepointCount)
+{
+    static int codepoints[95 + 64 + 128 + 90] = {};
+    static bool initialized = false;
+
+    if (!initialized)
+    {
+        int index = 0;
+
+        for (int c = 32; c <= 126; ++c)
+            codepoints[index++] = c;
+
+        for (int c = 0x00C0; c <= 0x00FF; ++c)
+            codepoints[index++] = c;
+
+        for (int c = 0x0100; c <= 0x017F; ++c)
+            codepoints[index++] = c;
+
+        for (int c = 0x1EA0; c <= 0x1EF9; ++c)
+            codepoints[index++] = c;
+
+        initialized = true;
+    }
+
+    codepointCount = sizeof(codepoints) / sizeof(codepoints[0]);
+    return codepoints;
+}
+
 static Font LoadFontSafe(const char* path, int size)
 {
     if (FileExists(path))
-        return LoadFontEx(path, size, 0, 0);
+    {
+        int codepointCount = 0;
+        int* codepoints = GetVietnameseCodepoints(codepointCount);
+        return LoadFontEx(path, size, codepoints, codepointCount);
+    }
 
     return GetFontDefault();
 }

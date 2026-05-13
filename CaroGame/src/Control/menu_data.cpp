@@ -142,7 +142,7 @@ int gSettingButtonCount = sizeof(gSettingButtons) / sizeof(gSettingButtons[0]);
 // animIndex = 31
 Button gAboutButtons[] =
 {
-    { Vector2{ 660.0f, 715.0f }, Vector2{ 280.0f, 62.0f }, "BACK", ABOUT_BTN_BACK, BUTTON_VISUAL_TEXT, BUTTON_ICON_NONE, 26.0f, 2.0f }
+    { Vector2{ SCREEN_WIDTH * 0.5f - 75.0f, 800.0f }, Vector2{ 150.0f, 62.0f }, "BACK", ABOUT_BTN_BACK, BUTTON_VISUAL_TEXT, BUTTON_ICON_NONE, 26.0f, 2.0f }
 };
 
 int gAboutButtonCount = sizeof(gAboutButtons) / sizeof(gAboutButtons[0]);
