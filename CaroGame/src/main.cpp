@@ -142,15 +142,9 @@ int main()
 
 		case SCREEN_SAVE_FIRST: 
         case SCREEN_SAVE_SECOND:       
-            DrawSaveUI(fontTitle, fontSmall, mouse, settings);
-            break;
-
         case SCREEN_SAVE_TO_BACK_MENU:
-            DrawSaveToExitUI(fontTitle, fontSmall, mouse, settings, false);
-			break;
-
         case SCREEN_SAVE_TO_EXIT:
-			DrawSaveToExitUI(fontTitle, fontSmall, mouse, settings, true);
+			DrawSaveUI(fontTitle, fontSmall, mouse, settings);
             break;
 
         case SCREEN_SAVE_AS:
@@ -163,7 +157,7 @@ int main()
 
 		case SCREEN_NOTIFY_EXIT: 
         case SCREEN_NOTIFY_BACK_MENU:
-			DrawNotifyUI(fontTitle, fontSmall, mouse, settings, shouldClose, currentScreen);
+			DrawNotifyUI(fontTitle, fontSmall, mouse, settings);
         }
 
         // UI brightness overlay (darkens the scene; 1.0=brightest, 0.0=very dark)

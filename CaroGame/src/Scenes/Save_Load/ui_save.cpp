@@ -195,7 +195,7 @@ void DrawSaveUI(Font fontTitle, Font fontSmall, const MouseState& mouse, const A
         DrawCenteredText(fontTitle, "GAME SAVED SUCCESSFULLY!", panel.y + 150.0f, 32.0f, LIME);
         // Hướng dẫn tiếp theo
         DrawCenteredText(fontSmall, "Press OK", panel.y + 220.0f, 20.0f, LIGHTGRAY);
-
+		SaveData(current()); // Đảm bảo lưu lại dữ liệu trước khi vẽ nút OK
         // Vẽ nút Back to Game
         Rectangle hitRect = GetButtonRect(gSaveButtons[1]); // Nút BACK
         bool hov = IsMouseOverRect(mouse, hitRect);
@@ -214,6 +214,7 @@ void UpdateSaveUISecond(
 {
     if (IsKeyPressed(KEY_ESCAPE)) currentScreen = SCREEN_PLAY;
     // Chỉ cần xử lý nút Back to Game
+	SaveData(current()); // Đảm bảo lưu lại dữ liệu trước khi quay về Play
     Rectangle hitRect = GetButtonRect(gSaveButtons[1]); // Nút BACK
     bool hovered = IsMouseOverRect(mouse, hitRect);
     bool pressed = hovered && mouse.leftPressed;
@@ -452,6 +453,7 @@ void UpdateSaveToBackMenuUI(
     }
 
     else {
+		SaveData(current()); // Đảm bảo lưu lại dữ liệu trước khi quay về menu
         Rectangle hitRect = GetButtonRect(gSaveButtons[1]); // Nút BACK
         bool hovered = IsMouseOverRect(mouse, hitRect);
         bool pressed = hovered && mouse.leftPressed;
@@ -515,7 +517,6 @@ void UpdateSaveToExitUI(
                         current().nameGame[sizeof(current().nameGame) - 1] = '\0'; // Đảm bảo null-terminated
                         gStatusMsg = "GAME SAVED SUCCESSFULLY! BACK TO MENU...";
                         SaveData(current()); // Giả định hàm lưu của bạn nhận tên file 
-                        SaveGamesToFile(gameSaves); // Cập nhật file saves.dat sau khi lưu
                         shouldClose = true; // Đặt cờ để thoát game sau khi lưu
 
                         //gMessageTimer = MESSAGE_LIMIT; // Bắt đầu đếm ngược 3s
@@ -538,6 +539,7 @@ void UpdateSaveToExitUI(
     }
 
     else {
+		SaveData(current()); // Đảm bảo lưu lại dữ liệu trước khi thoát game
         Rectangle hitRect = GetButtonRect(gSaveButtons[1]); // Nút BACK
         bool hovered = IsMouseOverRect(mouse, hitRect);
         bool pressed = hovered && mouse.leftPressed;
@@ -549,76 +551,4 @@ void UpdateSaveToExitUI(
     }
 
     if (IsKeyPressed(KEY_ESCAPE)) currentScreen = SCREEN_PLAY;
-}
-
-void DrawSaveToExitUI(Font fontTitle, Font fontSmall, const MouseState& mouse, const AppSettings& settings, bool isShouldClose)
-{
-    DrawBackgroundOnly();
-
-    // Vẽ Panel chính
-    Rectangle panel = {
-        SCREEN_WIDTH * 0.5f - SAVE_PANEL_W * 0.5f,
-        SCREEN_HEIGHT * 0.5f - SAVE_PANEL_H * 0.5f,
-        SAVE_PANEL_W, SAVE_PANEL_H
-    };
-    DrawPanelFrame(panel);
-    if (current().nameGame[0] == '\0') // Nếu chưa có tên game (lần đầu lưu), hiển thị giao diện nhập tên 
-    {
-        // 1. Tiêu đề
-        DrawCenteredText(fontTitle, "SAVE GAME", panel.y + 35.0f, 40.0f, Color{ 255, 235, 225, 255 });
-
-        // 2. Thông báo trạng thái (Hiện ra khi có gStatusMsg)
-        if (gStatusMsg[0] != '\0')
-        {
-            // Màu đỏ cho lỗi (chữ N trong Name), màu xanh cho thành công
-            Color msgColor = (gStatusMsg[0] == 'N') ? RED : LIME;
-            DrawCenteredText(fontSmall, gStatusMsg, panel.y + 85.0f, 28.0f, msgColor);
-        }
-
-        // 3. Khung nhập liệu
-        Rectangle inputBox = { panel.x + 100, panel.y + 130, 400, 50 };
-        DrawRectangleRec(inputBox, Color{ 20, 20, 30, 255 });
-        DrawRectangleLinesEx(inputBox, 2.0f, RAYWHITE);
-
-        Vector2 textPos = { inputBox.x + 15, inputBox.y + 12 };
-        if (gLetterCount == 0)
-        {
-            DrawTextEx(fontSmall, " Enter save name...", textPos, 24.0f, 1.0f, GRAY);
-        }
-        else
-        {
-            DrawTextEx(fontSmall, gInputBuffer, textPos, 24.0f, 1.0f, GOLD);
-        }
-
-        // 4. Con trỏ nhấp nháy (Cursor)
-        if (fmodf(gCursorBlinkTimer, 1.0f) < 0.5f /* &&!gShouldExitAfterSave */)
-        {
-            Vector2 textSize = MeasureTextEx(fontSmall, gInputBuffer, 24.0f, 1.0f);
-            DrawTextEx(fontSmall, "_", Vector2{ textPos.x + textSize.x + 2.0f, textPos.y }, 24.0f, 1.0f, GOLD);
-        }
-
-        // 5. Hướng dẫn
-        DrawCenteredText(fontSmall, "Press CONFIRM to save your progress", panel.y + 200.0f, 20.0f, LIGHTGRAY);
-
-        // 6. Vẽ các nút bấm
-        for (int i = 0; i < gSaveButtonCount; ++i)
-        {
-            Rectangle hitRect = GetButtonRect(gSaveButtons[i]);
-            bool hov = IsMouseOverRect(mouse, hitRect);
-            bool prs = hov && mouse.leftDown;
-            DrawUIButton(50 + i, gSaveButtons[i], fontSmall, hov, prs);
-        }
-    }
-    else // Nếu đã có tên game (đã lưu ít nhất 1 lần), hiển thị giao diện thông báo lưu thành công 
-    {
-        DrawCenteredText(fontTitle, "GAME SAVED SUCCESSFULLY!", panel.y + 150.0f, 32.0f, LIME);
-        // Hướng dẫn tiếp theo
-        DrawCenteredText(fontSmall, "Press OK", panel.y + 220.0f, 20.0f, LIGHTGRAY);
-
-        // Vẽ nút Back to Game
-        Rectangle hitRect = GetButtonRect(gSaveButtons[1]); // Nút BACK
-        bool hov = IsMouseOverRect(mouse, hitRect);
-        bool prs = hov && mouse.leftDown;
-        DrawUIButton(51, gSaveButtons[1], fontSmall, hov, prs);
-    }
 }

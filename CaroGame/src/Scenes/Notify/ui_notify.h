@@ -26,4 +26,4 @@ void UpdateNotifyUI(
 	bool isShouldClose
 );
 
-void DrawNotifyUI(Font fontTitle, Font fontSmall, const MouseState& mouse, const AppSettings& settings, bool& shouldClose, bool isShouldClose);
+void DrawNotifyUI(Font fontTitle, Font fontSmall, const MouseState& mouse, const AppSettings& settings);

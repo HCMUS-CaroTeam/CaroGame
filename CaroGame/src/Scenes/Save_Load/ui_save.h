@@ -35,7 +35,6 @@ void UpdateSaveUISecond(
     const AppSettings& settings,
     ScreenState& currentScreen
 );
-void DrawSaveUISecond(Font fontTitle, Font fontSmall, const MouseState& mouse, const AppSettings& settings);
 
 // For SCREEN_SAVE_AS: Lưu game với tên mới (cập nhật game cũ, cho phép nhập tên mới nhưng không bắt buộc).
 void UpdateSaveAsUI(
@@ -63,5 +62,3 @@ void UpdateSaveToExitUI(
     ScreenState& currentScreen,
 	bool& shouldClose
 );
-
-void DrawSaveToExitUI(Font fontTitle, Font fontSmall, const MouseState& mouse, const AppSettings& settings, bool isShouldClose);

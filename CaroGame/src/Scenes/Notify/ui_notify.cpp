@@ -66,7 +66,7 @@ void UpdateNotifyUI(
 	if (IsKeyPressed(KEY_ESCAPE)) currentScreen = SCREEN_PLAY;
 }
 
-void DrawNotifyUI(Font fontTitle, Font fontSmall, const MouseState& mouse, const AppSettings& settings,bool &shouldClose, bool isShouldClose) {
+void DrawNotifyUI(Font fontTitle, Font fontSmall, const MouseState& mouse, const AppSettings& settings) {
 	DrawBackgroundOnly();
 	// Vẽ Panel chính
 	Rectangle panel = {
