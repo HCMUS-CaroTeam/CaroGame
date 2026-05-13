@@ -21,9 +21,6 @@ static bool  gWasHover[32] = {};
 static float gHoverAnim[32] = {};
 static float gPressAnim[32] = {};
 
-static constexpr Rectangle SRC_IDLE = { 211.0f, 180.0f, 77.0f, 33.0f };
-static constexpr Rectangle SRC_PRESSED = { 319.0f, 178.0f, 75.0f, 35.0f };
-
 static bool IsTextureReadyEx(const Texture2D& tex)
 {
     return tex.id != 0;
@@ -110,6 +107,11 @@ static Rectangle GetDrawButtonRect(const Button& button, bool hovered, bool pres
     }
 
     return rect;
+}
+
+static Rectangle GetFullTextureSource(const Texture2D& tex)
+{
+    return Rectangle{ 0.0f, 0.0f, static_cast<float>(tex.width), static_cast<float>(tex.height) };
 }
 
 static void DrawButtonTextureCropped(const Texture2D& tex, Rectangle src, Rectangle dest)
@@ -269,11 +271,11 @@ void DrawUIButton(
 
     if (pressed && gButtonPressed.loaded)
     {
-        DrawButtonTextureCropped(gButtonPressed.texture, SRC_PRESSED, drawRect);
+        DrawButtonTextureCropped(gButtonPressed.texture, GetFullTextureSource(gButtonPressed.texture), drawRect);
     }
     else if (gButtonIdle.loaded)
     {
-        DrawButtonTextureCropped(gButtonIdle.texture, SRC_IDLE, drawRect);
+        DrawButtonTextureCropped(gButtonIdle.texture, GetFullTextureSource(gButtonIdle.texture), drawRect);
     }
 
     const char* text = button.title.c_str();
