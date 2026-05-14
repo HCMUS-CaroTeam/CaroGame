@@ -11,3 +11,5 @@ void SaveData(DataGame& gameData);
 void SaveGamesToFile(const unordered_map<string, DataGame>& gameSaves);
 void LoadData(const unordered_map<string, DataGame>& gameLoaded, const string& gameName);
 void LoadGamesFromFile(unordered_map<string, DataGame>& loadedGames);
+void DeleteGameSave(const string& gameName);
+void CreateFolder();

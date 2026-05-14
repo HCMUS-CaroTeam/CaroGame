@@ -76,7 +76,7 @@ static void ActionRenameSave() {
 
     // Thực hiện đổi tên trong Map
     DataGame data = gameSaves[oldKey];
-    gameSaves.erase(oldKey); // Xóa bản lưu cũ
+	DeleteGameSave(oldKey); // Xóa bản lưu cũ (cả file và map)
     strcpy_s(data.nameGame, newKey.c_str()); // Cập nhật tên mới vào struct
     gameSaves[newKey] = data; // Chèn bản lưu mới
 
@@ -87,8 +87,8 @@ static void ActionRenameSave() {
 
 static void ActionDeleteSave() {
     if (!gSelectedKey.empty()) {
-        gameSaves.erase(gSelectedKey);
-        SaveGamesToFile(gameSaves);
+		DeleteGameSave(gSelectedKey); // Xóa bản lưu khỏi file và map
+		SaveGamesToFile(gameSaves); // Ghi lại file để đảm bảo bản lưu đã bị xóa hoàn toàn
         gSelectedKey = ""; // Xóa xong thì không chọn gì nữa
         gShowDeleteConfirm = false;
     }

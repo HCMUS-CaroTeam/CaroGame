@@ -29,6 +29,7 @@ static void DrawCenteredText(Font font, const char* text, float y, float fontSiz
 
 void InitSaveUI()
 {
+    CreateFolder();
     gInputBuffer[0] = '\0';
     gLetterCount = 0;
     gStatusMsg = "";

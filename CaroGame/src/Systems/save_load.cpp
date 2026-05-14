@@ -1,6 +1,7 @@
 #include "save_load.h"
 #include <ctime>
 #include <fstream>
+#include <filesystem>
 
 unordered_map<string, DataGame> gameSaves = {};
 
@@ -11,17 +12,14 @@ void SaveData(DataGame& gameData) {
 }
 
 void SaveGamesToFile(const unordered_map<string, DataGame>& gameSaves) {
-	ofstream outFile("saves.dat", ios::binary | ios::trunc);
-	if (!outFile) {
-		return;
+	for (const auto& [name, data] : gameSaves) {
+		string filename = "Saves/" + name + ".dat"; // Create a separate file for each save
+		ofstream saveFile(filename, ios::binary | ios::trunc);
+		if (saveFile) {
+			saveFile.write(reinterpret_cast<const char*>(&data), sizeof(DataGame));
+			saveFile.close();
+		}
 	}
-	size_t numSaves = gameSaves.size();
-	outFile.write(reinterpret_cast<const char*>(&numSaves), sizeof(numSaves));
-	for (const auto& pair : gameSaves) {
-		const DataGame& data = pair.second;
-		outFile.write(reinterpret_cast<const char*>(&data), sizeof(DataGame));
-	}
-	outFile.close();
 }
 
 void LoadData(const unordered_map<string, DataGame>& gameLoaded, const string& gameName) {
@@ -34,17 +32,27 @@ void LoadData(const unordered_map<string, DataGame>& gameLoaded, const string& g
 }
 
 void LoadGamesFromFile(unordered_map<string, DataGame>& loadedGames) {
-	ifstream inFile("saves.dat", ios::binary); //Maybe change filename to save.
-	if (!inFile) {
-		return; // Return if file cannot be opened
+	for (const auto& entry : filesystem::directory_iterator("Saves")) {
+		if (entry.is_regular_file() && entry.path().extension() == ".dat") {
+			ifstream loadFile(entry.path(), ios::binary);
+			if (loadFile) {
+				DataGame data = {};
+				loadFile.read(reinterpret_cast<char*>(&data), sizeof(DataGame));
+				loadFile.close();
+				loadedGames[string(data.nameGame)] = data; // Use game name as key
+			}
+		}
 	}
-	size_t numSaves = 0;
-	inFile.read(reinterpret_cast<char*>(&numSaves), sizeof(numSaves));
-	for (size_t i = 0; i < numSaves; ++i) {
-		DataGame data = {};
-		inFile.read(reinterpret_cast<char*>(&data), sizeof(DataGame));
-		loadedGames[string(data.nameGame)] = data; // Use game name as key
+}
+
+void DeleteGameSave(const string& gameName) {
+	string filename = "Saves/" + gameName + ".dat";
+	filesystem::remove(filename); // Remove the save file from the filesystem
+	gameSaves.erase(gameName); // Remove the entry from the in-memory map
+}
+	
+void CreateFolder() {
+	if (!filesystem::exists("Saves")) {
+		filesystem::create_directory("Saves");
 	}
-	inFile.close();
-	gameSaves = loadedGames; // Update global saves with loaded games
 }
