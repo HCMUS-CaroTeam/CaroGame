@@ -388,6 +388,7 @@ void UpdateSaveToBackMenuUI(
     const AppSettings& settings,
     ScreenState& currentScreen
 )
+
 {
     if (current().nameGame[0] == '\0') // Nếu chưa có tên game (lần đầu lưu), hiển thị giao diện nhập tên
     {

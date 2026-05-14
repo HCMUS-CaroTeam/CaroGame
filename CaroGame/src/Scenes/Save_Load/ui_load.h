@@ -15,6 +15,8 @@ extern char gLoadBuffer[32];         // Buffer chứa tên game load
 extern int gLoadLetterCount;         // Độ dài tên game load hiện tại
 extern const char* gLoadStatusMsg;   // Thông báo trạng thái load (Load thành công/thất bại)
 
+// Nút Confirm và Back
+
 
 void InitLoadUI();
 void ShutdownLoadUI();

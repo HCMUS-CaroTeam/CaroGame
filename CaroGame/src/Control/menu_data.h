@@ -112,15 +112,14 @@ extern int gSaveButtonCount;
 
 enum LoadButtonId
 {
-    LOAD_BTN_GN = 0,
-    LOAD_BTN_GP1,
-    LOAD_BTN_GP2,
-    LOAD_BTN_GMODE,
-    LOAD_BTN_CONFIRM,
-    LOAD_BTN_BACK
+	LOAD_BTN_CONFIRM = 0,
+	LOAD_BTN_RENAME,
+	LOAD_BTN_DELETE,
+	LOAD_BTN_BACK
 };
 
 extern Button gLoadButtons[];
+extern int gLoadButtonCount;
 
 enum NotifyButtonId
 {

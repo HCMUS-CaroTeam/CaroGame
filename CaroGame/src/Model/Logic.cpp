@@ -149,6 +149,15 @@ int TestBoard(int lastRow, int lastCol) {
                     current().winLine[idx][1] = nc;
                     idx++;
                 }
+                if (player == CELL_X)
+                {
+                    current().scorePlayer1++;
+                }
+				else if (player == CELL_O)
+                {
+                    current().scorePlayer2++;
+                }
+                // Cập nhật kết quả vào current() để Control có thể xử lý
 				return (player == CELL_X) ? RESULT_X_WINS : RESULT_O_WINS;
             }
         }
