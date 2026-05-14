@@ -1,5 +1,6 @@
 #include "ui_notify.h"
 #include "Model/Logic.h"
+#include "Scenes/Save_Load/ui_save.h"
 
 static constexpr float SAVE_PANEL_W = 1000.0f;
 static constexpr float SAVE_PANEL_H = 300.0f;
@@ -31,38 +32,55 @@ void UpdateNotifyUI(
 	bool isShouldClose
 ) {
 	// Xử lý nút bấm
-	for (int i = 0; i < gNotifyButtonCount; ++i)
+	if (current().nameGame[0] == '\0')
 	{
-		bool hovered = false, pressed = false;
-		UpdateUIButton(50 + i, gNotifyButtons[i], mouse, dt, audio, settings, hovered, pressed);
-		if (hovered && mouse.leftPressed)
+		for (int i = 0; i < gNotifyButtonCount; ++i)
 		{
-			PlayMenuClick(audio, settings);
-			if (gNotifyButtons[i].id == NOTIFY_BTN_CONFIRM_YES)
+			bool hovered = false, pressed = false;
+			UpdateUIButton(50 + i, gNotifyButtons[i], mouse, dt, audio, settings, hovered, pressed);
+			if (hovered && mouse.leftPressed)
 			{
-				if (isShouldClose) {
-					currentScreen = SCREEN_SAVE_TO_EXIT;
+				PlayMenuClick(audio, settings);
+				if (gNotifyButtons[i].id == NOTIFY_BTN_CONFIRM_YES)
+				{
+					if (isShouldClose) {
+						currentScreen = SCREEN_SAVE_TO_EXIT;
+					}
+					else {
+						currentScreen = SCREEN_SAVE_TO_BACK_MENU;
+					}
 				}
-				else {
-					currentScreen = SCREEN_SAVE_TO_BACK_MENU;
+				else if (gNotifyButtons[i].id == NOTIFY_BTN_CONFIRM_NO)
+				{
+					if (isShouldClose) {
+						shouldClose = true; // Đặt cờ để thoát game mà không lưu
+					}
+					else {
+						InitNewGame(); // Bắt đầu game mới mà không lưu
+						InitSaveUI(); 
+						currentScreen = SCREEN_MAIN_MENU; // Quay lại menu chính nếu không muốn lưu
+					}
 				}
-			}
-			else if (gNotifyButtons[i].id == NOTIFY_BTN_CONFIRM_NO)
-			{
-				if (isShouldClose) {
-					shouldClose = true; // Đặt cờ để thoát game mà không lưu
+				else if (gNotifyButtons[i].id == NOTIFY_BTN_BACK)
+				{
+					currentScreen = SCREEN_PLAY; // Quay lại chơi nếu không muốn lưu
 				}
-				else {
-					InitNewGame(); // Bắt đầu game mới mà không lưu
-					currentScreen = SCREEN_MAIN_MENU; // Quay lại menu chính nếu không muốn lưu
-				}
-			}
-			else if (gNotifyButtons[i].id == NOTIFY_BTN_BACK)
-			{
-				currentScreen = SCREEN_PLAY; // Quay lại chơi nếu không muốn lưu
 			}
 		}
 	}
+	else if (current().nameGame[0] != '\0') {
+		SaveData(current()); // Tự động lưu nếu đã có tên game, không cần hỏi lại
+		if (isShouldClose) {
+			shouldClose = true; // Đặt cờ để thoát game sau khi tự động lưu
+		}
+		else {
+			InitNewGame(); // Bắt đầu game mới sau khi tự động lưu
+			InitSaveUI();
+			currentScreen = SCREEN_MAIN_MENU; // Quay lại menu chính sau khi tự động lưu
+		}
+
+	}
+
 	if (IsKeyPressed(KEY_ESCAPE)) currentScreen = SCREEN_PLAY;
 }
 

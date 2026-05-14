@@ -7,16 +7,16 @@ static float TIME_LEFT = 0.0f; // Biến toàn cục để theo dõi thời gian
 static bool timerInitialized = false; // Biến toàn cục để theo dõi trạng thái khởi tạo timer
 
 int UpdateTimer() {
-	// Chỉ đếm giờ khi đang ở chế độ PVP TOURNAMENT hoặc MODE_PVE, còn lại thì bỏ qua phần đếm giờ
-	// Nếu không làm Tournament thì comment dòng này đi
-	if (current().gameMode == MODE_PVP && current().pvpMode != TOURNAMENT) 
+    // Chỉ đếm giờ khi đang ở chế độ PVP TOURNAMENT hoặc MODE_PVE, còn lại thì bỏ qua phần đếm giờ
+    // Nếu không làm Tournament thì comment dòng này đi
+    if (current().gameMode == MODE_PVP && current().pvpMode != TOURNAMENT)
 
         return 0; // Mode PVP khác mode tournament không có giới hạn thời gian
-	// if (current().timeLeft == TIME_LIMIT_NONE)
+    // if (current().timeLeft == TIME_LIMIT_NONE)
     //       return 0; // Mode PVP CLASSIC không giới hạn thời gian
 
-	if (!timerInitialized) {
-		timerInitialized = true; // Đánh dấu đã khởi tạo timer
+    if (!timerInitialized) {
+        timerInitialized = true; // Đánh dấu đã khởi tạo timer
         switch (current().timeLeft)
         {
         case TIME_LIMIT_5S:
@@ -33,7 +33,7 @@ int UpdateTimer() {
         }
         TIME_LEFT = TIME_LIMIT; // Khởi tạo thời gian còn lại bằng thời gian giới hạn
     }
-	
+
     TIME_LEFT -= GetFrameTime();
 
     if (TIME_LEFT <= 0.0f) {
@@ -60,7 +60,7 @@ int CheckBoard(int pX, int pY) {
 
         // Đánh xong thì reset Timer 
         // Chỉ reset timer khi đang ở chế độ có giới hạn thời gian
-		if (current().gameMode == MODE_PVE || current().pvpMode == TOURNAMENT) { 
+        if (current().gameMode == MODE_PVE || current().pvpMode == TOURNAMENT) {
             TIME_LEFT = TIME_LIMIT;
         }
 
@@ -119,8 +119,8 @@ int TestBoard(int lastRow, int lastCol) {
             }
 
             if (isWin) {
-				// Nếu nthắng thì lưu lại đường thắng vào current().winLine để UI có thể vẽ đường thắng
-                
+                // Nếu nthắng thì lưu lại đường thắng vào current().winLine để UI có thể vẽ đường thắng
+
                 // Tìm phạm vi của chuỗi quân cờ liên tiếp (để tránh lấy nhầm quân không liền kề hoặc vượt quá mảng)
                 int startStep = 0;
                 while (true) {
@@ -149,11 +149,20 @@ int TestBoard(int lastRow, int lastCol) {
                     current().winLine[idx][1] = nc;
                     idx++;
                 }
-				return (player == CELL_X) ? RESULT_X_WINS : RESULT_O_WINS;
+                if (player == CELL_X)
+                {
+                    current().scorePlayer1++;
+                }
+                else if (player == CELL_O)
+                {
+                    current().scorePlayer2++;
+                }
+                // Cập nhật kết quả vào current() để Control có thể xử lý
+                return (player == CELL_X) ? RESULT_X_WINS : RESULT_O_WINS;
             }
         }
     }
-	return RESULT_ONGOING; // Chưa có ai thắng, tiếp tục chơi
+    return RESULT_ONGOING; // Chưa có ai thắng, tiếp tục chơi
 }
 
 void ResetBoard() {
@@ -161,26 +170,26 @@ void ResetBoard() {
         for (int c = 0; c < BOARD_SIZE; c++)
             current().board[r][c] = 0;
     current().turn = CELL_X; // Mặc định X đi trước
-	current().result = RESULT_ONGOING; // Reset kết quả về ongoing khi reset bàn cờ
+    current().result = RESULT_ONGOING; // Reset kết quả về ongoing khi reset bàn cờ
     timerInitialized = false; // Reset trạng thái khởi tạo timer khi reset bàn cờ
-	current().lastMoveRow = -1; // Reset vị trí nước đi cuối cùng về giá trị không hợp lệ
-	current().lastMoveCol = -1; // Reset vị trí nước đi cuối cùng về giá trị không hợp lệ
-	current().winLine[0][0] = -1; // Reset đường thắng về giá trị không hợp lệ
+    current().lastMoveRow = -1; // Reset vị trí nước đi cuối cùng về giá trị không hợp lệ
+    current().lastMoveCol = -1; // Reset vị trí nước đi cuối cùng về giá trị không hợp lệ
+    current().winLine[0][0] = -1; // Reset đường thắng về giá trị không hợp lệ
 }
 
 void InitNewGame() {
     ResetBoard();
-	current().nameGame[0] = '\0'; // Reset tên game
-	current().namePlayer1[0] = '\0'; // Reset tên người chơi 1
-	current().scorePlayer1 = 0; // Reset điểm số người chơi 1
-	current().namePlayer2[0] = '\0'; // Reset tên người chơi 2
-	current().scorePlayer2 = 0; // Reset điểm số người chơi 2
-	current().gameMode = MODE_PVP; // Mặc định chế độ chơi là PVP
-	current().botDifficulty = DIFFICULTY_NONE; // Mặc định không có Bot
-	current().pvpMode = NONE; // Mặc định không có chế độ PVP đặc biệt
-	current().timeLeft = TIME_LIMIT_NONE; // Mặc định không giới hạn thời gian
+    current().nameGame[0] = '\0'; // Reset tên game
+    current().namePlayer1[0] = '\0'; // Reset tên người chơi 1
+    current().scorePlayer1 = 0; // Reset điểm số người chơi 1
+    current().namePlayer2[0] = '\0'; // Reset tên người chơi 2
+    current().scorePlayer2 = 0; // Reset điểm số người chơi 2
+    current().gameMode = MODE_PVP; // Mặc định chế độ chơi là PVP
+    current().botDifficulty = DIFFICULTY_NONE; // Mặc định không có Bot
+    current().pvpMode = NONE; // Mặc định không có chế độ PVP đặc biệt
+    current().timeLeft = TIME_LIMIT_NONE; // Mặc định không giới hạn thời gian
     TIME_LIMIT = 0.0f;
-	TIME_LEFT = 0.0f;
+    TIME_LEFT = 0.0f;
     // Có thể thêm các thiết lập khác khi bắt đầu game mới nếu cần
 }
 
