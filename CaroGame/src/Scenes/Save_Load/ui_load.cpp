@@ -19,7 +19,14 @@ static bool gShowDeleteConfirm = false;
 
 // Trạng thái cho Notification chung (dùng cho cả Rename và Delete)
 static bool gShowNotification = false;
-static string gNotificationMessage = "";
+static string gNotificationMessageLine1 = "";
+static string gNotificationMessageLine2 = "";
+
+// Hàm hỗ trợ
+static const bool IsValidChar(char key)
+{
+    return (isalnum(key) || key == '_');
+}
 
 // Nút Rename, Delete và OK 
 static Button gRenameButtons[] = {
@@ -76,14 +83,10 @@ static bool ActionRenameSave() {
     }
 
     // Thực hiện đổi tên trong Map
-    DataGame data = gameSaves[oldKey];
-    DeleteGameSave(oldKey); // Xóa bản lưu cũ (cả file và map)
-    strcpy_s(data.nameGame, newKey.c_str()); // Cập nhật tên mới vào struct
-    gameSaves[newKey] = data; // Chèn bản lưu mới
-
-    SaveGamesToFile(gameSaves); // Ghi lại file vật lý
+	RenameLoadedGame(oldKey, newKey); // Cập nhật tên trong currentGame nếu đang load game đó
     gSelectedKey = newKey;      // Cập nhật lựa chọn hiện tại sang tên mới
     gShowRenameOverlay = false; // Đóng bảng
+	return true;
 }
 
 static void ActionDeleteSave() {
@@ -95,12 +98,13 @@ static void ActionDeleteSave() {
     }
 }
 
-static void DrawNotificationMessageUI(Font fontTitle, Font fontSmall, const char* message, Color color) {
+static void DrawNotificationMessageUI(Font fontTitle, Font fontSmall, const char* messageLine1, const char* messageLine2, Color color) {
     DrawRectangle(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, Color{ 0, 0, 0, 180 });
 
     Rectangle panel = { SCREEN_WIDTH / 2 - 300, SCREEN_HEIGHT / 2 - 120, 600, 240 };
     DrawPanelFrame(panel);
-    DrawCenteredText(fontTitle, message, SCREEN_HEIGHT * 0.5f - 40.0f, 30.0f, color);
+    DrawCenteredText(fontTitle, messageLine1, SCREEN_HEIGHT * 0.5f - 80.0f, 30.0f, color);
+    DrawCenteredText(fontSmall, messageLine2, SCREEN_HEIGHT * 0.5f - 45.0f, 30.0f, color);
 
     Rectangle btnRect = GetButtonRect(gOKButton);
     bool hov = CheckCollisionPointRec(GetMousePosition(), btnRect);
@@ -118,7 +122,7 @@ static void DrawLoadOverlays(Font fontTitle, Font fontSmall, const MouseState& m
         DrawCenteredText(fontTitle, "RENAME SAVE", panel.y + 20, 30, GOLD);
 
         if (gRenameStatusMsg[0] != '\0')
-            DrawCenteredText(fontSmall, gRenameStatusMsg, panel.y + 60, 20, RED);
+            DrawCenteredText(fontSmall, gRenameStatusMsg, panel.y + 60, 20, Color {160, 20, 20, 255});
 
         Rectangle box = { panel.x + 50, panel.y + 75, 500, 50 };
         DrawRectangleRec(box, Color{ 30, 30, 40, 255 });
@@ -197,7 +201,7 @@ void UpdateLoadUI(
         int key = GetCharPressed();
         while (key > 0) {
             // Chỉ nhận các ký tự in ấn được (A-Z, 0-9, space,...) và giới hạn 31 ký tự
-            if ((key >= 32) && (key <= 125) && (gRenameLetterCount < 31)) {
+            if (IsValidChar((char)key) && (gRenameLetterCount < 31)) {
                 gRenameBuffer[gRenameLetterCount] = (char)key;
                 gRenameLetterCount++;
                 gRenameBuffer[gRenameLetterCount] = '\0'; // Kết thúc chuỗi
@@ -219,14 +223,18 @@ void UpdateLoadUI(
             PlayMenuClick(audio, settings);
             string temp = gSelectedKey;
             if (ActionRenameSave()) {
-                gNotificationMessage = "RENAMED GAME \"" + temp + "\" TO GAME \"" + gRenameBuffer + "\" SUCCESSFULLY!";
+                gNotificationMessageLine1 = "RENAMED GAME \"" + temp + "\"";
+				gNotificationMessageLine2 = "TO GAME \"" + gSelectedKey + "\" SUCCESSFULLY!";
+				gRenameBuffer[0] = '\0'; // Reset buffer sau khi đổi tên thành công
+				gRenameLetterCount = 0; // Reset đếm ký tự
 
                 // Sau khi đổi tên, cập nhật lại danh sách ngay lập tức
                 gameSaves.clear();
                 LoadGamesFromFile(gameSaves);
             }
             else {
-                gNotificationMessage = "FAILED TO RENAME! NAME OF GAME ALREADY EXISTED!";
+                gNotificationMessageLine1 = "FAILED TO RENAME GAME!";
+				gNotificationMessageLine2 = "NAME IS EITHER EMPTY OR ALREADY EXISTS.";
 			}
             gShowNotification = true; // Hiển thị thông báo sau khi đổi tên
         }
@@ -244,7 +252,7 @@ void UpdateLoadUI(
         bool noClicked = (CheckCollisionPointRec(mouse.position, noRect) && mouse.leftReleased);
         if (yesClicked) {
             PlayMenuClick(audio, settings);
-            gNotificationMessage = "DELETED \"" + gSelectedKey + "\" SUCCESSFULLY!";
+			gNotificationMessageLine1 = "DELETED GAME \"" + gSelectedKey + "\" SUCCESSFULLY!";
             ActionDeleteSave();
             // Sau khi xóa, cập nhật lại danh sách ngay lập tức
             gameSaves.clear();
@@ -410,10 +418,6 @@ void DrawLoadUI(Font fontTitle, Font fontSmall, const MouseState& mouse, const A
                     DrawTextEx(fontSmall, "STATUS: IN PROGRESS...", { startX, currY }, 23, 1, ORANGE);
                 }
             }
-
-            // --- DÒNG 4: KẾT QUẢ (NẾU CÓ) ---
-            // Click để chọn
-            if (hovered && mouse.leftPressed) gSelectedKey = pair.first;
         }
         i++;
     }
@@ -436,7 +440,7 @@ void DrawLoadUI(Font fontTitle, Font fontSmall, const MouseState& mouse, const A
 
     // (Tùy chọn) Hiện dòng chữ nhắc nhở nhẹ nhàng nếu chưa chọn game
     if (gSelectedKey.empty()) {
-        DrawCenteredText(fontSmall, "(Please select a save to Load/Rename)", panel.y + panel.height - 50.0f, 18, WHITE);
+        DrawCenteredText(fontSmall, "(Please select a save to Load/Rename)", panel.y + panel.height - 60.0f, 18, WHITE);
     }
 
     if (gShowRenameOverlay || gShowDeleteConfirm) {
@@ -445,6 +449,6 @@ void DrawLoadUI(Font fontTitle, Font fontSmall, const MouseState& mouse, const A
 
     // Hiển thị thông báo
     if (gShowNotification) {
-        DrawNotificationMessageUI(fontTitle, fontSmall, gNotificationMessage.c_str(), DARKGREEN);
+        DrawNotificationMessageUI(fontTitle, fontSmall, gNotificationMessageLine1.c_str(), gNotificationMessageLine2.c_str(), DARKGREEN);
     }
 }

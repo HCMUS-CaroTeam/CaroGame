@@ -1,7 +1,7 @@
 #include "ui_save.h" 
 #include "Model/Logic.h"
 #include <cmath> 
-#include <iostream>
+#include <cctype>
 
 // --- BIẾN TRẠNG THÁI HỆ THỐNG ---
 static float gCursorBlinkTimer = 0.0f;
@@ -17,6 +17,12 @@ static const char* gStatusMsg = "";         // Nội dung thông báo
 // --- CẤU HÌNH GIAO DIỆN ---
 static constexpr float SAVE_PANEL_W = 600.0f;
 static constexpr float SAVE_PANEL_H = 400.0f;
+
+// --- HÀM HỖ TRỢ ---
+static const bool IsValidChar(char key)
+{
+    return (isalnum(key) || key == '_');
+}
 
 static void DrawCenteredText(Font font, const char* text, float y, float fontSize, Color color)
 {
@@ -76,7 +82,7 @@ void UpdateSaveUI(
     char key = GetCharPressed();
     while (key > 0)
     {
-        if (key >= 32 && key <= 126 && gLetterCount < (int)sizeof(gInputBuffer) - 1)
+        if (IsValidChar(key) && gLetterCount < (int)sizeof(gInputBuffer) - 1)
         {
             gInputBuffer[gLetterCount] = key;
             gLetterCount++;
@@ -114,8 +120,7 @@ void UpdateSaveUI(
                     else
                     {
                         // LOGIC LƯU THÀNH CÔNG
-                        strcpy_s(current().nameGame, sizeof(current().nameGame), gInputBuffer);
-                        current().nameGame[sizeof(current().nameGame) - 1] = '\0';
+						ChangeGameName(gInputBuffer); // Cập nhật tên game hiện tại trước khi lưu
                         gStatusMsg = "GAME SAVED SUCCESSFULLY!";
                         SaveData(current());
                     }
@@ -161,7 +166,7 @@ void DrawSaveUI(Font fontTitle, Font fontSmall, const MouseState& mouse, const A
         if (gStatusMsg[0] != '\0')
         {
             // Màu đỏ cho lỗi (chữ N trong Name), màu xanh cho thành công
-            Color msgColor = (gStatusMsg[0] == 'N') ? RED : LIME;
+            Color msgColor = (gStatusMsg[0] == 'N') ? Color{ 160, 20, 20, 255 } : Color{ 0, 255, 0, 255 };
             DrawCenteredText(fontSmall, gStatusMsg, panel.y + 85.0f, 28.0f, msgColor);
         }
 
@@ -268,7 +273,7 @@ void UpdateSaveAsUI(
     char key = GetCharPressed();
     while (key > 0)
     {
-        if (key >= 32 && key <= 126 && gLetterCount < (int)sizeof(gInputBuffer) - 1)
+        if (IsValidChar(key) && gLetterCount < (int)sizeof(gInputBuffer) - 1)
         {
             gInputBuffer[gLetterCount] = key;
             gLetterCount++;
@@ -320,11 +325,8 @@ void UpdateSaveAsUI(
                         {
                             gameSaves.erase(it); // Xóa tên cũ nếu người chơi đổi sang tên mới
                         }
-
-                        strcpy_s(current().nameGame, sizeof(current().nameGame), gInputBuffer);
-                        current().nameGame[sizeof(current().nameGame) - 1] = '\0';
+						ChangeGameName(newName.c_str()); // Cập nhật tên trong dữ liệu game hiện tại
                         gameSaves[newName] = current();
-
                         gStatusMsg = "GAME SAVED SUCCESSFULLY!";
                         SaveData(current());
                         SaveGamesToFile(gameSaves);
@@ -369,7 +371,7 @@ void DrawSaveAsUI(Font fontTitle, Font fontSmall, const MouseState& mouse, const
     if (gStatusMsg[0] != '\0')
     {
         // Màu đỏ cho lỗi (chữ N trong Name), màu xanh cho thành công
-        Color msgColor = (gStatusMsg[0] == 'N') ? RED : DARKGREEN;
+        Color msgColor = (gStatusMsg[0] == 'N') ? Color{ 160, 20, 20, 255 } : Color{ 0, 255, 0, 255 };
         DrawCenteredText(fontSmall, gStatusMsg, panel.y + 85.0f, 28.0f, msgColor);
     }
 
@@ -422,7 +424,7 @@ void UpdateSaveToBackMenuUI(
         char key = GetCharPressed();
         while (key > 0)
         {
-            if (key >= 32 && key <= 126 && gLetterCount < (int)sizeof(gInputBuffer) - 1)
+            if (IsValidChar(key) && gLetterCount < (int)sizeof(gInputBuffer) - 1)
             {
                 gInputBuffer[gLetterCount] = key;
                 gLetterCount++;
@@ -460,8 +462,7 @@ void UpdateSaveToBackMenuUI(
                         else
                         {
                             // LOGIC LƯU THÀNH CÔNG
-                            strcpy_s(current().nameGame, sizeof(current().nameGame), gInputBuffer);
-                            current().nameGame[sizeof(current().nameGame) - 1] = '\0';
+							ChangeGameName(gInputBuffer);
                             gStatusMsg = "GAME SAVED SUCCESSFULLY! BACK TO MENU...";
                             SaveData(current());
 
@@ -519,7 +520,7 @@ void UpdateSaveToExitUI(
         char key = GetCharPressed();
         while (key > 0)
         {
-            if (key >= 32 && key <= 126 && gLetterCount < (int)sizeof(gInputBuffer) - 1)
+            if (IsValidChar(key) && gLetterCount < (int)sizeof(gInputBuffer) - 1)
             {
                 gInputBuffer[gLetterCount] = key;
                 gLetterCount++;
@@ -557,8 +558,7 @@ void UpdateSaveToExitUI(
                         else
                         {
                             // LOGIC LƯU THÀNH CÔNG
-                            strcpy_s(current().nameGame, sizeof(current().nameGame), gInputBuffer);
-                            current().nameGame[sizeof(current().nameGame) - 1] = '\0';
+                            ChangeGameName(gInputBuffer);
                             gStatusMsg = "GAME SAVED SUCCESSFULLY! BACK TO MENU...";
                             SaveData(current());
                             shouldClose = true;
