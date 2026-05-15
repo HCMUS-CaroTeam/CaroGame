@@ -107,14 +107,14 @@ int gMainMenuButtonCount = sizeof(gMainMenuButtons) / sizeof(gMainMenuButtons[0]
 Button gSetupButtons[] =
 {
     { Vector2{ 1050.0f, 250.0f }, Vector2{ 200.0f, 60.0f }, "PVP", SETUP_BTN_PVP, BUTTON_VISUAL_TEXT, BUTTON_ICON_NONE, 28.0f, 2.0f },
-    { Vector2{ 1050.0f, 340.0f }, Vector2{ 200.0f, 60.0f }, "PVE", SETUP_BTN_PVE, BUTTON_VISUAL_TEXT, BUTTON_ICON_NONE, 28.0f, 2.0f },
+    { Vector2{ 1050.0f, 410.0f }, Vector2{ 200.0f, 60.0f }, "PVE", SETUP_BTN_PVE, BUTTON_VISUAL_TEXT, BUTTON_ICON_NONE, 28.0f, 2.0f },
 
     // Nút Play ở giữa
     { Vector2{ 550.0f, 570.0f }, Vector2{ 200.0f, 60.0f }, "PLAY", SETUP_BTN_PLAY, BUTTON_VISUAL_TEXT, BUTTON_ICON_NONE, 28.0f, 2.0f },
 
     // Nút mũi tên trái / phải
-    { Vector2{ 130.0f, 300.0f }, Vector2{ 300.0f, 300.0f }, "", SETUP_BTN_PREV, BUTTON_VISUAL_ICON, BUTTON_ICON_ARROW_LEFT, 0.0f, 0.0f },
-    { Vector2{ 890.0f, 360.0f }, Vector2{ 300.0f, 300.0f }, "", SETUP_BTN_NEXT, BUTTON_VISUAL_ICON, BUTTON_ICON_ARROW_RIGHT, 0.0f, 0.0f },
+    { Vector2{ 258.0f, 336.0f }, Vector2{ 72.0f, 88.0f }, "", SETUP_BTN_PREV, BUTTON_VISUAL_ICON, BUTTON_ICON_ARROW_LEFT, 0.0f, 0.0f },
+    { Vector2{ 970.0f, 336.0f }, Vector2{ 72.0f, 88.0f }, "", SETUP_BTN_NEXT, BUTTON_VISUAL_ICON, BUTTON_ICON_ARROW_RIGHT, 0.0f, 0.0f },
 
     { Vector2{ 1050.0f, 570.0f }, Vector2{ 200.0f, 60.0f }, "BACK", SETUP_BTN_BACK, BUTTON_VISUAL_TEXT, BUTTON_ICON_NONE, 28.0f, 2.0f }
 };
@@ -142,7 +142,7 @@ int gSettingButtonCount = sizeof(gSettingButtons) / sizeof(gSettingButtons[0]);
 // animIndex = 31
 Button gAboutButtons[] =
 {
-    { Vector2{ 660.0f, 715.0f }, Vector2{ 280.0f, 62.0f }, "BACK", ABOUT_BTN_BACK, BUTTON_VISUAL_TEXT, BUTTON_ICON_NONE, 26.0f, 2.0f }
+    { Vector2{ SCREEN_WIDTH * 0.5f - 75.0f, 800.0f }, Vector2{ 150.0f, 62.0f }, "BACK", ABOUT_BTN_BACK, BUTTON_VISUAL_TEXT, BUTTON_ICON_NONE, 26.0f, 2.0f }
 };
 
 int gAboutButtonCount = sizeof(gAboutButtons) / sizeof(gAboutButtons[0]);
@@ -164,15 +164,13 @@ float btnH = 45.0f;  // Chiều cao nút
 
 Button gLoadButtons[] = {
     // 4 nút hiển thị thông số (Visual Text)
-    { { previewX + 20, previewY + 70 },  { btnW, btnH }, "", LOAD_BTN_GN,    BUTTON_VISUAL_TEXT, BUTTON_ICON_NONE, 20.0f, 1.2f },
-    { { previewX + 20, previewY + 130 }, { btnW, btnH }, "", LOAD_BTN_GP1,   BUTTON_VISUAL_TEXT, BUTTON_ICON_NONE, 20.0f, 1.2f },
-    { { previewX + 20, previewY + 190 }, { btnW, btnH }, "", LOAD_BTN_GP2,   BUTTON_VISUAL_TEXT, BUTTON_ICON_NONE, 20.0f, 1.2f },
-    { { previewX + 20, previewY + 250 }, { btnW, btnH }, "", LOAD_BTN_GMODE, BUTTON_VISUAL_TEXT, BUTTON_ICON_NONE, 20.0f, 1.2f },
-
-    // Nút chức năng ở dưới cùng
-    { { previewX + 20, previewY + 330 }, { btnW, 50.0f }, "CONFIRM", LOAD_BTN_CONFIRM, BUTTON_VISUAL_TEXT, BUTTON_ICON_NONE, 22.0f, 1.5f },
-    { { SCREEN_WIDTH * 0.5f - 160.0f, 560.0f }, { 320.0f, 60.0f }, "BACK TO MENU", LOAD_BTN_BACK, BUTTON_VISUAL_TEXT, BUTTON_ICON_NONE, 24.0f, 1.5f }
+    { Vector2{ previewX - 50.0f, previewY + 110.0f}, Vector2{ 240.0f, 70.0f }, "LOAD", LOAD_BTN_CONFIRM, BUTTON_VISUAL_TEXT, BUTTON_ICON_NONE, 30.0f, 1.0f },
+    { Vector2{ previewX - 50.0f , previewY + 280.0f }, Vector2{ 240.0f, 70.0f }, "RENAME", LOAD_BTN_RENAME, BUTTON_VISUAL_TEXT, BUTTON_ICON_NONE, 30.0f, 1.0f },
+    { Vector2{ previewX - 50.0f , previewY + 450.0f }, Vector2{ 240.0f, 70.0f }, "DELETE", LOAD_BTN_DELETE, BUTTON_VISUAL_TEXT, BUTTON_ICON_NONE, 30.0f, 1.0f },
+    { Vector2{ SCREEN_WIDTH * 0.5f - 160.0f, 780.0f }, Vector2{ 240.0f, 70.0f }, "BACK", LOAD_BTN_BACK, BUTTON_VISUAL_TEXT, BUTTON_ICON_NONE, 30.0f, 1.0f }
 };
+
+int gLoadButtonCount = sizeof(gLoadButtons) / sizeof(gLoadButtons[0]);
 
 Button gNotifyButtons[] = {
     { Vector2{ SCREEN_WIDTH * 0.5f - 400.0f, 480.0f }, Vector2{ 320.0f, 60.0f }, "YES", NOTIFY_BTN_CONFIRM_YES, BUTTON_VISUAL_TEXT, BUTTON_ICON_NONE, 24.0f, 1.5f },

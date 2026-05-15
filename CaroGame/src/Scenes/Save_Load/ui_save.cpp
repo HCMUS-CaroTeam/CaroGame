@@ -29,6 +29,7 @@ static void DrawCenteredText(Font font, const char* text, float y, float fontSiz
 
 void InitSaveUI()
 {
+    CreateFolder();
     gInputBuffer[0] = '\0';
     gLetterCount = 0;
     gStatusMsg = "";
@@ -105,11 +106,19 @@ void UpdateSaveUI(
             {
                 if (gLetterCount > 0)
                 {
-                    // LOGIC LƯU THÀNH CÔNG
-                    strcpy_s(current().nameGame, sizeof(current().nameGame), gInputBuffer);
-                    current().nameGame[sizeof(current().nameGame) - 1] = '\0'; // Đảm bảo null-terminated
-                    gStatusMsg = "GAME SAVED SUCCESSFULLY!";
-                    SaveData(current()); // Giả định hàm lưu của bạn nhận tên file
+					// LOGIC KIỂM TRA TRÙNG TÊN
+                    if (isDuplicateName(string(gInputBuffer)))
+                    {
+                        gStatusMsg = "NAME OF GAME ALREADY EXISTS!";
+                    }
+                    else
+                    {
+                        // LOGIC LƯU THÀNH CÔNG
+                        strcpy_s(current().nameGame, sizeof(current().nameGame), gInputBuffer);
+                        current().nameGame[sizeof(current().nameGame) - 1] = '\0';
+                        gStatusMsg = "GAME SAVED SUCCESSFULLY!";
+                        SaveData(current());
+                    }
 
                     //gMessageTimer = MESSAGE_LIMIT; // Bắt đầu đếm ngược 3s
                     //gShouldExitAfterSave = true;   // Đặt lệnh chờ thoát
@@ -143,7 +152,7 @@ void DrawSaveUI(Font fontTitle, Font fontSmall, const MouseState& mouse, const A
         SAVE_PANEL_W, SAVE_PANEL_H
     };
     DrawPanelFrame(panel);
-	if (current().nameGame[0] == '\0') // Nếu chưa có tên game (lần đầu lưu), hiển thị giao diện nhập tên 
+    if (current().nameGame[0] == '\0') // Nếu chưa có tên game (lần đầu lưu), hiển thị giao diện nhập tên 
     {
         // 1. Tiêu đề
         DrawCenteredText(fontTitle, "SAVE GAME", panel.y + 35.0f, 40.0f, Color{ 255, 235, 225, 255 });
@@ -190,12 +199,12 @@ void DrawSaveUI(Font fontTitle, Font fontSmall, const MouseState& mouse, const A
             DrawUIButton(50 + i, gSaveButtons[i], fontSmall, hov, prs);
         }
     }
-	else // Nếu đã có tên game (đã lưu ít nhất 1 lần), hiển thị giao diện thông báo lưu thành công 
+    else // Nếu đã có tên game (đã lưu ít nhất 1 lần), hiển thị giao diện thông báo lưu thành công 
     {
-        DrawCenteredText(fontTitle, "GAME SAVED SUCCESSFULLY!", panel.y + 150.0f, 32.0f, LIME);
+        DrawCenteredText(fontTitle, "GAME SAVED SUCCESSFULLY!", panel.y + 150.0f, 32.0f, DARKGREEN);
         // Hướng dẫn tiếp theo
-        DrawCenteredText(fontSmall, "Press OK", panel.y + 220.0f, 20.0f, LIGHTGRAY);
-		SaveData(current()); // Đảm bảo lưu lại dữ liệu trước khi vẽ nút OK
+        DrawCenteredText(fontSmall, "Press BACK", panel.y + 220.0f, 20.0f, LIGHTGRAY);
+        SaveData(current()); // Đảm bảo lưu lại dữ liệu trước khi vẽ nút OK
         // Vẽ nút Back to Game
         Rectangle hitRect = GetButtonRect(gSaveButtons[1]); // Nút BACK
         bool hov = IsMouseOverRect(mouse, hitRect);
@@ -214,7 +223,7 @@ void UpdateSaveUISecond(
 {
     if (IsKeyPressed(KEY_ESCAPE)) currentScreen = SCREEN_PLAY;
     // Chỉ cần xử lý nút Back to Game
-	SaveData(current()); // Đảm bảo lưu lại dữ liệu trước khi quay về Play
+    SaveData(current()); // Đảm bảo lưu lại dữ liệu trước khi quay về Play
     Rectangle hitRect = GetButtonRect(gSaveButtons[1]); // Nút BACK
     bool hovered = IsMouseOverRect(mouse, hitRect);
     bool pressed = hovered && mouse.leftPressed;
@@ -289,19 +298,37 @@ void UpdateSaveAsUI(
             {
                 if (gLetterCount > 0)
                 {
-                    // LOGIC LƯU THÀNH CÔNG
+                    string newName(gInputBuffer);
+                    string currentName(current().nameGame);
 
-                    auto it = gameSaves.find(string(current().nameGame));
-                    if (it != gameSaves.end()) {
-                        gameSaves.erase(it); // Xóa tên cũ nếu đã tồn tại để tránh trùng lặp
-                        strcpy_s(current().nameGame, sizeof(current().nameGame), gInputBuffer);
-                        current().nameGame[sizeof(current().nameGame) - 1] = '\0'; // Đảm bảo null-terminated
-                        gameSaves[string(current().nameGame)] = current();
+                    // LOGIC KIỂM TRA TRÙNG LẶP CHO SAVE AS
+                    // Nếu tên mới đã tồn tại VÀ nó không phải là tên hiện tại đang chơi
+                    if (newName == currentName)
+                    {
+                        gStatusMsg = "GAME NAME IS UNCHANGED!";
+						SaveData(current()); // Vẫn lưu lại dữ liệu hiện tại dù tên không đổi, nhưng sẽ hiển lỗi để người chơi biết
                     }
-                    gStatusMsg = "GAME SAVED SUCCESSFULLY WITH NEW NAME!";
-                    SaveData(current()); // Giả định hàm lưu của bạn nhận tên file
-                    SaveGamesToFile(gameSaves); // Cập nhật file saves.bin sau khi đổi tên
+                    else if (isDuplicateName(newName))
+                    {
+                        gStatusMsg = "NAME OF GAME ALREADY EXISTS!";
+                    }
+                    else
+                    {
+                        // LOGIC LƯU THÀNH CÔNG (Ghi đè hoặc Đổi tên)
+                        auto it = gameSaves.find(currentName);
+						if (it != gameSaves.end() && newName != currentName)
+                        {
+                            gameSaves.erase(it); // Xóa tên cũ nếu người chơi đổi sang tên mới
+                        }
 
+                        strcpy_s(current().nameGame, sizeof(current().nameGame), gInputBuffer);
+                        current().nameGame[sizeof(current().nameGame) - 1] = '\0';
+                        gameSaves[newName] = current();
+
+                        gStatusMsg = "GAME SAVED SUCCESSFULLY!";
+                        SaveData(current());
+                        SaveGamesToFile(gameSaves);
+                    }
                     //gMessageTimer = MESSAGE_LIMIT; // Bắt đầu đếm ngược 3s
                     //gShouldExitAfterSave = true;   // Đặt lệnh chờ thoát
                 }
@@ -342,7 +369,7 @@ void DrawSaveAsUI(Font fontTitle, Font fontSmall, const MouseState& mouse, const
     if (gStatusMsg[0] != '\0')
     {
         // Màu đỏ cho lỗi (chữ N trong Name), màu xanh cho thành công
-        Color msgColor = (gStatusMsg[0] == 'N') ? RED : LIME;
+        Color msgColor = (gStatusMsg[0] == 'N') ? RED : DARKGREEN;
         DrawCenteredText(fontSmall, gStatusMsg, panel.y + 85.0f, 28.0f, msgColor);
     }
 
@@ -388,6 +415,7 @@ void UpdateSaveToBackMenuUI(
     const AppSettings& settings,
     ScreenState& currentScreen
 )
+
 {
     if (current().nameGame[0] == '\0') // Nếu chưa có tên game (lần đầu lưu), hiển thị giao diện nhập tên
     {
@@ -424,14 +452,23 @@ void UpdateSaveToBackMenuUI(
                 {
                     if (gLetterCount > 0)
                     {
-                        // LOGIC LƯU THÀNH CÔNG
-                        strcpy_s(current().nameGame, sizeof(current().nameGame), gInputBuffer);
-                        current().nameGame[sizeof(current().nameGame) - 1] = '\0'; // Đảm bảo null-terminated
-                        gStatusMsg = "GAME SAVED SUCCESSFULLY! BACK TO MENU...";
-                        SaveData(current()); // Giả định hàm lưu của bạn nhận tên file
+                        // KIỂM TRA TRÙNG TÊN TRƯỚC KHI LƯU
+                        if (isDuplicateName(string(gInputBuffer)))
+                        {
+                            gStatusMsg = "NAME OF GAME ALREADY EXISTS!";
+                        }
+                        else
+                        {
+                            // LOGIC LƯU THÀNH CÔNG
+                            strcpy_s(current().nameGame, sizeof(current().nameGame), gInputBuffer);
+                            current().nameGame[sizeof(current().nameGame) - 1] = '\0';
+                            gStatusMsg = "GAME SAVED SUCCESSFULLY! BACK TO MENU...";
+                            SaveData(current());
 
-                        InitNewGame();
-                        currentScreen = SCREEN_MAIN_MENU; // Quay về menu chính sau khi lưu
+                            InitNewGame();
+                            InitSaveUI();
+                            currentScreen = SCREEN_MAIN_MENU;
+                        }
 
                         //gMessageTimer = MESSAGE_LIMIT; // Bắt đầu đếm ngược 3s
                         //gShouldExitAfterSave = true;   // Đặt lệnh chờ thoát
@@ -453,7 +490,7 @@ void UpdateSaveToBackMenuUI(
     }
 
     else {
-		SaveData(current()); // Đảm bảo lưu lại dữ liệu trước khi quay về menu
+        SaveData(current()); // Đảm bảo lưu lại dữ liệu trước khi quay về menu
         Rectangle hitRect = GetButtonRect(gSaveButtons[1]); // Nút BACK
         bool hovered = IsMouseOverRect(mouse, hitRect);
         bool pressed = hovered && mouse.leftPressed;
@@ -472,7 +509,7 @@ void UpdateSaveToExitUI(
     float dt,
     AudioAssets& audio,
     const AppSettings& settings,
-	ScreenState& currentScreen, 
+    ScreenState& currentScreen,
     bool& shouldClose
 )
 {
@@ -513,11 +550,19 @@ void UpdateSaveToExitUI(
                     if (gLetterCount > 0)
                     {
                         // LOGIC LƯU THÀNH CÔNG
-                        strcpy_s(current().nameGame, sizeof(current().nameGame), gInputBuffer);
-                        current().nameGame[sizeof(current().nameGame) - 1] = '\0'; // Đảm bảo null-terminated
-                        gStatusMsg = "GAME SAVED SUCCESSFULLY! BACK TO MENU...";
-                        SaveData(current()); // Giả định hàm lưu của bạn nhận tên file 
-                        shouldClose = true; // Đặt cờ để thoát game sau khi lưu
+                        if (isDuplicateName(string(gInputBuffer)))
+                        {
+                            gStatusMsg = "NAME OF GAME ALREADY EXISTS!";
+                        }
+                        else
+                        {
+                            // LOGIC LƯU THÀNH CÔNG
+                            strcpy_s(current().nameGame, sizeof(current().nameGame), gInputBuffer);
+                            current().nameGame[sizeof(current().nameGame) - 1] = '\0';
+                            gStatusMsg = "GAME SAVED SUCCESSFULLY! BACK TO MENU...";
+                            SaveData(current());
+                            shouldClose = true;
+                        }
 
                         //gMessageTimer = MESSAGE_LIMIT; // Bắt đầu đếm ngược 3s
                         //gShouldExitAfterSave = true;   // Đặt lệnh chờ thoát
@@ -539,7 +584,7 @@ void UpdateSaveToExitUI(
     }
 
     else {
-		SaveData(current()); // Đảm bảo lưu lại dữ liệu trước khi thoát game
+        SaveData(current()); // Đảm bảo lưu lại dữ liệu trước khi thoát game
         Rectangle hitRect = GetButtonRect(gSaveButtons[1]); // Nút BACK
         bool hovered = IsMouseOverRect(mouse, hitRect);
         bool pressed = hovered && mouse.leftPressed;
@@ -547,7 +592,7 @@ void UpdateSaveToExitUI(
         {
             PlayMenuClick(audio, settings);
             shouldClose = true; // Đặt cờ để thoát game mà không lưu
-		}
+        }
     }
 
     if (IsKeyPressed(KEY_ESCAPE)) currentScreen = SCREEN_PLAY;

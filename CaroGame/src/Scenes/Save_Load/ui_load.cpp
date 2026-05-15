@@ -4,8 +4,35 @@ using namespace std;
 
 static float gScrollY = 0.0f;
 static string gSelectedKey = "";
-static const float ITEM_HEIGHT = 90.0f;
+static const float ITEM_HEIGHT = 120.0f;
 static const float VIEW_HEIGHT = 450.0f;
+
+// Trạng thái cho Rename
+static bool gShowRenameOverlay = false;
+static char gRenameBuffer[32] = "";
+static int gRenameLetterCount = 0;
+static float gCursorBlinkTimer = 0.0f;
+static const char* gRenameStatusMsg = "";
+
+// Trạng thái cho Delete
+static bool gShowDeleteConfirm = false;
+
+// Trạng thái cho Notification chung (dùng cho cả Rename và Delete)
+static bool gShowNotification = false;
+static string gNotificationMessage = "";
+
+// Nút Rename, Delete và OK 
+static Button gRenameButtons[] = {
+    { { SCREEN_WIDTH / 2 - 150, SCREEN_HEIGHT / 2 + 30 }, { 140.0f , 45.0f }, "CONFIRM", 100, BUTTON_VISUAL_TEXT, BUTTON_ICON_NONE, 20.0f, 1.0f },
+    { { SCREEN_WIDTH / 2 + 10 , SCREEN_HEIGHT / 2 + 30 }, { 140.0f , 45.0f }, "CANCEL", 101, BUTTON_VISUAL_TEXT, BUTTON_ICON_NONE, 20.0f, 1.0f },
+};
+
+static Button gDeleteButtons[] = {
+    { { SCREEN_WIDTH / 2 - 150, SCREEN_HEIGHT / 2 + 30 }, { 140.0f , 45.0f }, "YES", 102, BUTTON_VISUAL_TEXT, BUTTON_ICON_NONE, 20.0f, 1.0f },
+    { { SCREEN_WIDTH / 2 + 10 , SCREEN_HEIGHT / 2 + 30 }, { 140.0f , 45.0f }, "NO", 103, BUTTON_VISUAL_TEXT, BUTTON_ICON_NONE, 20.0f, 1.0f },
+};
+
+static Button gOKButton = { { SCREEN_WIDTH / 2 - 70, SCREEN_HEIGHT / 2 + 30 }, { 140.0f , 45.0f }, "OK", 104, BUTTON_VISUAL_TEXT, BUTTON_ICON_NONE, 20.0f, 1.0f };
 
 // CẤU HÌNH GIAO DIỆN (Đồng bộ với ui_save)
 static constexpr float LOAD_PANEL_W = 800.0f;
@@ -21,27 +48,6 @@ static void DrawCenteredText(Font font, const char* text, float y, float fontSiz
 }
 
 // Trong ui_load.cpp hoặc file chứa định nghĩa button
-void UpdateLoadButtonPositions(Rectangle panel) {
-    float previewStartX = panel.x + panel.width - 280.0f; // Căn lề phải trong panel
-    float startY = panel.y + 100.0f;
-    float spacingY = 65.0f;
-    float btnWidth = 240.0f;
-    float btnHeight = 45.0f;
-
-    // 4 nút thông số
-    for (int i = 0; i < 4; i++) {
-        gLoadButtons[i].position = { previewStartX, startY + i * spacingY };
-        gLoadButtons[i].size = { btnWidth, btnHeight };
-    }
-
-    // Nút CONFIRM lớn (màu đỏ trong hình)
-    gLoadButtons[LOAD_BTN_CONFIRM].position = { previewStartX, startY + 4 * spacingY + 120.0f };
-    gLoadButtons[LOAD_BTN_CONFIRM].size = { btnWidth, 50.0f };
-
-    // Nút BACK (ở dưới cùng màn hình như ui_save)
-    gLoadButtons[LOAD_BTN_BACK].position = { SCREEN_WIDTH * 0.5f - 160.0f, SCREEN_HEIGHT - 100.0f };
-    gLoadButtons[LOAD_BTN_BACK].size = { 320.0f, 60.0f };
-}
 
 void InitLoadUI()
 {
@@ -53,6 +59,108 @@ void InitLoadUI()
 void ShutdownLoadUI()
 {
     // Giải phóng tài nguyên nếu cần
+}
+
+static bool ActionRenameSave() {
+    string oldKey = gSelectedKey;
+    string newKey = string(gRenameBuffer);
+
+    if (newKey.empty()) {
+        gRenameStatusMsg = "";
+        return false;
+    }
+    if (gameSaves.count(newKey) && newKey != oldKey)
+    {
+        gRenameStatusMsg = "";
+        return false;
+    }
+
+    // Thực hiện đổi tên trong Map
+    DataGame data = gameSaves[oldKey];
+    DeleteGameSave(oldKey); // Xóa bản lưu cũ (cả file và map)
+    strcpy_s(data.nameGame, newKey.c_str()); // Cập nhật tên mới vào struct
+    gameSaves[newKey] = data; // Chèn bản lưu mới
+
+    SaveGamesToFile(gameSaves); // Ghi lại file vật lý
+    gSelectedKey = newKey;      // Cập nhật lựa chọn hiện tại sang tên mới
+    gShowRenameOverlay = false; // Đóng bảng
+}
+
+static void ActionDeleteSave() {
+    if (!gSelectedKey.empty()) {
+        DeleteGameSave(gSelectedKey); // Xóa bản lưu khỏi file và map
+        SaveGamesToFile(gameSaves); // Ghi lại file để đảm bảo bản lưu đã bị xóa hoàn toàn
+        gSelectedKey = ""; // Xóa xong thì không chọn gì nữa
+        gShowDeleteConfirm = false;
+    }
+}
+
+static void DrawNotificationMessageUI(Font fontTitle, Font fontSmall, const char* message, Color color) {
+    DrawRectangle(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, Color{ 0, 0, 0, 180 });
+
+    Rectangle panel = { SCREEN_WIDTH / 2 - 300, SCREEN_HEIGHT / 2 - 120, 600, 240 };
+    DrawPanelFrame(panel);
+    DrawCenteredText(fontTitle, message, SCREEN_HEIGHT * 0.5f - 40.0f, 30.0f, color);
+
+    Rectangle btnRect = GetButtonRect(gOKButton);
+    bool hov = CheckCollisionPointRec(GetMousePosition(), btnRect);
+    bool prs = hov && IsMouseButtonDown(MOUSE_LEFT_BUTTON);
+
+    DrawUIButton(104, gOKButton, fontSmall, hov, prs);
+}
+
+static void DrawLoadOverlays(Font fontTitle, Font fontSmall, const MouseState& mouse) {
+    DrawRectangle(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, Color{ 0, 0, 0, 180 });
+
+    if (gShowRenameOverlay) {
+        Rectangle panel = { SCREEN_WIDTH / 2 - 300, SCREEN_HEIGHT / 2 - 120, 600, 240 };
+        DrawPanelFrame(panel);
+        DrawCenteredText(fontTitle, "RENAME SAVE", panel.y + 20, 30, GOLD);
+
+        if (gRenameStatusMsg[0] != '\0')
+            DrawCenteredText(fontSmall, gRenameStatusMsg, panel.y + 60, 20, RED);
+
+        Rectangle box = { panel.x + 50, panel.y + 75, 500, 50 };
+        DrawRectangleRec(box, Color{ 30, 30, 40, 255 });
+        DrawRectangleLinesEx(box, 2.0f, RAYWHITE);
+
+        Vector2 textPos = { box.x + 15, box.y + 12 };
+        if (gRenameLetterCount == 0)
+        {
+            DrawTextEx(fontSmall, gSelectedKey.c_str(), textPos, 22.0f, 1.0f, GRAY);
+        }
+        else
+        {
+            DrawTextEx(fontSmall, gRenameBuffer, { box.x + 15, box.y + 12 }, 22.0f, 1.0f, GOLD);
+        }
+
+        if (fmodf(gCursorBlinkTimer, 1.0f) < 0.5f /* &&!gShouldExitAfterSave */)
+        {
+            Vector2 textSize = MeasureTextEx(fontSmall, gRenameBuffer, 22.0f, 1.0f);
+            DrawTextEx(fontSmall, "_", Vector2{ textPos.x + textSize.x + 2.0f, textPos.y }, 22.0f, 1.0f, GOLD);
+        }
+        // Định nghĩa nút theo đúng kiểu của bạn
+
+        for (int j = 0; j < 2; j++) {
+            Rectangle r = { gRenameButtons[j].position.x, gRenameButtons[j].position.y, gRenameButtons[j].size.x, gRenameButtons[j].size.y };
+            bool hov = CheckCollisionPointRec(mouse.position, r);
+            // Dùng ID 100+j để không trùng với ID nút main của LoadUI
+            DrawUIButton(100 + j, gRenameButtons[j], fontSmall, hov, hov && mouse.leftDown);
+        }
+    }
+
+    if (gShowDeleteConfirm) {
+        Rectangle panel = { SCREEN_WIDTH / 2 - 300, SCREEN_HEIGHT / 2 - 120, 600, 240 };
+        DrawPanelFrame(panel);
+        DrawCenteredText(fontSmall, "ARE YOU SURE YOU WANT TO DELETE THIS GAME?", panel.y + 40, 35, DARKPURPLE);
+        DrawCenteredText(fontSmall, ("\"" + gSelectedKey + "\"").c_str(), panel.y + 80, 30, DARKPURPLE);
+
+        for (int j = 0; j < 2; j++) {
+            Rectangle r = { gDeleteButtons[j].position.x, gDeleteButtons[j].position.y, gDeleteButtons[j].size.x, gDeleteButtons[j].size.y };
+            bool hov = CheckCollisionPointRec(mouse.position, r);
+            DrawUIButton(102 + j, gDeleteButtons[j], fontSmall, hov, hov && mouse.leftDown);
+        }
+    }
 }
 
 void UpdateLoadUI(
@@ -68,6 +176,87 @@ void UpdateLoadUI(
     float panelH = 600.0f;
     Rectangle panel = { SCREEN_WIDTH * 0.5f - panelW * 0.5f, SCREEN_HEIGHT * 0.5f - panelH * 0.5f, panelW, panelH };
     Rectangle container = { panel.x + 40, panel.y + 100, 480, VIEW_HEIGHT };
+
+    if (gShowNotification) {
+        Rectangle btnRect = GetButtonRect(gOKButton);
+        bool hov = CheckCollisionPointRec(mouse.position, btnRect);
+
+        // Chỉ đơn thuần là đóng thông báo để quay lại màn hình Load
+        if ((hov && mouse.leftReleased)) {
+            PlayMenuClick(audio, settings);
+            gShowNotification = false;
+        }
+        return;
+    }
+
+    if (gShowRenameOverlay) {
+        // Cập nhật bộ đếm thời gian cho con trỏ nhấp nháy
+        gCursorBlinkTimer += dt;
+
+        // 1. Lấy ký tự vừa nhấn
+        int key = GetCharPressed();
+        while (key > 0) {
+            // Chỉ nhận các ký tự in ấn được (A-Z, 0-9, space,...) và giới hạn 31 ký tự
+            if ((key >= 32) && (key <= 125) && (gRenameLetterCount < 31)) {
+                gRenameBuffer[gRenameLetterCount] = (char)key;
+                gRenameLetterCount++;
+                gRenameBuffer[gRenameLetterCount] = '\0'; // Kết thúc chuỗi
+            }
+            key = GetCharPressed(); // Lấy ký tự tiếp theo trong hàng đợi
+        }
+
+        // 2. Xử lý phím xóa (Backspace)
+        if (IsKeyPressed(KEY_BACKSPACE) && gRenameLetterCount > 0) {
+            gRenameLetterCount--;
+            gRenameBuffer[gRenameLetterCount] = '\0';
+        }
+
+        // 3. Xử lý nút Confirm và Cancel
+        Rectangle confirmRect = { gRenameButtons[0].position.x, gRenameButtons[0].position.y, gRenameButtons[0].size.x, gRenameButtons[0].size.y };
+        Rectangle cancelRect = { gRenameButtons[1].position.x, gRenameButtons[1].position.y, gRenameButtons[1].size.x, gRenameButtons[1].size.y };
+        bool confirmClicked = (CheckCollisionPointRec(mouse.position, confirmRect) && mouse.leftReleased);
+        if (confirmClicked) {
+            PlayMenuClick(audio, settings);
+            string temp = gSelectedKey;
+            if (ActionRenameSave()) {
+                gNotificationMessage = "RENAMED GAME \"" + temp + "\" TO GAME \"" + gRenameBuffer + "\" SUCCESSFULLY!";
+
+                // Sau khi đổi tên, cập nhật lại danh sách ngay lập tức
+                gameSaves.clear();
+                LoadGamesFromFile(gameSaves);
+            }
+            else {
+                gNotificationMessage = "FAILED TO RENAME! NAME OF GAME ALREADY EXISTED!";
+			}
+            gShowNotification = true; // Hiển thị thông báo sau khi đổi tên
+        }
+        else if (CheckCollisionPointRec(mouse.position, cancelRect) && mouse.leftReleased) {
+            PlayMenuClick(audio, settings);
+            gShowRenameOverlay = false;
+        }
+        return;
+    }
+
+    if (gShowDeleteConfirm) {
+        Rectangle yesRect = { gDeleteButtons[0].position.x, gDeleteButtons[0].position.y, gDeleteButtons[0].size.x, gDeleteButtons[0].size.y };
+        Rectangle noRect = { gDeleteButtons[1].position.x, gDeleteButtons[1].position.y, gDeleteButtons[1].size.x, gDeleteButtons[1].size.y };
+        bool yesClicked = (CheckCollisionPointRec(mouse.position, yesRect) && mouse.leftReleased);
+        bool noClicked = (CheckCollisionPointRec(mouse.position, noRect) && mouse.leftReleased);
+        if (yesClicked) {
+            PlayMenuClick(audio, settings);
+            gNotificationMessage = "DELETED \"" + gSelectedKey + "\" SUCCESSFULLY!";
+            ActionDeleteSave();
+            // Sau khi xóa, cập nhật lại danh sách ngay lập tức
+            gameSaves.clear();
+            LoadGamesFromFile(gameSaves);
+            gShowNotification = true; // Hiển thị thông báo sau khi xóa
+        }
+        else if (noClicked) {
+            PlayMenuClick(audio, settings);
+            gShowDeleteConfirm = false;
+        }
+        return;
+    }
 
     // --- 1. XỬ LÝ CUỘN CHUỘT ---
     float wheel = GetMouseWheelMove();
@@ -100,40 +289,39 @@ void UpdateLoadUI(
     }
 
     // --- 3. XỬ LÝ NÚT CONFIRM TRÊN MÀN HÌNH ---
-    for (int j = LOAD_BTN_CONFIRM; j <= LOAD_BTN_BACK; j++) {
-        bool h, p; // Biến nhận trạng thái hover và pressed từ hệ thống UI chung
-
-        // Gọi hàm hệ thống bạn đã cung cấp để cập nhật hiệu ứng (phình to, âm thanh hover)
+    for (int j = 0; j < gLoadButtonCount; j++) {
+        bool h, p;
         UpdateUIButton(j, gLoadButtons[j], mouse, dt, audio, settings, h, p);
 
-        // Xử lý logic khi nút thực sự được Click (Chuột nhả ra trên nút)
         if (h && mouse.leftReleased) {
+            PlayMenuClick(audio, settings);
+
             switch (gLoadButtons[j].id) {
-            case LOAD_BTN_CONFIRM:
+            case LOAD_BTN_CONFIRM: // Nút LOAD
                 if (!gSelectedKey.empty()) {
-                    PlayMenuClick(audio, settings);
-                    GetCurrentGameData() = gameSaves[gSelectedKey];
+                    current() = gameSaves[gSelectedKey]; // Cập nhật dữ liệu game hiện tại với dữ liệu đã chọn
                     currentScreen = SCREEN_PLAY;
                 }
                 break;
 
-            case LOAD_BTN_BACK:
-                PlayMenuClick(audio, settings);
-                currentScreen = SCREEN_MAIN_MENU;
+                // Trong switch (gLoadButtons[j].id) của UpdateLoadUI
+            case LOAD_BTN_RENAME:
+                if (!gSelectedKey.empty()) {
+                    gShowRenameOverlay = true;
+                    gRenameStatusMsg = "";
+                }
                 break;
 
-                // Các nút thông số (LOAD_BTN_GN, GP1, GP2, GMODE) không có logic click
-                // Không thêm hiệu ứng nhấn tại đây.
-            default: break;
+            case LOAD_BTN_DELETE: // Thêm nút Delete
+                if (!gSelectedKey.empty()) gShowDeleteConfirm = true;
+                break;
+
+            case LOAD_BTN_BACK:
+                currentScreen = SCREEN_MAIN_MENU;
+                break;
             }
         }
     }
-    // --- 4. XỬ LÝ PHÍM TẮT ---
-    if (!gSelectedKey.empty() && (IsKeyPressed(KEY_ENTER) || IsKeyPressed(KEY_KP_ENTER))) {
-        GetCurrentGameData() = gameSaves[gSelectedKey];
-        currentScreen = SCREEN_PLAY;
-    }
-    if (IsKeyPressed(KEY_ESCAPE)) currentScreen = SCREEN_MAIN_MENU;
 }
 
 void DrawLoadUI(Font fontTitle, Font fontSmall, const MouseState& mouse, const AppSettings& settings)
@@ -145,7 +333,6 @@ void DrawLoadUI(Font fontTitle, Font fontSmall, const MouseState& mouse, const A
 
     DrawPanelFrame(panel);
 
-    UpdateLoadButtonPositions(panel);
     DrawCenteredText(fontTitle, "LOAD GAME", panel.y + 35.0f, 40.0f, Color{ 255, 235, 225, 255 });
 
     // Khung danh sách
@@ -173,7 +360,7 @@ void DrawLoadUI(Font fontTitle, Font fontSmall, const MouseState& mouse, const A
             float lineSpacing = 25.0f; // Khoảng cách giữa các dòng
 
             // --- DÒNG 1: TÊN VÁN & THỜI GIAN ---
-            DrawTextEx(fontSmall, TextFormat("SAVE: %s", d.nameGame), { startX, currY }, 22, 1, GOLD);
+            DrawTextEx(fontSmall, TextFormat("SAVE: %s", d.nameGame), { startX, currY }, 25, 1, GOLD);
             // Giả sử bạn có biến d.saveTime, nếu chưa có hãy dùng tạm text mặc định
             struct tm timeInfo;
             localtime_s(&timeInfo, &d.saveTime); // Sử dụng localtime_s cho an toàn trên Windows
@@ -183,66 +370,81 @@ void DrawLoadUI(Font fontTitle, Font fontSmall, const MouseState& mouse, const A
             // Định dạng: %d (ngày), %m (tháng), %Y (năm), %H (giờ), %M (phút)
             strftime(timeBuffer, sizeof(timeBuffer), "%d/%m/%Y %H:%M", &timeInfo);
 
-            DrawTextEx(fontSmall, timeBuffer, { itemRect.x + itemRect.width - 150, currY + 25.0f }, 18, 1, GRAY);
+            DrawTextEx(fontSmall, timeBuffer, { itemRect.x + itemRect.width - 150, currY + 25.0f }, 23, 1, GRAY);
 
             // --- DÒNG 2: NGƯỜI CHƠI 1 & NGƯỜI CHƠI 2 (KÈM ĐIỂM) ---
             currY += lineSpacing;
-            DrawTextEx(fontSmall, TextFormat("P1: %s (%d)", d.namePlayer1, d.scorePlayer1), { startX, currY }, 18, 1, WHITE);
-            DrawTextEx(fontSmall, TextFormat("P2: %s (%d)", d.namePlayer2, d.scorePlayer2), { startX + 200, currY }, 18, 1, WHITE);
+            DrawTextEx(fontSmall, TextFormat("P1: %s (%d)", d.namePlayer1, d.scorePlayer1), { startX, currY }, 23, 1, WHITE);
+            DrawTextEx(fontSmall, TextFormat("P2: %s (%d)", d.namePlayer2, d.scorePlayer2), { startX + 200, currY }, 23, 1, WHITE);
 
             // --- DÒNG 3: CHẾ ĐỘ CHƠI & ĐỘ KHÓ BOT ---
             currY += lineSpacing;
-            const char* modeStr = (d.gameMode == MODE_PVP) ? "Mode: PVP (2 Player)" : "Mode: PVE (vs Bot)";
-            DrawTextEx(fontSmall, modeStr, { startX, currY }, 18, 1, LIGHTGRAY);
+            if (d.gameMode == MODE_PVP) {
+                const char* pvpModeStr = (d.pvpMode == CLASSIC) ? "PVP Mode: Classic" : "PVP Mode: Tournament";
+                DrawTextEx(fontSmall, pvpModeStr, { startX, currY }, 23, 1, VIOLET);
 
-            if (d.gameMode == MODE_PVE) {
-                const char* diffStr = TextFormat("Bot: %s", (d.botDifficulty == DIFFICULTY_EASY ? "Easy" : (d.botDifficulty == DIFFICULTY_HARD ? "Hard" : "Medium")));
-                DrawTextEx(fontSmall, diffStr, { startX + 250, currY }, 18, 1, SKYBLUE);
+                currY += lineSpacing;
+
+                if (d.scorePlayer1 >= 5 || d.scorePlayer2 >= 5 || d.result != RESULT_ONGOING) {
+                    const char* resStr = "STATUS: GAME DONE";
+                    DrawTextEx(fontSmall, resStr, { startX, currY }, 23, 1, LIME);
+                }
+                else {
+                    DrawTextEx(fontSmall, "STATUS: IN PROGRESS...", { startX, currY }, 23, 1, ORANGE);
+                }
+            }
+
+            else if (d.gameMode == MODE_PVE) {
+                const char* pveModeStr = TextFormat("Mode: PVE (vs Bot)  %s", (d.botDifficulty == DIFFICULTY_EASY ? "Easy" : (d.botDifficulty == DIFFICULTY_HARD ? "Hard" : "Medium")));
+                DrawTextEx(fontSmall, pveModeStr, { startX, currY }, 23, 1, SKYBLUE);
+
+                currY += lineSpacing;
+
+                if (d.scorePlayer1 >= 5 || d.scorePlayer2 >= 5 || d.result != RESULT_ONGOING) {
+
+
+                    const char* resStr = (d.scorePlayer1 > d.scorePlayer2 ? "STATUS: WINNING" : (d.scorePlayer2 > d.scorePlayer1 ? "STATUS: LOSING" : "STATUS: DRAW"));
+                    DrawTextEx(fontSmall, resStr, { startX, currY }, 23, 1, LIME);
+                }
+                else {
+                    DrawTextEx(fontSmall, "STATUS: IN PROGRESS...", { startX, currY }, 23, 1, ORANGE);
+                }
             }
 
             // --- DÒNG 4: KẾT QUẢ (NẾU CÓ) ---
-            currY += lineSpacing;
-            if (d.scorePlayer1 >= 5 || d.scorePlayer2 >= 5 || d.result != RESULT_ONGOING) {
-                const char* resStr = (d.scorePlayer1 >= 5) ? "WINNER: PLAYER 1" : (d.scorePlayer2 >= 5 ? "WINNER: PLAYER 2" : "DRAW");
-                DrawTextEx(fontSmall, resStr, { startX, currY }, 18, 1, LIME);
-            }
-            else {
-                DrawTextEx(fontSmall, "Status: In Progress...", { startX, currY }, 18, 1, ORANGE);
-            }
-
             // Click để chọn
             if (hovered && mouse.leftPressed) gSelectedKey = pair.first;
         }
         i++;
     }
-    
+
     EndScissorMode();
 
     // Khung Preview & Nút Confirm
     Rectangle previewBox = { container.x + container.width + 20, container.y, 220, VIEW_HEIGHT };
 
-    if (!gSelectedKey.empty()) {
-        DataGame& d = gameSaves[gSelectedKey];
-        DrawTextEx(fontSmall, "PREVIEW", { previewBox.x + 15, previewBox.y + 15 }, 22, 1, GOLD);
+    for (int j = 0; j < gLoadButtonCount; j++) {
+        Rectangle btnRect = GetButtonRect(gLoadButtons[j]);
 
-        gLoadButtons[LOAD_BTN_GN].title = TextFormat("Game: %s", d.nameGame);
-        gLoadButtons[LOAD_BTN_GP1].title = TextFormat("P1: %s", d.namePlayer1);
-        gLoadButtons[LOAD_BTN_GP2].title = TextFormat("P2: %s", d.namePlayer2);
-        gLoadButtons[LOAD_BTN_GMODE].title = TextFormat("Mode: %s", (d.gameMode == MODE_PVP ? "PVP" : "PVE"));
+        // Kiểm tra hover và pressed để tạo hiệu ứng thị giác (nút vẫn lún xuống khi bấm)
+        bool hov = IsMouseOverRect(mouse, btnRect);
+        bool prs = hov && mouse.leftDown;
 
-        for (int j = 0; j < 4; j++) {
-            // Ép hovered = false, pressed = false
-            DrawUIButton(j, gLoadButtons[j], fontSmall, false, false);
-        }
+        // Vẽ nút bình thường (không có lớp phủ xám)
+        DrawUIButton(j, gLoadButtons[j], fontSmall, hov, prs);
+    }
 
-        // 2. Vẽ nút CONFIRM: Giữ nguyên logic tương tác
-        bool hovConf = IsMouseOverRect(mouse, GetButtonRect(gLoadButtons[LOAD_BTN_CONFIRM]));
-        bool prsConf = hovConf && mouse.leftDown;
-        DrawUIButton(LOAD_BTN_CONFIRM, gLoadButtons[LOAD_BTN_CONFIRM], fontSmall, hovConf, prsConf);
+    // (Tùy chọn) Hiện dòng chữ nhắc nhở nhẹ nhàng nếu chưa chọn game
+    if (gSelectedKey.empty()) {
+        DrawCenteredText(fontSmall, "(Please select a save to Load/Rename)", panel.y + panel.height - 50.0f, 18, WHITE);
+    }
 
-        // Luôn vẽ nút BACK
-        bool hovBack = IsMouseOverRect(mouse, GetButtonRect(gLoadButtons[LOAD_BTN_BACK]));
-        bool prsBack = hovBack && mouse.leftDown;
-        DrawUIButton(LOAD_BTN_BACK, gLoadButtons[LOAD_BTN_BACK], fontSmall, hovBack, prsBack);
+    if (gShowRenameOverlay || gShowDeleteConfirm) {
+        DrawLoadOverlays(fontTitle, fontSmall, mouse);
+    }
+
+    // Hiển thị thông báo
+    if (gShowNotification) {
+        DrawNotificationMessageUI(fontTitle, fontSmall, gNotificationMessage.c_str(), DARKGREEN);
     }
 }

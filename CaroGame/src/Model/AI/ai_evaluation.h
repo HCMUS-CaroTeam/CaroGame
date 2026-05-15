@@ -27,15 +27,15 @@ enum PatternType {
 
 // BẢNG ĐIỂM DÀNH CHO MINIMAX (Bot Hard)
 constexpr long long HARD_SCORES[] = {
-    1000000000LL, // WIN
+    1000000000LL,  // WIN
     100000000LL,   // OPEN_4
     10000000LL,    // OPEN_3
     1000000LL,     // BLOCKED_4
 	100000LL,      // OPEN_2
 	10000LL,       // BLOCKED_3
-    100LL,        // BLOCKED_2
-    10LL,         // OPEN_1
-    1LL           // BLOCKED_1
+    100LL,         // BLOCKED_2
+    10LL,          // OPEN_1
+    1LL            // BLOCKED_1
 };
 
 // BẢNG ĐIỂM DÀNH CHO HEURISTIC (Bot Medium)
