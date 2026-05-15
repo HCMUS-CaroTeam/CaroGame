@@ -5,11 +5,11 @@
 #include "View/ui_frame.h"
 #include "Model/config.h"
 #include "Control/menu_data.h"
-#include "Model/Logic.h"
+#include "Model/logic.h"
 #include "Model/game_data.h"
 #include "Scenes/Save_Load/ui_save.h"
 #include "Scenes/Save_Load/ui_load.h"
-#include "Model/ai_bot.h"
+#include "Model/AI/ai_bot.h"
 #include <cmath>
 
 static bool gPaused = false;

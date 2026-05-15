@@ -131,10 +131,11 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="src/Control\input_mouse.cpp" />
-    <ClCompile Include="src\Model\ai_bot.cpp" />
-    <ClCompile Include="src\Model\ai_easy.cpp" />
-    <ClCompile Include="src\Model\ai_hard.cpp" />
-    <ClCompile Include="src\Model\ai_medium.cpp" />
+    <ClCompile Include="src\Model\AI\ai_bot.cpp" />
+    <ClCompile Include="src\Model\AI\ai_easy.cpp" />
+    <ClCompile Include="src\Model\AI\ai_evaluation.cpp" />
+    <ClCompile Include="src\Model\AI\ai_hard.cpp" />
+    <ClCompile Include="src\Model\AI\ai_medium.cpp" />
     <ClCompile Include="src\Model\game_data.cpp" />
     <ClCompile Include="src\Scenes\About\ui_about.cpp" />
     <ClCompile Include="src\Scenes\Notify\ui_notify.cpp" />
@@ -144,7 +145,7 @@
     <ClCompile Include="src\Systems\audio_manager.cpp" />
     <ClCompile Include="src\Control\menu_data.cpp" />
     <ClCompile Include="src\main.cpp" />
-    <ClCompile Include="src\Model\Logic.cpp" />
+    <ClCompile Include="src\Model\logic.cpp" />
     <ClCompile Include="src\Scenes\MainMenu\ui_main_menu.cpp" />
     <ClCompile Include="src\Scenes\Play\ui_pause.cpp" />
     <ClCompile Include="src\Scenes\Play\ui_play.cpp" />
@@ -173,13 +174,14 @@
     <ClInclude Include="raylib\include\raymath.h" />
     <ClInclude Include="raylib\include\rlgl.h" />
     <ClInclude Include="src\Control\menu_data.h" />
-    <ClInclude Include="src\Model\ai_bot.h" />
-    <ClInclude Include="src\Model\ai_easy.h" />
-    <ClInclude Include="src\Model\ai_hard.h" />
-    <ClInclude Include="src\Model\ai_medium.h" />
+    <ClInclude Include="src\Model\AI\ai_bot.h" />
+    <ClInclude Include="src\Model\AI\ai_easy.h" />
+    <ClInclude Include="src\Model\AI\ai_evaluation.h" />
+    <ClInclude Include="src\Model\AI\ai_hard.h" />
+    <ClInclude Include="src\Model\AI\ai_medium.h" />
     <ClInclude Include="src\Model\app_settings.h" />
     <ClInclude Include="src\Model\game_data.h" />
-    <ClInclude Include="src\Model\Logic.h" />
+    <ClInclude Include="src\Model\logic.h" />
     <ClInclude Include="src\audio_manager.h" />
     <ClInclude Include="src\Scenes\MainMenu\ui_main_menu.h" />
     <ClInclude Include="src\Scenes\Notify\ui_notify.h" />
