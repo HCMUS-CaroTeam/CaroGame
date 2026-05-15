@@ -253,6 +253,7 @@ void UpdateLoadUI(
         if (yesClicked) {
             PlayMenuClick(audio, settings);
 			gNotificationMessageLine1 = "DELETED GAME \"" + gSelectedKey + "\" SUCCESSFULLY!";
+            gNotificationMessageLine2 = "";
             ActionDeleteSave();
             // Sau khi xóa, cập nhật lại danh sách ngay lập tức
             gameSaves.clear();
