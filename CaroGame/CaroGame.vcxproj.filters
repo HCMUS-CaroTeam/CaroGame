@@ -27,7 +27,7 @@
     <ClCompile Include="src\Control\menu_data.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\Model\Logic.cpp">
+    <ClCompile Include="src\Model\logic.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\Scenes\Setup\ui_setup.cpp">
@@ -54,13 +54,13 @@
     <ClCompile Include="src\Scenes\Setting\ui_setting.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\Model\ai_bot.cpp">
+    <ClCompile Include="src\Model\AI\ai_bot.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\Model\ai_easy.cpp">
+    <ClCompile Include="src\Model\AI\ai_easy.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\Model\ai_medium.cpp">
+    <ClCompile Include="src\Model\AI\ai_medium.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\Model\game_data.cpp">
@@ -78,10 +78,13 @@
     <ClCompile Include="src\Systems\save_load.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\Model\ai_hard.cpp">
+    <ClCompile Include="src\Model\AI\ai_hard.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\Scenes\Notify\ui_notify.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Model\AI\ai_evaluation.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -145,7 +148,7 @@
     <ClInclude Include="Shared\Common.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\Model\Logic.h">
+    <ClInclude Include="src\Model\logic.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\Scenes\Setup\ui_setup.h">
@@ -172,13 +175,13 @@
     <ClInclude Include="src\Scenes\Setting\ui_setting.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\Model\ai_bot.h">
+    <ClInclude Include="src\Model\AI\ai_bot.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\Model\ai_easy.h">
+    <ClInclude Include="src\Model\AI\ai_easy.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\Model\ai_medium.h">
+    <ClInclude Include="src\Model\AI\ai_medium.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\Model\game_data.h">
@@ -202,10 +205,13 @@
     <ClInclude Include="src\Systems\save_load.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\Model\ai_hard.h">
+    <ClInclude Include="src\Model\AI\ai_hard.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\Scenes\Notify\ui_notify.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Model\AI\ai_evaluation.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

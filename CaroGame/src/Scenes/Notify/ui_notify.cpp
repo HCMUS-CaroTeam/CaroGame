@@ -1,5 +1,5 @@
 #include "ui_notify.h"
-#include "Model/Logic.h"
+#include "Model/logic.h"
 #include "Scenes/Save_Load/ui_save.h"
 
 static constexpr float SAVE_PANEL_W = 1000.0f;
