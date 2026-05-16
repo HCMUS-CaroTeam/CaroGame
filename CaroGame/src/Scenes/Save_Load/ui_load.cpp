@@ -439,11 +439,6 @@ void DrawLoadUI(Font fontTitle, Font fontSmall, const MouseState& mouse, const A
         DrawUIButton(j, gLoadButtons[j], fontSmall, hov, prs);
     }
 
-    // (Tùy chọn) Hiện dòng chữ nhắc nhở nhẹ nhàng nếu chưa chọn game
-    if (gSelectedKey.empty()) {
-        DrawCenteredText(fontSmall, "(Please select a save to Load/Rename)", panel.y + panel.height - 60.0f, 18, WHITE);
-    }
-
     if (gShowRenameOverlay || gShowDeleteConfirm) {
         DrawLoadOverlays(fontTitle, fontSmall, mouse);
     }

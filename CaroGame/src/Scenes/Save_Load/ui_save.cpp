@@ -1,5 +1,5 @@
 #include "ui_save.h" 
-#include "Model/Logic.h"
+#include "Model/logic.h"
 #include <cmath> 
 #include <cctype>
 
