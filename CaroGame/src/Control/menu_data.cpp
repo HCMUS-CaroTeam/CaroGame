@@ -178,4 +178,10 @@ Button gNotifyButtons[] = {
     { Vector2{ SCREEN_WIDTH * 0.5f - 160.0f, 680.0f }, Vector2{ 320.0f, 60.0f }, "BACK", NOTIFY_BTN_BACK, BUTTON_VISUAL_TEXT, BUTTON_ICON_NONE, 24.0f, 1.5f }
 };
 
+// Khai báo nút SKIP chuẩn theo cấu trúc của team
+Button skipBtn = {
+    Vector2{ 1080.0f, 660.0f },  Vector2{ 160.0f, 50.0f }, "SKIP", 99, BUTTON_VISUAL_TEXT, BUTTON_ICON_NONE, 24.0f, 2.0f};
+
 int gNotifyButtonCount = sizeof(gNotifyButtons) / sizeof(gNotifyButtons[0]);
+
+
