@@ -45,12 +45,12 @@ void UpdateMainMenuUI(
             switch (gMainMenuButtons[i].id)
             {
             case BTN_PLAY:
-                currentScreen = SCREEN_SETUP;
+                currentScreen = SCREEN_STORY; // thêm scene story 
                 break;
 
             case BTN_LOAD:
                 currentScreen = SCREEN_LOAD;
-				break;
+                break;
 
             case BTN_ABOUT:
                 currentScreen = SCREEN_ABOUT;

@@ -61,6 +61,7 @@ enum PauseButtonId
 enum ScreenState
 {
     SCREEN_MAIN_MENU = 900,
+    SCREEN_STORY,
     SCREEN_PLAY,
     SCREEN_ABOUT,
     SCREEN_SETTING,
@@ -72,7 +73,8 @@ enum ScreenState
 	SCREEN_SAVE_TO_BACK_MENU,
     SCREEN_SAVE_TO_EXIT, 
 	SCREEN_NOTIFY_EXIT,
-	SCREEN_NOTIFY_BACK_MENU
+	SCREEN_NOTIFY_BACK_MENU,
+  
 };
 
 extern Button gMainMenuButtons[];

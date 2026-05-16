@@ -15,6 +15,10 @@
 #include "Scenes/Save_Load/ui_save.h"
 #include "Scenes/Save_Load/ui_load.h"
 #include "Scenes/Notify/ui_notify.h"
+#include "Scenes/Story/ui_story.h"
+
+
+
 
 static int* GetVietnameseCodepoints(int& codepointCount)
 {
@@ -59,7 +63,7 @@ static Font LoadFontSafe(const char* path, int size)
 
 int main()
 {
-    InitWindow(SCREEN_WIDTH, SCREEN_HEIGHT, "Quantum Caro");
+    InitWindow(SCREEN_WIDTH, SCREEN_HEIGHT, "CaroGame");
     SetExitKey(KEY_NULL);
     SetTargetFPS(TARGET_FPS);
 
@@ -76,6 +80,7 @@ int main()
     InitUIButtonSystem();
     InitUIFrameSystem();
     InitMainMenuUI();
+    InitStoryScene(); //here
     InitSetupUI();
     InitPlayUI();
     InitSettingUI();
@@ -83,6 +88,7 @@ int main()
     InitSaveUI();
     InitLoadUI();
 	InitNotifyUI();
+  
     ScreenState currentScreen = SCREEN_MAIN_MENU;
     bool shouldClose = false;
 
@@ -97,6 +103,10 @@ int main()
         {
         case SCREEN_MAIN_MENU:
             UpdateMainMenuUI(mouse, dt, audio, settings, currentScreen, shouldClose);
+            break;
+
+        case SCREEN_STORY:
+            UpdateStoryScene(mouse, dt, audio, settings, currentScreen);
             break;
 
         case SCREEN_SETUP:
@@ -146,6 +156,8 @@ int main()
 		case SCREEN_SAVE_TO_EXIT:
 			UpdateSaveToExitUI(mouse, dt, audio, settings, currentScreen, shouldClose);
 			break;
+
+ 
         }
 
         BeginDrawing();
@@ -156,10 +168,14 @@ int main()
             DrawMainMenuUI(fontTitle, fontSmall, mouse);
             break;
 
+        case SCREEN_STORY:
+            DrawStoryScene(fontTitle, fontSmall, mouse);
+            break;
+
         case SCREEN_SETUP:
             DrawSetupUI(fontTitle, fontSmall, mouse, settings);
             break;
-
+    
         case SCREEN_PLAY:
             DrawPlayUI(fontTitle, fontSmall, mouse, settings);
             break;
@@ -213,11 +229,13 @@ int main()
     ShutdownSaveUI();
     ShutdownLoadUI();
     ShutdownMainMenuUI();
+    ShutdownStoryScene();
     ShutdownNotifyUI();
     ShutdownUIFrameSystem();
     ShutdownUIButtonSystem();
     ShutdownGameAudio(audio);
     UnloadBackgroundAssets();
+  
 
     if (FileExists(FONT_PATH))
     {
