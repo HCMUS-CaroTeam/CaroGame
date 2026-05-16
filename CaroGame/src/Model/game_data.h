@@ -71,12 +71,9 @@ struct DataGame {
 };
 #pragma pack(pop)
 
-extern DataGame currentGame; // Biến toàn cục lưu trữ trạng thái hiện tại của trò chơi, được sử dụng trong toàn bộ chương trình
-
 extern DataGame& GetCurrentGameData(); // Hàm trả về tham chiếu đến currentGame để các module ui_play, logic có thể truy cập và cập nhật trạng thái trò chơi hiện tại
-
-extern DataGame GetCopyOfCurrentGameData(); // Hàm trả về một bản sao của currentGame để tránh việc thay đổi trực tiếp trên currentGame khi load game hoặc reset game
 
 inline DataGame& current() {
 	return GetCurrentGameData();
 }
+

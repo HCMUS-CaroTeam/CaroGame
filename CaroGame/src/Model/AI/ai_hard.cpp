@@ -11,23 +11,22 @@ const long long INF = 10000000000000000LL;
 typedef int ScratchBoard[BOARD_SIZE][BOARD_SIZE];
 
 struct Move {
-  int r, c;
-  long long score;
+    int r, c;
+    long long score;
 }; // Thêm điểm số vào Struct ảo để Sort
 
 // ========================================================================
 // HÀM HỖ TRỢ: SAO CHÉP BÀN CỜ THẬT SANG BÀN CỜ ẢO
 // ========================================================================
 static void CopyBoard(const int src[BOARD_SIZE][BOARD_SIZE], ScratchBoard dst) {
-  memcpy(dst, src, sizeof(int) * BOARD_SIZE * BOARD_SIZE);
+    memcpy(dst, src, sizeof(int) * BOARD_SIZE * BOARD_SIZE);
 }
 
 // ========================================================================
 // HÀM HỖ TRỢ: GHI BÀN CỜ ẢO NGƯỢC LẠI BÀN CỜ THẬT (phục hồi an toàn)
 // ========================================================================
-static void RestoreBoard(int dst[BOARD_SIZE][BOARD_SIZE],
-                         const ScratchBoard src) {
-  memcpy(dst, src, sizeof(int) * BOARD_SIZE * BOARD_SIZE);
+static void RestoreBoard(int dst[BOARD_SIZE][BOARD_SIZE], const ScratchBoard src) {
+    memcpy(dst, src, sizeof(int) * BOARD_SIZE * BOARD_SIZE);
 }
 
 // ========================================================================
