@@ -80,25 +80,24 @@ void UpdateStoryScene(
     int charsToShow = (int)(timeElapsed * TYPE_SPEED);
     bool isTyping = charsToShow < totalLen;
 
-    // Logic nút SKIP 
     bool hovered = false;
     bool pressed = false;
+
     UpdateUIButton(10, skipBtn, mouse, dt, audio, settings, hovered, pressed);
 
-    if (hovered && mouse.leftPressed) {
+    if (pressed) {
+        PlayMenuClick(audio, settings);
         currentScreen = SCREEN_SETUP;
         needReset = true;
         return;
     }
 
-    // Logic điều khiển LOG 
     if (IsMouseButtonPressed(MOUSE_RIGHT_BUTTON)) {
         if (isTyping) {
             timeElapsed = (float)totalLen / TYPE_SPEED + 1.0f;
         }
         else {
             currentLogIndex++;
-
             if (currentLogIndex >= numLogs) {
                 currentScreen = SCREEN_SETUP;
                 needReset = true;
@@ -123,6 +122,9 @@ void DrawStoryScene(Font fontTitle, Font fontSmall, const MouseState& mouse) {
     DrawRectangle(0, (int)boxY, GetScreenWidth(), 280, ColorAlpha(BLACK, 0.65f));
     DrawRectangle(0, (int)boxY, GetScreenWidth(), 3, ColorAlpha(LIGHTGRAY, 0.5f));
 
+    if (currentLogIndex < 0 || currentLogIndex >= numLogs || storyLogs[currentLogIndex] == nullptr) {
+        return; // Thoát hàm draw ngay lập tức nếu dữ liệu lỗi để tránh văng game
+    }
     // Lấy thông tin đoạn log hiện tại
     int totalLen = (int)strlen(storyLogs[currentLogIndex]);
     int charsToShow = (int)(timeElapsed * TYPE_SPEED);
