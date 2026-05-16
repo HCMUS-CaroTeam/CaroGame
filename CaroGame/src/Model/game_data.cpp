@@ -23,7 +23,3 @@ DataGame& GetCurrentGameData() {
 	return currentGame;
 }
 
-DataGame GetCopyOfCurrentGameData() {
-	return currentGame; 
-	// Trả về một bản sao của currentGame để tránh việc các module khác vô tình sửa đổi trực tiếp
-}
