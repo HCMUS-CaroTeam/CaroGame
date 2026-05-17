@@ -29,24 +29,24 @@ static const char* storyLogs[] = {
     "A portal from the Moon opens, unleashing the 'Moon Demon' upon\n"
     "the mortal realm. The creature ravages the village, abducting young"
     "maidens to drain their life force and maintain its immortality.\n"
-    "Nobita, an orphan raised by the village chief, is deeply in love"
-    "with Shizuka, the chief's beautiful daughter.",
+    "Hiro, an orphan raised by the village chief, is deeply in love"
+    "with Yuki, the chief's beautiful daughter.",
 
     "On a night when the Full Moon shone its brightest, while the village "
     "celebrated a grand festival, the Demon suddenly descended.\n"
-    "It seized Shizuka as the villagers watched in terror. Nobita fought "
+    "It seized Yuki as the villagers watched in terror. Hiro fought "
     "with unmatched fury, but a mere mortal was no match for \n"
     "demonic magic. He watched in agony as she was dragged into the void, violently "
     "thrown into the abyss by the portal's shockwave.",
 
-    "Surviving the fall, Nobita silently gathered his gear amidst the "
+    "Surviving the fall, Hiro silently gathered his gear amidst the "
     "ruins of his home. The village chief, with eyes full of sorrow and\n"
     "resolve, imparted his final wisdom: 'The moonlight portal is closed, but "
     "it will soon wane. You have exactly one lunar cycle to train.\n"
     "When the moon becomes a crescent, the demons are at their weakest. "
     "That will be your only chance to ascend to the Moon.' ",
 
-    "Leaving the flickering lights behind, Nobita embarks on a deadly "
+    "Leaving the flickering lights behind, Hiro embarks on a deadly "
     "training journey to prepare for the Moon's shifting powers."
 };
 
