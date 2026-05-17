@@ -27,7 +27,7 @@ void GetMediumMove(int& outRow, int& outCol) {
 
                 // 3. Tổng điểm = Công + Thủ 
                 // Mẹo: Nhân thủ với 1.5 để Bot ưu tiên tính "chắc cốp", thấy nguy hiểm là chặn ngay
-                long long totalScore = attackScore + (defenseScore * 1.5);
+                long long totalScore = attackScore + (defenseScore * 3 / 2);
 
                 //// Ưu tiên Tuyệt đối #1: Đánh vào đây là THẮNG LUÔN -> Đánh ngay.
                 //if (attackScore >= SCORE_WIN) {
