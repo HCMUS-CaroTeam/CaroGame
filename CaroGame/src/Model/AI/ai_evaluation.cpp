@@ -16,72 +16,97 @@ PatternType ClassifyLine(int count, int blocks, int gaps) {
             return WIN; // Không có gap -> Win xịn -> Thắng luôn
     }
 
-    if (blocks == 0) {
-        switch (count) {
-        case 4:
-            return OPEN_4;
-        case 3:
-            return OPEN_3;
-        case 2:
-            return OPEN_2;
-        case 1:
-            return OPEN_1;
-        default:
-            return PATTERN_NONE;
-        }
-    } else { // blocks == 1
-        switch (count) {
-            case 4:
-                return BLOCKED_4;
-            case 3:
-                return BLOCKED_3;
-            case 2:
-                return BLOCKED_2;
-            case 1:
-                return BLOCKED_1;
-            default:
-                return PATTERN_NONE;
-        }
+  // FIX LỖI: NẾU CÓ KHOẢNG TRỐNG (GAP) THÌ TUYỆT ĐỐI KHÔNG ĐƯỢC TÍNH LÀ WIN!
+  if (gaps > 0) {
+    if (count >= 5)
+      count =
+          4; // Giáng cấp: 5 quân đứt khúc chỉ tương đương 1 chuỗi 4 cực mạnh
+  } else {
+    if (count >= 5)
+      return WIN; // Không có gap -> Win xịn -> Thắng luôn
+  }
+
+  if (blocks == 0) {
+    switch (count) {
+    case 4:
+      return OPEN_4;
+    case 3:
+      return OPEN_3;
+    case 2:
+      return OPEN_2;
+    case 1:
+      return OPEN_1;
+    default:
+      return PATTERN_NONE;
     }
+  } else { // blocks == 1
+    switch (count) {
+    case 4:
+      return BLOCKED_4;
+    case 3:
+      return BLOCKED_3;
+    case 2:
+      return BLOCKED_2;
+    case 1:
+      return BLOCKED_1;
+    default:
+      return PATTERN_NONE;
+    }
+  }
 }
 
 // ========================================================================
 // HÀM CHO BOT EASY (Quét đơn giản + bảng điểm phẳng)
 // ========================================================================
 long long EvaluatePositionEasy(int r, int c, int piece) {
-    long long totalScore = 0;
-    int dx[] = { 1, 0, 1, 1 };
-    int dy[] = { 0, 1, 1, -1 };
+  long long totalScore = 0;
+  int dx[] = {1, 0, 1, 1};
+  int dy[] = {0, 1, 1, -1};
 
-    for (int dir = 0; dir < 4; dir++) {
-        int count = 1;
-        int blocks = 0;
+  for (int dir = 0; dir < 4; dir++) {
+    int count = 1;
+    int blocks = 0;
 
-        // Quét TỚI
-        for (int step = 1; step <= 4; step++) {
-            int nr = r + step * dx[dir];
-            int nc = c + step * dy[dir];
-            if (nr < 0 || nr >= BOARD_SIZE || nc < 0 || nc >= BOARD_SIZE) { blocks++; break; }
-            if (current().board[nr][nc] == piece) count++;
-            else if (current().board[nr][nc] != 0) { blocks++; break; }
-            else break;
-        }
-
-        // Quét LÙI
-        for (int step = 1; step <= 4; step++) {
-            int nr = r - step * dx[dir];
-            int nc = c - step * dy[dir];
-            if (nr < 0 || nr >= BOARD_SIZE || nc < 0 || nc >= BOARD_SIZE) { blocks++; break; }
-            if (current().board[nr][nc] == piece) count++;
-            else if (current().board[nr][nc] != 0) { blocks++; break; }
-            else break;
-        }
-
-        // Phân loại rồi tra bảng điểm Easy
-        PatternType type = ClassifyLine(count, blocks, 0);
-        if (type != PATTERN_NONE) totalScore += EASY_SCORES[type];
+    // Quét TỚI
+    for (int step = 1; step <= 4; step++) {
+      int nr = r + step * dx[dir];
+      int nc = c + step * dy[dir];
+      if (nr < 0 || nr >= BOARD_SIZE || nc < 0 || nc >= BOARD_SIZE) {
+        blocks++;
+        break;
+      }
+      if (current().board[nr][nc] == piece)
+        count++;
+      else if (current().board[nr][nc] != 0) {
+        blocks++;
+        break;
+      } else
+        break;
     }
-    return totalScore;
+
+    // Quét LÙI
+    for (int step = 1; step <= 4; step++) {
+      int nr = r - step * dx[dir];
+      int nc = c - step * dy[dir];
+      if (nr < 0 || nr >= BOARD_SIZE || nc < 0 || nc >= BOARD_SIZE) {
+        blocks++;
+        break;
+      }
+      if (current().board[nr][nc] == piece)
+        count++;
+      else if (current().board[nr][nc] != 0) {
+        blocks++;
+        break;
+      } else
+        break;
+    }
+
+    // Phân loại rồi tra bảng điểm Easy
+    PatternType type = ClassifyLine(count, blocks, 0);
+    if (type != PATTERN_NONE)
+      totalScore += EASY_SCORES[type];
+  }
+  return totalScore;
 }
 
 // ========================================================================
