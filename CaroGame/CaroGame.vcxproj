@@ -161,6 +161,9 @@
     <ClCompile Include="src\View\ui_frame.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <Image Include="Assets\avatar\BossPhases%28Moon%29\pixil-layer-trang-ban.png" />
+    <Image Include="Assets\avatar\BossPhases%28Moon%29\pixil-layer-trang-khuyet.png" />
+    <Image Include="Assets\avatar\BossPhases%28Moon%29\pixil-layer-trang-tron.png" />
     <Image Include="Assets\bg\background.png" />
     <Image Include="Assets\bg\button1.png" />
     <Image Include="Assets\bg\button2.png" />
