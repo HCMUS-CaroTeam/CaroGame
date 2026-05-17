@@ -1,0 +1,17 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Debug CaroGame",
+      "type": "cppvsdbg",
+      "request": "launch",
+      "program": "${workspaceFolder}\\x64\\Debug\\CaroGame.exe",
+      "args": [],
+      "stopAtEntry": false,
+      "cwd": "${workspaceFolder}\\CaroGame",
+      "environment": [],
+      "console": "externalTerminal",
+      "preLaunchTask": "Build CaroGame Debug x64"
+    }
+  ]
+}

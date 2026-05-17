@@ -1,0 +1,23 @@
+{
+  "version": 4,
+  "configurations": [
+    {
+      "name": "Win32",
+      "includePath": [
+        "${workspaceFolder}\\CaroGame\\src",
+        "${workspaceFolder}\\CaroGame\\Shared",
+        "${workspaceFolder}\\CaroGame\\raylib\\include",
+        "${workspaceFolder}\\CaroGame\\**"
+      ],
+      "defines": [
+        "_DEBUG",
+        "_CONSOLE"
+      ],
+      "windowsSdkVersion": "10.0",
+      "compilerPath": "cl.exe",
+      "cStandard": "c17",
+      "cppStandard": "c++20",
+      "intelliSenseMode": "windows-msvc-x64"
+    }
+  ]
+}

@@ -1,0 +1,36 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "Build CaroGame Debug x64",
+      "type": "shell",
+      "command": "powershell",
+      "args": [
+        "-NoProfile",
+        "-ExecutionPolicy",
+        "Bypass",
+        "-File",
+        "${workspaceFolder}\\.vscode\\build.ps1",
+        "-Configuration",
+        "Debug",
+        "-Platform",
+        "x64"
+      ],
+      "group": {
+        "kind": "build",
+        "isDefault": true
+      },
+      "problemMatcher": "$msCompile"
+    },
+    {
+      "label": "Run CaroGame",
+      "type": "shell",
+      "command": "${workspaceFolder}\\x64\\Debug\\CaroGame.exe",
+      "options": {
+        "cwd": "${workspaceFolder}\\CaroGame"
+      },
+      "dependsOn": "Build CaroGame Debug x64",
+      "problemMatcher": []
+    }
+  ]
+}
