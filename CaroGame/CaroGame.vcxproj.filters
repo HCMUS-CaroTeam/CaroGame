@@ -87,6 +87,12 @@
     <ClCompile Include="src\Model\AI\ai_evaluation.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\Scenes\Setup\ui_name_setup.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Control\name_input_data.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
     <ClCompile Include="src\Scenes\Story\ui_story.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -120,6 +126,63 @@
       <Filter>Resource Files</Filter>
     </Image>
     <Image Include="Assets\bg\story_bg.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Assets\avatars\boss.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Assets\avatars\character-1.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Assets\avatars\character-2.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Assets\avatars\character-3.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Assets\avatars\character-4.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Assets\buttons\button1.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Assets\buttons\pixil-layer-13.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Assets\buttons\pixil-layer-12.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Assets\buttons\pixil-layer-11.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Assets\buttons\pixil-layer-10.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Assets\buttons\pixil-layer-9.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Assets\buttons\pixil-layer-8.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Assets\buttons\pixil-layer-6.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Assets\buttons\pixil-layer-4.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Assets\buttons\button2.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Assets\buttons\pixil-layer-5.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Assets\buttons\pixil-layer-7.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Assets\texture\pixil-layer-setting2.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Assets\texture\pixil-layer-setting1.png">
       <Filter>Resource Files</Filter>
     </Image>
   </ItemGroup>
@@ -220,6 +283,12 @@
     <ClInclude Include="src\Model\AI\ai_evaluation.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="src\Scenes\Setup\ui_name_setup.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Control\name_input_data.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
     <ClInclude Include="src\Scenes\Story\ui_story.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -239,5 +308,8 @@
   <ItemGroup>
     <Media Include="Assets\audio\lose_sound.mp3" />
     <Media Include="Assets\audio\win_sound.mp3" />
+  </ItemGroup>
+  <ItemGroup>
+    <Font Include="Assets\fonts\Born2bSportyFS.otf" />
   </ItemGroup>
 </Project>

@@ -135,17 +135,23 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="src/Control\input_mouse.cpp" />
+    <ClCompile Include="src\Control\name_input_data.cpp" />
     <ClCompile Include="src\Model\AI\ai_bot.cpp" />
     <ClCompile Include="src\Model\AI\ai_easy.cpp" />
     <ClCompile Include="src\Model\AI\ai_evaluation.cpp" />
     <ClCompile Include="src\Model\AI\ai_hard.cpp" />
     <ClCompile Include="src\Model\AI\ai_medium.cpp" />
+    <ClCompile Include="src\Model\ai_bot.cpp" />
+    <ClCompile Include="src\Model\ai_easy.cpp" />
+    <ClCompile Include="src\Model\ai_hard.cpp" />
+    <ClCompile Include="src\Model\ai_medium.cpp" />
     <ClCompile Include="src\Model\game_data.cpp" />
     <ClCompile Include="src\Scenes\About\ui_about.cpp" />
     <ClCompile Include="src\Scenes\Notify\ui_notify.cpp" />
     <ClCompile Include="src\Scenes\Save_Load\ui_load.cpp" />
     <ClCompile Include="src\Scenes\Save_Load\ui_save.cpp" />
     <ClCompile Include="src\Scenes\Setting\ui_setting.cpp" />
+    <ClCompile Include="src\Scenes\Setup\ui_name_setup.cpp" />
     <ClCompile Include="src\Scenes\Story\ui_story.cpp" />
     <ClCompile Include="src\Systems\audio_manager.cpp" />
     <ClCompile Include="src\Control\menu_data.cpp" />
@@ -164,15 +170,34 @@
     <Image Include="Assets\avatar\BossPhases%28Moon%29\pixil-layer-trang-ban.png" />
     <Image Include="Assets\avatar\BossPhases%28Moon%29\pixil-layer-trang-khuyet.png" />
     <Image Include="Assets\avatar\BossPhases%28Moon%29\pixil-layer-trang-tron.png" />
+    <Image Include="Assets\avatars\boss.png" />
+    <Image Include="Assets\avatars\character-1.png" />
+    <Image Include="Assets\avatars\character-2.png" />
+    <Image Include="Assets\avatars\character-3.png" />
+    <Image Include="Assets\avatars\character-4.png" />
     <Image Include="Assets\bg\background.png" />
     <Image Include="Assets\bg\button1.png" />
     <Image Include="Assets\bg\button2.png" />
     <Image Include="Assets\bg\game name.png" />
     <Image Include="Assets\bg\story_bg.png" />
+    <Image Include="Assets\buttons\button1.png" />
+    <Image Include="Assets\buttons\button2.png" />
+    <Image Include="Assets\buttons\pixil-layer-10.png" />
+    <Image Include="Assets\buttons\pixil-layer-11.png" />
+    <Image Include="Assets\buttons\pixil-layer-12.png" />
+    <Image Include="Assets\buttons\pixil-layer-13.png" />
+    <Image Include="Assets\buttons\pixil-layer-4.png" />
+    <Image Include="Assets\buttons\pixil-layer-5.png" />
+    <Image Include="Assets\buttons\pixil-layer-6.png" />
+    <Image Include="Assets\buttons\pixil-layer-7.png" />
+    <Image Include="Assets\buttons\pixil-layer-8.png" />
+    <Image Include="Assets\buttons\pixil-layer-9.png" />
     <Image Include="Assets\frame\pixil-layer-1.png" />
     <Image Include="Assets\frame\pixil-layer-2.png" />
     <Image Include="Assets\frame\pixil-layer-3.png" />
     <Image Include="Assets\Texture\background.jpg" />
+    <Image Include="Assets\texture\pixil-layer-setting1.png" />
+    <Image Include="Assets\texture\pixil-layer-setting2.png" />
     <Image Include="x64\Debug\Assets\Texture\background.jpg" />
   </ItemGroup>
   <ItemGroup>
@@ -183,11 +208,16 @@
     <ClInclude Include="raylib\include\raymath.h" />
     <ClInclude Include="raylib\include\rlgl.h" />
     <ClInclude Include="src\Control\menu_data.h" />
+    <ClInclude Include="src\Control\name_input_data.h" />
     <ClInclude Include="src\Model\AI\ai_bot.h" />
     <ClInclude Include="src\Model\AI\ai_easy.h" />
     <ClInclude Include="src\Model\AI\ai_evaluation.h" />
     <ClInclude Include="src\Model\AI\ai_hard.h" />
     <ClInclude Include="src\Model\AI\ai_medium.h" />
+    <ClInclude Include="src\Model\ai_bot.h" />
+    <ClInclude Include="src\Model\ai_easy.h" />
+    <ClInclude Include="src\Model\ai_hard.h" />
+    <ClInclude Include="src\Model\ai_medium.h" />
     <ClInclude Include="src\Model\app_settings.h" />
     <ClInclude Include="src\Model\game_data.h" />
     <ClInclude Include="src\Model\logic.h" />
@@ -200,6 +230,7 @@
     <ClInclude Include="src\Scenes\Save_Load\ui_load.h" />
     <ClInclude Include="src\Scenes\Save_Load\ui_save.h" />
     <ClInclude Include="src\Scenes\Setting\ui_setting.h" />
+    <ClInclude Include="src\Scenes\Setup\ui_name_setup.h" />
     <ClInclude Include="src\Scenes\Setup\ui_setup.h" />
     <ClInclude Include="src\Scenes\Story\ui_story.h" />
     <ClInclude Include="src\Systems\audio_manager.h" />
@@ -223,8 +254,19 @@
     <None Include="settings.cfg" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="Assets\audio\menu_click.ogg" />
+    <None Include="Assets\audio\menu_hover.ogg" />
+    <None Include="game_progress.dat" />
+    <None Include="packages.config" />
+    <None Include="saves.dat" />
+    <None Include="settings.cfg" />
     <Media Include="Assets\audio\lose_sound.mp3" />
     <Media Include="Assets\audio\win_sound.mp3" />
+  </ItemGroup>
+  <ItemGroup>
+    <Media Include="Assets\audio\lose_sound.mp3" />
+    <Media Include="Assets\audio\win_sound.mp3" />
+    <Font Include="Assets\fonts\Born2bSportyFS.otf" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
