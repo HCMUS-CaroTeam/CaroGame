@@ -146,6 +146,7 @@
     <ClCompile Include="src\Scenes\Save_Load\ui_load.cpp" />
     <ClCompile Include="src\Scenes\Save_Load\ui_save.cpp" />
     <ClCompile Include="src\Scenes\Setting\ui_setting.cpp" />
+    <ClCompile Include="src\Scenes\Story\ui_story.cpp" />
     <ClCompile Include="src\Systems\audio_manager.cpp" />
     <ClCompile Include="src\Control\menu_data.cpp" />
     <ClCompile Include="src\main.cpp" />
@@ -164,6 +165,7 @@
     <Image Include="Assets\bg\button1.png" />
     <Image Include="Assets\bg\button2.png" />
     <Image Include="Assets\bg\game name.png" />
+    <Image Include="Assets\bg\story_bg.png" />
     <Image Include="Assets\frame\pixil-layer-1.png" />
     <Image Include="Assets\frame\pixil-layer-2.png" />
     <Image Include="Assets\frame\pixil-layer-3.png" />
@@ -196,6 +198,7 @@
     <ClInclude Include="src\Scenes\Save_Load\ui_save.h" />
     <ClInclude Include="src\Scenes\Setting\ui_setting.h" />
     <ClInclude Include="src\Scenes\Setup\ui_setup.h" />
+    <ClInclude Include="src\Scenes\Story\ui_story.h" />
     <ClInclude Include="src\Systems\audio_manager.h" />
     <ClInclude Include="src\Systems\load.h" />
     <ClInclude Include="src\Systems\save.h" />

@@ -87,6 +87,9 @@
     <ClCompile Include="src\Model\AI\ai_evaluation.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\Scenes\Story\ui_story.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Image Include="Assets\Texture\background.jpg">
@@ -114,6 +117,9 @@
       <Filter>Resource Files</Filter>
     </Image>
     <Image Include="Assets\frame\pixil-layer-3.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Assets\bg\story_bg.png">
       <Filter>Resource Files</Filter>
     </Image>
   </ItemGroup>
@@ -212,6 +218,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\Model\AI\ai_evaluation.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Scenes\Story\ui_story.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

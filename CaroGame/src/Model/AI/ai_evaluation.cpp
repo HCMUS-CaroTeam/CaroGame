@@ -3,8 +3,18 @@
 
 PatternType ClassifyLine(int count, int blocks, int gaps) {
   // LUẬT VIỆT NAM: Đủ 5 con nhưng bị chặn 2 đầu => Vô giá trị
-  if (blocks >= 2)
-    return PATTERN_NONE;
+
+    if (blocks >= 2)
+        return PATTERN_NONE;
+
+    // FIX LỖI: NẾU CÓ KHOẢNG TRỐNG (GAP) THÌ TUYỆT ĐỐI KHÔNG ĐƯỢC TÍNH LÀ WIN!
+    if (gaps > 0) {
+        if (count >= 5)
+            count = 4; // Giáng cấp: 5 quân đứt khúc chỉ tương đương 1 chuỗi 4 cực mạnh
+    } else {
+        if (count >= 5)
+            return WIN; // Không có gap -> Win xịn -> Thắng luôn
+    }
 
   // FIX LỖI: NẾU CÓ KHOẢNG TRỐNG (GAP) THÌ TUYỆT ĐỐI KHÔNG ĐƯỢC TÍNH LÀ WIN!
   if (gaps > 0) {
