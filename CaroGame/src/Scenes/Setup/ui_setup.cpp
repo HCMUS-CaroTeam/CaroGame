@@ -4,6 +4,9 @@
 #include "View/ui_background.h"
 #include "View/ui_button.h"
 #include "View/ui_frame.h"
+#include "Model/config.h"
+#include "Model/Logic.h"
+#include "Scenes/Setup/ui_name_setup.h"
 
 
 // Khai báo biến Texture toàn cục cho màn hình Setup
@@ -149,11 +152,14 @@ void UpdateSetupUI(const MouseState &mouse, float dt, AudioAssets &audio,
         break;
 
       case SETUP_BTN_PLAY:
+        InitNewGame();
         // Reset board và timer trước khi set game data mới
-        ResetBoard();
+        ResetNameInputBuffers();
 
         // Cập nhật chế độ chơi và độ khó từ cài đặt sang core game
         current().gameMode = settings.gameMode;
+        current().botDifficulty = settings.botDifficulty;
+
         if (settings.gameMode == MODE_PVE) {
           current().botDifficulty = settings.botDifficulty;
         } else {
@@ -171,7 +177,7 @@ void UpdateSetupUI(const MouseState &mouse, float dt, AudioAssets &audio,
         }
 
         // Mở màn chơi
-        currentScreen = SCREEN_PLAY;
+        currentScreen = SCREEN_NAME_INPUT;
         break;
 
       case SETUP_BTN_BACK:

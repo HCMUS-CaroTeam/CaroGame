@@ -1,0 +1,39 @@
+﻿C:\Program Files\Microsoft Visual Studio\2022\Community\MSBuild\Microsoft\VC\v170\Microsoft.CppBuild.targets(1119,5): warning MSB8027: Two or more files with the name of ai_bot.cpp will produce outputs to the same location. This can lead to an incorrect build result.  The files involved are src\Model\AI\ai_bot.cpp, src\Model\ai_bot.cpp.
+C:\Program Files\Microsoft Visual Studio\2022\Community\MSBuild\Microsoft\VC\v170\Microsoft.CppBuild.targets(1119,5): warning MSB8027: Two or more files with the name of ai_easy.cpp will produce outputs to the same location. This can lead to an incorrect build result.  The files involved are src\Model\AI\ai_easy.cpp, src\Model\ai_easy.cpp.
+C:\Program Files\Microsoft Visual Studio\2022\Community\MSBuild\Microsoft\VC\v170\Microsoft.CppBuild.targets(1119,5): warning MSB8027: Two or more files with the name of ai_hard.cpp will produce outputs to the same location. This can lead to an incorrect build result.  The files involved are src\Model\AI\ai_hard.cpp, src\Model\ai_hard.cpp.
+C:\Program Files\Microsoft Visual Studio\2022\Community\MSBuild\Microsoft\VC\v170\Microsoft.CppBuild.targets(1119,5): warning MSB8027: Two or more files with the name of ai_medium.cpp will produce outputs to the same location. This can lead to an incorrect build result.  The files involved are src\Model\AI\ai_medium.cpp, src\Model\ai_medium.cpp.
+  ai_bot.cpp
+  ai_easy.cpp
+  ai_evaluation.cpp
+  ai_hard.cpp
+  ai_medium.cpp
+  ai_bot.cpp
+  ai_easy.cpp
+  ai_hard.cpp
+  ai_medium.cpp
+D:\GAME CARO NEW\CaroGame\CaroGame\src\Model\ai_hard.cpp(52,67): warning C4244: '-=': conversion from 'double' to '__int64', possible loss of data
+D:\GAME CARO NEW\CaroGame\CaroGame\src\Model\ai_medium.cpp(85,38): warning C4244: 'initializing': conversion from 'double' to '__int64', possible loss of data
+  game_data.cpp
+  logic.cpp
+D:\GAME CARO NEW\CaroGame\CaroGame\src\Model\logic.cpp(61,11): warning C4244: 'initializing': conversion from 'float' to 'int', possible loss of data
+D:\GAME CARO NEW\CaroGame\CaroGame\src\Model\logic.cpp(62,11): warning C4244: 'initializing': conversion from 'float' to 'int', possible loss of data
+  ui_about.cpp
+  ui_main_menu.cpp
+  ui_notify.cpp
+  ui_pause.cpp
+  ui_play.cpp
+  ui_load.cpp
+  ui_save.cpp
+  ui_setting.cpp
+  ui_name_setup.cpp
+  Generating Code...
+  Compiling...
+  ui_setup.cpp
+  ui_story.cpp
+  audio_manager.cpp
+  save_load.cpp
+  ui_button.cpp
+  ui_frame.cpp
+  main.cpp
+  Generating Code...
+  CaroGame.vcxproj -> D:\GAME CARO NEW\CaroGame\x64\Debug\CaroGame.exe

@@ -184,4 +184,3 @@ Button skipBtn = {
 
 int gNotifyButtonCount = sizeof(gNotifyButtons) / sizeof(gNotifyButtons[0]);
 
-

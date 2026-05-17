@@ -15,10 +15,8 @@
 #include "Scenes/Save_Load/ui_save.h"
 #include "Scenes/Save_Load/ui_load.h"
 #include "Scenes/Notify/ui_notify.h"
+#include "Scenes/Setup/ui_name_setup.h"
 #include "Scenes/Story/ui_story.h"
-
-
-
 
 static int* GetVietnameseCodepoints(int& codepointCount)
 {
@@ -88,7 +86,7 @@ int main()
     InitSaveUI();
     InitLoadUI();
 	InitNotifyUI();
-  
+    InitNameInputUI();
     ScreenState currentScreen = SCREEN_MAIN_MENU;
     bool shouldClose = false;
 
@@ -111,6 +109,10 @@ int main()
 
         case SCREEN_SETUP:
             UpdateSetupUI(mouse, dt, audio, settings, currentScreen);
+            break;
+
+        case SCREEN_NAME_INPUT:
+            UpdateNameInputUI(mouse, dt, audio, settings, currentScreen);
             break;
 
         case SCREEN_PLAY:
@@ -156,8 +158,6 @@ int main()
 		case SCREEN_SAVE_TO_EXIT:
 			UpdateSaveToExitUI(mouse, dt, audio, settings, currentScreen, shouldClose);
 			break;
-
- 
         }
 
         BeginDrawing();
@@ -175,7 +175,11 @@ int main()
         case SCREEN_SETUP:
             DrawSetupUI(fontTitle, fontSmall, mouse, settings);
             break;
-    
+
+        case SCREEN_NAME_INPUT:
+            DrawNameInputUI(fontTitle, fontSmall, mouse, settings);
+            break;
+
         case SCREEN_PLAY:
             DrawPlayUI(fontTitle, fontSmall, mouse, settings);
             break;
@@ -229,6 +233,7 @@ int main()
     ShutdownSaveUI();
     ShutdownLoadUI();
     ShutdownMainMenuUI();
+    ShutdownNameInputUI();
     ShutdownStoryScene();
     ShutdownNotifyUI();
     ShutdownUIFrameSystem();
