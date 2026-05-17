@@ -9,13 +9,25 @@ bool isDuplicateName(const string& name) {
 	return gameSaves.count(name) > 0;
 }
 
+void ChangeGameName(const char* newName) {
+	auto& data = GetCurrentGameData();
+	strcpy_s(data.nameGame, sizeof(data.nameGame), newName);
+	data.nameGame[sizeof(data.nameGame) - 1] = '\0'; // Đảm bảo kết thúc chuỗi
+}
+
+void RenameLoadedGame(const string& oldName, const string& newName) {
+	DataGame data = gameSaves[oldName]; // Tìm bản lưu cũ trong map bằng tên cũ
+	DeleteGameSave(oldName); // Xóa bản lưu cũ khỏi file và map
+	strcpy_s(data.nameGame, sizeof(data.nameGame), newName.c_str()); // Cập nhật tên game trong dữ liệu
+	gameSaves[newName] = data; // Thêm bản lưu mới với tên mới vào map
+	SaveGamesToFile(gameSaves); // Ghi lại file để đảm bảo thay đổi được lưu	
+}
+
 void SaveData(DataGame& gameData) {
 	gameData.saveTime = time(nullptr); // Cập nhật thời gian lưu hiện tại
 	// Use the name of the game as the key for saving
 	gameSaves[string(gameData.nameGame)] = gameData;
 }
-
-
 
 void SaveGamesToFile(const unordered_map<string, DataGame>& gameSaves) {
 	for (const auto& [name, data] : gameSaves) {
@@ -62,3 +74,4 @@ void CreateFolder() {
 		filesystem::create_directory("Saves");
 	}
 }
+

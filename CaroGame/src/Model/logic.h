@@ -50,4 +50,10 @@ extern void InitNewGame();
 */
 
 extern bool IsBoardFull();
+
+/**
+ * @brief Lấy thời gian còn lại của lượt đi hiện tại (dùng cho UI hiển thị countdown).
+ * @return Thời gian còn lại (giây). Trả về -1.0f nếu mode hiện tại không có giới hạn thời gian.
+ */
+extern float GetTimeLeft();
 #endif // LOGIC_H
