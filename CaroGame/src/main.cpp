@@ -18,6 +18,9 @@
 #include "Scenes/Setup/ui_name_setup.h"
 #include "Scenes/Story/ui_story.h"
 
+
+
+
 static int* GetVietnameseCodepoints(int& codepointCount)
 {
     static int codepoints[95 + 64 + 128 + 90] = {};
@@ -158,6 +161,8 @@ int main()
 		case SCREEN_SAVE_TO_EXIT:
 			UpdateSaveToExitUI(mouse, dt, audio, settings, currentScreen, shouldClose);
 			break;
+
+ 
         }
 
         BeginDrawing();
@@ -175,7 +180,7 @@ int main()
         case SCREEN_SETUP:
             DrawSetupUI(fontTitle, fontSmall, mouse, settings);
             break;
-
+    
         case SCREEN_NAME_INPUT:
             DrawNameInputUI(fontTitle, fontSmall, mouse, settings);
             break;

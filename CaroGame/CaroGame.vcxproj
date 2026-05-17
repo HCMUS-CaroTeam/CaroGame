@@ -42,7 +42,7 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
-    <PlatformToolset>v143</PlatformToolset>
+    <PlatformToolset>v145</PlatformToolset>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
@@ -254,10 +254,18 @@
     <None Include="settings.cfg" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="Assets\audio\menu_click.ogg" />
+    <None Include="Assets\audio\menu_hover.ogg" />
+    <None Include="game_progress.dat" />
+    <None Include="packages.config" />
+    <None Include="saves.dat" />
+    <None Include="settings.cfg" />
     <Media Include="Assets\audio\lose_sound.mp3" />
     <Media Include="Assets\audio\win_sound.mp3" />
   </ItemGroup>
   <ItemGroup>
+    <Media Include="Assets\audio\lose_sound.mp3" />
+    <Media Include="Assets\audio\win_sound.mp3" />
     <Font Include="Assets\fonts\Born2bSportyFS.otf" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
