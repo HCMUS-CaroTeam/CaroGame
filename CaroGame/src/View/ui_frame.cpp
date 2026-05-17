@@ -1,4 +1,5 @@
 #include "View/ui_frame.h"
+#include "raylib.h"
 
 static Texture2D gPanelFrame{};
 static Texture2D gSmallFrame{};
@@ -140,4 +141,55 @@ void DrawCardFrame(Rectangle dest)
 
     // frame ô / card
     DrawTextureFrameNPatch(gCardFrame, dest, 18, 18, 18, 18);
+}
+
+// Assuming your BossData struct looks something like this:
+struct BossData {
+    const char* title;
+    const char* name;
+    const char* description;
+};
+
+// Forward declaration of your existing UI frame drawing function
+void DrawPanelFrame(Rectangle dest);
+
+void DrawBossPreview(Texture2D avatar, Rectangle dialogBounds, BossData data, float scale) 
+{
+    // 1. Draw the background frame (using your existing UI asset system)
+    DrawPanelFrame(dialogBounds);
+
+    float halfWidth = dialogBounds.width / 2.0f;
+    
+    // 2. Left Pane - Avatar
+    Rectangle leftPane = { dialogBounds.x, dialogBounds.y, halfWidth, dialogBounds.height };
+    
+    float scaledW = avatar.width * scale;
+    float scaledH = avatar.height * scale;
+    
+    // Calculate centered coordinates for the scaled avatar
+    float avatarX = leftPane.x + (leftPane.width - scaledW) / 2.0f;
+    float avatarY = leftPane.y + (leftPane.height - scaledH) / 2.0f;
+    
+    DrawTextureEx(avatar, { avatarX, avatarY }, 0.0f, scale, WHITE);
+
+    // 3. Right Pane - Text contents
+    Rectangle rightPane = { dialogBounds.x + halfWidth, dialogBounds.y, halfWidth, dialogBounds.height };
+    
+    float textPaddingX = 30.0f;
+    float textPaddingY = 40.0f;
+    
+    float currentY = rightPane.y + textPaddingY;
+    
+    // Draw Title (e.g., "BOSS 2")
+    DrawText(data.title, static_cast<int>(rightPane.x + textPaddingX), static_cast<int>(currentY), 20, GRAY);
+    currentY += 30.0f; // line spacing
+    
+    // Draw Name (e.g., "Half Moon Demon")
+    DrawText(data.name, static_cast<int>(rightPane.x + textPaddingX), static_cast<int>(currentY), 30, DARKGRAY);
+    currentY += 50.0f; // larger spacing before description
+    
+    // Draw Description
+    // Note: If description has multiple lines or requires word-wrap, 
+    // you would loop through lines or use a custom DrawTextWrap function here.
+    DrawText(data.description, static_cast<int>(rightPane.x + textPaddingX), static_cast<int>(currentY), 20, BLACK);
 }
