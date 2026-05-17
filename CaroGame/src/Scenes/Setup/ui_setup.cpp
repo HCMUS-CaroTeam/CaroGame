@@ -222,7 +222,7 @@ void DrawSetupUI(Font fontTitle, Font fontSmall, const MouseState &mouse,
     } else if (settings.botDifficulty == DIFFICULTY_HARD) {
       titleText = "BOSS 3";
       descText = "Full Moon Demon";
-      detailText = "- The Moon Lord who kidnapped Shizuka.\n- Ultimate power, manipulates the entire board.\n- Sees the future, the undefeated champion!";
+      detailText = "- The Moon Lord who kidnapped Yuki.\n- Ultimate power, manipulates the entire board.\n- Sees the future, the undefeated champion!";
     }
   } else if (settings.gameMode == MODE_PVP) {
     if (settings.pvpMode == CLASSIC) {
