@@ -214,10 +214,6 @@
     <ClInclude Include="src\Model\AI\ai_evaluation.h" />
     <ClInclude Include="src\Model\AI\ai_hard.h" />
     <ClInclude Include="src\Model\AI\ai_medium.h" />
-    <ClInclude Include="src\Model\ai_bot.h" />
-    <ClInclude Include="src\Model\ai_easy.h" />
-    <ClInclude Include="src\Model\ai_hard.h" />
-    <ClInclude Include="src\Model\ai_medium.h" />
     <ClInclude Include="src\Model\app_settings.h" />
     <ClInclude Include="src\Model\game_data.h" />
     <ClInclude Include="src\Model\logic.h" />
