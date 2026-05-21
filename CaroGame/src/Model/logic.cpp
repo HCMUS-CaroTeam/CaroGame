@@ -58,8 +58,8 @@ int CheckBoard(int pX, int pY) {
   if (pX < BOARD_START_X || pY < BOARD_START_Y)
     return 0; // Sửa lỗi tính toán sai khi click âm phía trên bên trái
 
-  int col = (pX - BOARD_START_X) / CELL_SIZE;
-  int row = (pY - BOARD_START_Y) / CELL_SIZE;
+  int col = static_cast<int>((pX - BOARD_START_X) / CELL_SIZE);
+  int row = static_cast<int>((pY - BOARD_START_Y) / CELL_SIZE);
 
   // Rớt ngoài bàn cờ thì cút
   if (row < 0 || row >= BOARD_SIZE || col < 0 || col >= BOARD_SIZE)
