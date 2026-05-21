@@ -141,10 +141,6 @@
     <ClCompile Include="src\Model\AI\ai_evaluation.cpp" />
     <ClCompile Include="src\Model\AI\ai_hard.cpp" />
     <ClCompile Include="src\Model\AI\ai_medium.cpp" />
-    <ClCompile Include="src\Model\ai_bot.cpp" />
-    <ClCompile Include="src\Model\ai_easy.cpp" />
-    <ClCompile Include="src\Model\ai_hard.cpp" />
-    <ClCompile Include="src\Model\ai_medium.cpp" />
     <ClCompile Include="src\Model\game_data.cpp" />
     <ClCompile Include="src\Scenes\About\ui_about.cpp" />
     <ClCompile Include="src\Scenes\Notify\ui_notify.cpp" />
