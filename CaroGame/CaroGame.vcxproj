@@ -191,10 +191,12 @@
     <Image Include="Assets\frame\pixil-layer-1.png" />
     <Image Include="Assets\frame\pixil-layer-2.png" />
     <Image Include="Assets\frame\pixil-layer-3.png" />
-    <Image Include="Assets\Texture\background.jpg" />
     <Image Include="Assets\texture\pixil-layer-setting1.png" />
     <Image Include="Assets\texture\pixil-layer-setting2.png" />
-    <Image Include="x64\Debug\Assets\Texture\background.jpg" />
+    <Image Include="Assets\X-O\pixil-layer-0.png" />
+    <Image Include="Assets\X-O\pixil-layer-1.png" />
+    <Image Include="Assets\X-O\pixil-layer-2.png" />
+    <Image Include="Assets\X-O\pixil-layer-3.png" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Shared\Common.h" />
@@ -217,7 +219,6 @@
     <ClInclude Include="src\Model\app_settings.h" />
     <ClInclude Include="src\Model\game_data.h" />
     <ClInclude Include="src\Model\logic.h" />
-    <ClInclude Include="src\audio_manager.h" />
     <ClInclude Include="src\Scenes\MainMenu\ui_main_menu.h" />
     <ClInclude Include="src\Scenes\Notify\ui_notify.h" />
     <ClInclude Include="src\Scenes\Play\ui_pause.h" />
@@ -230,8 +231,6 @@
     <ClInclude Include="src\Scenes\Setup\ui_setup.h" />
     <ClInclude Include="src\Scenes\Story\ui_story.h" />
     <ClInclude Include="src\Systems\audio_manager.h" />
-    <ClInclude Include="src\Systems\load.h" />
-    <ClInclude Include="src\Systems\save.h" />
     <ClInclude Include="src\Systems\save_load.h" />
     <ClInclude Include="src\View\ui_background.h" />
     <ClInclude Include="src\View\ui_button.h" />
