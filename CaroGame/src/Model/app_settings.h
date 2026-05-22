@@ -1,4 +1,5 @@
 #pragma once
+#include <filesystem>
 #include <fstream>
 #include <sstream>
 #include <string>
@@ -21,9 +22,30 @@ struct AppSettings
     int           boardSize = 15;
 };
 
+inline std::string GetSettingsFilePath()
+{
+    const char* candidates[] = {
+        "CaroGame/settings.cfg",
+        "../CaroGame/settings.cfg",
+        "../../CaroGame/settings.cfg",
+        "settings.cfg"
+    };
+
+    for (const char* path : candidates)
+    {
+        if (std::filesystem::exists(path)) return path;
+    }
+
+    if (std::filesystem::exists("CaroGame")) return "CaroGame/settings.cfg";
+    if (std::filesystem::exists("../CaroGame")) return "../CaroGame/settings.cfg";
+    if (std::filesystem::exists("../../CaroGame")) return "../../CaroGame/settings.cfg";
+
+    return "settings.cfg";
+}
+
 inline void SaveSettings(const AppSettings& s)
 {
-    std::ofstream f("settings.cfg");
+    std::ofstream f(GetSettingsFilePath());
     if (!f) return;
 
     f << "backgroundGrid="    << s.backgroundGrid     << "\n";
@@ -43,7 +65,7 @@ inline void SaveSettings(const AppSettings& s)
 
 inline void LoadSettings(AppSettings& s)
 {
-    std::ifstream f("settings.cfg");
+    std::ifstream f(GetSettingsFilePath());
     if (!f) return;
 
     std::string line;

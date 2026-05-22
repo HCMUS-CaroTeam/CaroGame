@@ -115,6 +115,8 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalLibraryDirectories>$(ProjectDir)raylib\lib</AdditionalLibraryDirectories>
       <AdditionalDependencies>raylib.lib;opengl32.lib;gdi32.lib;winmm.lib;$(CoreLibraryDependencies);%(AdditionalDependencies)</AdditionalDependencies>
+      <IgnoreSpecificDefaultLibraries>MSVCRT;%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
+      <AdditionalOptions>/NODEFAULTLIB:MSVCRT %(AdditionalOptions)</AdditionalOptions>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -126,11 +128,14 @@
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp20</LanguageStandard>
+      <AdditionalIncludeDirectories>$(ProjectDir)raylib\include;$(ProjectDir)src</AdditionalIncludeDirectories>
       <AdditionalOptions>/utf-8 %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalLibraryDirectories>$(ProjectDir)raylib\lib</AdditionalLibraryDirectories>
+      <AdditionalDependencies>raylib.lib;opengl32.lib;gdi32.lib;winmm.lib;$(CoreLibraryDependencies);%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
@@ -199,7 +204,6 @@
     <Image Include="Assets\X-O\pixil-layer-3.png" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Shared\Common.h" />
     <ClInclude Include="src/Control\input_mouse.h" />
     <ClInclude Include="src/Model\config.h" />
     <ClInclude Include="raylib/include\raylib.h" />
@@ -212,10 +216,6 @@
     <ClInclude Include="src\Model\AI\ai_evaluation.h" />
     <ClInclude Include="src\Model\AI\ai_hard.h" />
     <ClInclude Include="src\Model\AI\ai_medium.h" />
-    <ClInclude Include="src\Model\ai_bot.h" />
-    <ClInclude Include="src\Model\ai_easy.h" />
-    <ClInclude Include="src\Model\ai_hard.h" />
-    <ClInclude Include="src\Model\ai_medium.h" />
     <ClInclude Include="src\Model\app_settings.h" />
     <ClInclude Include="src\Model\game_data.h" />
     <ClInclude Include="src\Model\logic.h" />
@@ -235,10 +235,6 @@
     <ClInclude Include="src\View\ui_background.h" />
     <ClInclude Include="src\View\ui_button.h" />
     <ClInclude Include="src\View\ui_frame.h" />
-  </ItemGroup>
-  <ItemGroup>
-    <Library Include="raylib\lib\raylib.lib" />
-    <Library Include="raylib\lib\raylibdll.lib" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\audio\menu_click.ogg" />

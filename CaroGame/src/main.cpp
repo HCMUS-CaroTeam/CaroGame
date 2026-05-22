@@ -98,6 +98,7 @@ int main()
         const MouseState mouse = GetMouseStateNow();
         const float dt = GetFrameTime();
 
+        SetBattleMusic(audio, currentScreen == SCREEN_PLAY);
         UpdateGameAudio(audio, settings);
 
         switch (currentScreen)
