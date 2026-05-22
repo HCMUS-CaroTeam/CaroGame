@@ -3,7 +3,26 @@
 #include "Scenes/Save_Load/ui_save.h"
 
 static constexpr float SAVE_PANEL_W = 1000.0f;
-static constexpr float SAVE_PANEL_H = 300.0f;
+static constexpr float SAVE_PANEL_H = 360.0f;
+
+static Button GetNotifyActionButton(int index)
+{
+	switch (index)
+	{
+	case 0:
+		return Button{ Vector2{ SCREEN_WIDTH * 0.5f - 390.0f, SCREEN_HEIGHT * 0.5f + 82.0f },
+					   Vector2{ 240.0f, 58.0f }, "YES", NOTIFY_BTN_CONFIRM_YES,
+					   BUTTON_VISUAL_TEXT, BUTTON_ICON_NONE, 24.0f, 1.5f };
+	case 1:
+		return Button{ Vector2{ SCREEN_WIDTH * 0.5f - 120.0f, SCREEN_HEIGHT * 0.5f + 82.0f },
+					   Vector2{ 240.0f, 58.0f }, "NO", NOTIFY_BTN_CONFIRM_NO,
+					   BUTTON_VISUAL_TEXT, BUTTON_ICON_NONE, 24.0f, 1.5f };
+	default:
+		return Button{ Vector2{ SCREEN_WIDTH * 0.5f + 150.0f, SCREEN_HEIGHT * 0.5f + 82.0f },
+					   Vector2{ 240.0f, 58.0f }, "BACK", NOTIFY_BTN_BACK,
+					   BUTTON_VISUAL_TEXT, BUTTON_ICON_NONE, 24.0f, 1.5f };
+	}
+}
 
 static void DrawCenteredText(Font font, const char* text, float y, float fontSize, Color color)
 {
@@ -36,12 +55,13 @@ void UpdateNotifyUI(
 	{
 		for (int i = 0; i < gNotifyButtonCount; ++i)
 		{
+			Button button = GetNotifyActionButton(i);
 			bool hovered = false, pressed = false;
-			UpdateUIButton(50 + i, gNotifyButtons[i], mouse, dt, audio, settings, hovered, pressed);
+			UpdateUIButton(50 + i, button, mouse, dt, audio, settings, hovered, pressed);
 			if (hovered && mouse.leftPressed)
 			{
 				PlayMenuClick(audio, settings);
-				if (gNotifyButtons[i].id == NOTIFY_BTN_CONFIRM_YES)
+				if (button.id == NOTIFY_BTN_CONFIRM_YES)
 				{
 					if (isShouldClose) {
 						currentScreen = SCREEN_SAVE_TO_EXIT;
@@ -50,7 +70,7 @@ void UpdateNotifyUI(
 						currentScreen = SCREEN_SAVE_TO_BACK_MENU;
 					}
 				}
-				else if (gNotifyButtons[i].id == NOTIFY_BTN_CONFIRM_NO)
+				else if (button.id == NOTIFY_BTN_CONFIRM_NO)
 				{
 					if (isShouldClose) {
 						shouldClose = true; // Đặt cờ để thoát game mà không lưu
@@ -61,7 +81,7 @@ void UpdateNotifyUI(
 						currentScreen = SCREEN_MAIN_MENU; // Quay lại menu chính nếu không muốn lưu
 					}
 				}
-				else if (gNotifyButtons[i].id == NOTIFY_BTN_BACK)
+				else if (button.id == NOTIFY_BTN_BACK)
 				{
 					currentScreen = SCREEN_PLAY; // Quay lại chơi nếu không muốn lưu
 				}
@@ -85,6 +105,7 @@ void UpdateNotifyUI(
 }
 
 void DrawNotifyUI(Font fontTitle, Font fontSmall, const MouseState& mouse, const AppSettings& settings) {
+	(void)settings;
 	DrawBackgroundOnly();
 	// Vẽ Panel chính
 	Rectangle panel = {
@@ -94,16 +115,25 @@ void DrawNotifyUI(Font fontTitle, Font fontSmall, const MouseState& mouse, const
 	};
 	DrawPanelFrame(panel);
 	// Thông báo
-	const char* msg = "Do you want to save your progress?";
-	DrawCenteredText(fontTitle, msg, panel.y + 50.0f, 28.0f, LIME);
+	Rectangle content = {
+		panel.x + 70.0f,
+		panel.y + 42.0f,
+		panel.width - 140.0f,
+		150.0f
+	};
+	DrawRectangleRounded(content, 0.12f, 10, Color{ 34, 26, 38, 150 });
+	DrawRectangleRoundedLinesEx(content, 0.12f, 10, 2.0f, Color{ 255, 214, 94, 110 });
+	DrawCenteredText(fontTitle, "SAVE PROGRESS?", panel.y + 70.0f, 38.0f, Color{ 255, 236, 194, 255 });
 	// Hướng dẫn
-	DrawCenteredText(fontSmall, "Press YES (NO / BACK) to SAVE (DON'T SAVE / BACK TO GAME),", panel.y + 100.0f, 20.0f, LIGHTGRAY);
+	DrawCenteredText(fontSmall, "YES saves before leaving. NO leaves without saving.", panel.y + 128.0f, 22.0f, Color{ 235, 231, 216, 235 });
+	DrawCenteredText(fontSmall, "BACK returns to the match.", panel.y + 162.0f, 22.0f, Color{ 190, 226, 255, 230 });
 	// Vẽ các nút bấm
 	for (int i = 0; i < gNotifyButtonCount; ++i)
 	{
-		Rectangle hitRect = GetButtonRect(gNotifyButtons[i]);
+		Button button = GetNotifyActionButton(i);
+		Rectangle hitRect = GetButtonRect(button);
 		bool hov = IsMouseOverRect(mouse, hitRect);
 		bool prs = hov && mouse.leftDown;
-		DrawUIButton(50 + i, gNotifyButtons[i], fontSmall, hov, prs);
+		DrawUIButton(50 + i, button, fontSmall, hov, prs);
 	}
 }

@@ -7,6 +7,7 @@
 #include "Scenes/Save_Load/ui_load.h"
 #include "Scenes/Save_Load/ui_save.h"
 #include "Scenes/Setting/ui_setting.h"
+#include "Scenes/Setup/ui_name_setup.h"
 #include "View/ui_background.h"
 #include "View/ui_button.h"
 #include "View/ui_frame.h"
@@ -20,11 +21,14 @@ static const char *gPauseMessage = "";
 // Thêm biến timer dành cho AI Bot (đoạn dòng 16)
 static float gBotDelayTimer = 0.0f;
 
-static Texture2D gPlayAvatarP1{};
-static Texture2D gPlayAvatarP2{};
-static Texture2D gPlayAvatarBot{};
+static constexpr int PLAY_AVATAR_COUNT = 4;
+static Texture2D gPlayAvatars[PLAY_AVATAR_COUNT]{};
+static Texture2D gPlayAvatarBoss{};
 static Texture2D gPieceXTex{};
 static Texture2D gPieceOTex{};
+static Texture2D gDrawEffectTex[2]{};
+static Texture2D gLoseEffectTex[2]{};
+static Texture2D gWinEffectTex[2]{};
 static bool gPlayAssetsLoaded = false;
 
 static constexpr float PLAY_FRAME_PAD = 14.0f;
@@ -33,11 +37,6 @@ static constexpr float PLAYER_PANEL_W = 305.0f;
 static constexpr float PLAYER_PANEL_H = 682.0f;
 static constexpr float PLAYER_LEFT_X = 58.0f;
 static constexpr float PLAYER_RIGHT_X = SCREEN_WIDTH - PLAYER_LEFT_X - PLAYER_PANEL_W;
-
-static Rectangle GetResetButtonRect()
-{
-  return Rectangle{1282.0f, 42.0f, 164.0f, 50.0f};
-}
 
 static bool IsTextureReadyEx(const Texture2D &tex)
 {
@@ -53,37 +52,78 @@ static Texture2D LoadTextureFromCandidates(const char *a, const char *b = nullpt
   return Texture2D{};
 }
 
+static Texture2D LoadEffectTextureFromCandidates(const char *a, const char *b = nullptr)
+{
+  Texture2D texture = LoadTextureFromCandidates(a, b);
+  if (IsTextureReadyEx(texture))
+    SetTextureFilter(texture, TEXTURE_FILTER_POINT);
+  return texture;
+}
+
+static const Texture2D &GetPlayerAvatarTexture(bool playerOne)
+{
+  int avatarIndex = playerOne ? GetSelectedAvatarP1() : GetSelectedAvatarP2();
+  if (avatarIndex < 0 || avatarIndex >= PLAY_AVATAR_COUNT)
+    avatarIndex = playerOne ? 0 : 1;
+  return gPlayAvatars[avatarIndex];
+}
+
+static const Texture2D &GetBotAvatarTexture()
+{
+  return gPlayAvatarBoss;
+}
+
 static void LoadPlayAssets()
 {
   if (gPlayAssetsLoaded)
     return;
 
-  gPlayAvatarP1 = LoadTextureFromCandidates("assets/avatars/character-1.png", "Assets/avatars/character-1.png");
-  gPlayAvatarP2 = LoadTextureFromCandidates("assets/avatars/character-2.png", "Assets/avatars/character-2.png");
-  gPlayAvatarBot = LoadTextureFromCandidates("assets/avatars/boss.png", "Assets/avatars/boss.png");
+  gPlayAvatars[0] = LoadTextureFromCandidates("assets/avatars/character-1.png", "Assets/avatars/character-1.png");
+  gPlayAvatars[1] = LoadTextureFromCandidates("assets/avatars/character-2.png", "Assets/avatars/character-2.png");
+  gPlayAvatars[2] = LoadTextureFromCandidates("assets/avatars/character-3.png", "Assets/avatars/character-3.png");
+  gPlayAvatars[3] = LoadTextureFromCandidates("assets/avatars/character-4.png", "Assets/avatars/character-4.png");
+  gPlayAvatarBoss = LoadTextureFromCandidates("assets/avatars/boss.png", "Assets/avatars/boss.png");
   gPieceXTex = LoadTextureFromCandidates("assets/X-O/pixil-layer-2.png", "Assets/X-O/pixil-layer-2.png");
   gPieceOTex = LoadTextureFromCandidates("assets/X-O/pixil-layer-1.png", "Assets/X-O/pixil-layer-1.png");
+  gDrawEffectTex[0] = LoadEffectTextureFromCandidates("assets/WIN-LOSE EFFECT/pixil-layer-0.png", "Assets/WIN-LOSE EFFECT/pixil-layer-0.png");
+  gDrawEffectTex[1] = LoadEffectTextureFromCandidates("assets/WIN-LOSE EFFECT/pixil-layer-1.png", "Assets/WIN-LOSE EFFECT/pixil-layer-1.png");
+  gLoseEffectTex[0] = LoadEffectTextureFromCandidates("assets/WIN-LOSE EFFECT/pixil-layer-4.png", "Assets/WIN-LOSE EFFECT/pixil-layer-4.png");
+  gLoseEffectTex[1] = LoadEffectTextureFromCandidates("assets/WIN-LOSE EFFECT/pixil-layer-5.png", "Assets/WIN-LOSE EFFECT/pixil-layer-5.png");
+  gWinEffectTex[0] = LoadEffectTextureFromCandidates("assets/WIN-LOSE EFFECT/pixil-layer-6.png", "Assets/WIN-LOSE EFFECT/pixil-layer-6.png");
+  gWinEffectTex[1] = LoadEffectTextureFromCandidates("assets/WIN-LOSE EFFECT/pixil-layer-7.png", "Assets/WIN-LOSE EFFECT/pixil-layer-7.png");
   gPlayAssetsLoaded = true;
 }
 
 static void UnloadPlayAssets()
 {
-  if (IsTextureReadyEx(gPlayAvatarP1))
-    UnloadTexture(gPlayAvatarP1);
-  if (IsTextureReadyEx(gPlayAvatarP2))
-    UnloadTexture(gPlayAvatarP2);
-  if (IsTextureReadyEx(gPlayAvatarBot))
-    UnloadTexture(gPlayAvatarBot);
+  for (int i = 0; i < PLAY_AVATAR_COUNT; ++i)
+    if (IsTextureReadyEx(gPlayAvatars[i]))
+      UnloadTexture(gPlayAvatars[i]);
+  if (IsTextureReadyEx(gPlayAvatarBoss))
+    UnloadTexture(gPlayAvatarBoss);
   if (IsTextureReadyEx(gPieceXTex))
     UnloadTexture(gPieceXTex);
   if (IsTextureReadyEx(gPieceOTex))
     UnloadTexture(gPieceOTex);
+  for (int i = 0; i < 2; ++i) {
+    if (IsTextureReadyEx(gDrawEffectTex[i]))
+      UnloadTexture(gDrawEffectTex[i]);
+    if (IsTextureReadyEx(gLoseEffectTex[i]))
+      UnloadTexture(gLoseEffectTex[i]);
+    if (IsTextureReadyEx(gWinEffectTex[i]))
+      UnloadTexture(gWinEffectTex[i]);
+  }
 
-  gPlayAvatarP1 = {};
-  gPlayAvatarP2 = {};
-  gPlayAvatarBot = {};
+  for (int i = 0; i < PLAY_AVATAR_COUNT; ++i)
+    gPlayAvatars[i] = {};
+  gPlayAvatarBoss = {};
   gPieceXTex = {};
   gPieceOTex = {};
+  for (int i = 0; i < 2; ++i) {
+    gDrawEffectTex[i] = {};
+    gLoseEffectTex[i] = {};
+    gWinEffectTex[i] = {};
+  }
   gPlayAssetsLoaded = false;
 }
 
@@ -134,6 +174,24 @@ static void DrawTextCenteredInRect(Font font, const char *text, Rectangle rect,
              fontSize, spacing, color);
 }
 
+static void DrawTextFitCenteredInRect(Font font, const char *text, Rectangle rect,
+                                      float fontSize, float minFontSize,
+                                      Color color, float spacing = 1.0f) {
+  float sizeToDraw = fontSize;
+  Vector2 textSize = MeasureTextEx(font, text, sizeToDraw, spacing);
+  const float maxWidth = rect.width - 18.0f;
+
+  while (textSize.x > maxWidth && sizeToDraw > minFontSize) {
+    sizeToDraw -= 1.0f;
+    textSize = MeasureTextEx(font, text, sizeToDraw, spacing);
+  }
+
+  DrawTextEx(font, text,
+             Vector2{rect.x + rect.width * 0.5f - textSize.x * 0.5f,
+                     rect.y + rect.height * 0.5f - textSize.y * 0.5f},
+             sizeToDraw, spacing, color);
+}
+
 static void DrawHeaderStrip(Rectangle rect, Color fill) {
   DrawRectangleRounded(rect, 0.08f, 8, Color{92, 28, 34, 245});
   Rectangle inner{rect.x + 10.0f, rect.y + 8.0f, rect.width - 20.0f,
@@ -163,7 +221,7 @@ static const char *GetPlayerName(bool playerOne) {
   const char *name = playerOne ? current().namePlayer1 : current().namePlayer2;
   if (name && name[0] != '\0')
     return name;
-  return playerOne ? "PLAYER 1" : (current().gameMode == MODE_PVE ? "BOT" : "PLAYER 2");
+  return playerOne ? "Player 1" : "Player 2";
 }
 
 static void DrawStatRow(Font fontSmall, Rectangle row, const char *label,
@@ -189,11 +247,12 @@ static void DrawPlayerPanel(Font fontTitle, Font fontSmall, bool playerOne) {
   DrawRectangleLinesEx(Rectangle{header.x + 4.0f, header.y + header.height - 1.0f,
                                  header.width - 8.0f, 1.0f},
                        2.0f, Color{98, 28, 32, 220});
-  DrawTextCenteredInRect(fontSmall, playerOne ? "PLAYER 1" : "PLAYER 2", header,
-                         24.0f, Color{255, 243, 211, 255}, 2.0f);
+  DrawTextFitCenteredInRect(fontSmall, GetPlayerName(playerOne), header,
+                            24.0f, 15.0f, Color{255, 243, 211, 255}, 2.0f);
 
-  const Texture2D &avatar = playerOne ? gPlayAvatarP1
-                                      : (current().gameMode == MODE_PVE ? gPlayAvatarBot : gPlayAvatarP2);
+  const Texture2D &avatar = playerOne ? GetPlayerAvatarTexture(true)
+                                      : (current().gameMode == MODE_PVE ? GetBotAvatarTexture()
+                                                                        : GetPlayerAvatarTexture(false));
   DrawFramedAvatar(avatar, Rectangle{x + 66.0f, panel.y + 92.0f, 172.0f, 172.0f});
 
   const bool active = current().result == RESULT_ONGOING &&
@@ -239,61 +298,9 @@ static void DrawPlayerPanel(Font fontTitle, Font fontSmall, bool playerOne) {
 }
 
 static void DrawPlayTopBar(Font fontTitle, Font fontSmall, const MouseState &mouse) {
-  Rectangle topBar{32.0f, 28.0f, SCREEN_WIDTH - 64.0f, 78.0f};
-  DrawHeaderStrip(topBar, Color{170, 43, 56, 235});
-
-  DrawTextEx(fontTitle, "CARO", Vector2{82.0f, 52.0f}, 30.0f, 3.0f,
-             Color{255, 214, 94, 255});
-
-  Rectangle center{318.0f, 32.0f, 900.0f, 68.0f};
-  DrawSmallFrame(center);
-  DrawRectangleRounded(Rectangle{center.x + 14.0f, center.y + 12.0f,
-                                 center.width - 28.0f, center.height - 24.0f},
-                       0.05f, 6, Color{45, 35, 25, 150});
-
-  const char *turnText = "TURN: X";
-  Color turnColor{255, 92, 98, 255};
-  if (current().result == RESULT_X_WINS) {
-    turnText = "WINNER: X";
-  } else if (current().result == RESULT_O_WINS) {
-    turnText = "WINNER: O";
-    turnColor = Color{102, 178, 255, 255};
-  } else if (current().result == RESULT_DRAW) {
-    turnText = "DRAW";
-    turnColor = Color{255, 214, 84, 255};
-  } else if (current().turn == CELL_O) {
-    turnText = "TURN: O";
-    turnColor = Color{102, 178, 255, 255};
-  }
-
-  DrawTextCenteredInRect(fontSmall, turnText,
-                         Rectangle{center.x, center.y + 9.0f, center.width, 22.0f},
-                         18.0f, Color{255, 243, 211, 255}, 2.0f);
-  DrawCircleV(Vector2{center.x + center.width * 0.5f - 76.0f, center.y + 22.0f}, 5.0f, turnColor);
-  DrawCircleV(Vector2{center.x + center.width * 0.5f + 76.0f, center.y + 22.0f}, 5.0f, turnColor);
-  DrawTextCenteredInRect(fontSmall, "5 IN A ROW TO WIN",
-                         Rectangle{center.x, center.y + 39.0f, center.width, 22.0f},
-                         16.0f, Color{255, 236, 194, 245}, 2.0f);
-
-  Button resetButton{
-      Vector2{GetResetButtonRect().x, GetResetButtonRect().y},
-      Vector2{GetResetButtonRect().width, GetResetButtonRect().height},
-      "RESET",
-      0,
-      BUTTON_VISUAL_TEXT,
-      BUTTON_ICON_NONE,
-      22.0f,
-      1.0f};
-  const Rectangle hit = GetResetButtonRect();
-  const bool hovered = IsMouseOverRect(mouse, hit);
-  DrawUIButton(72, resetButton, fontSmall, hovered, hovered && mouse.leftDown);
-}
-
-static void DrawBoardTitle(Font fontTitle) {
-  Rectangle badge{SCREEN_WIDTH * 0.5f - 205.0f, 164.0f, 410.0f, 56.0f};
-  DrawSmallFrame(badge);
-  DrawTextCenteredInRect(fontTitle, "BATTLE BOARD", badge, 28.0f,
-                         Color{255, 214, 94, 255}, 2.0f);
+  (void)fontTitle;
+  (void)fontSmall;
+  (void)mouse;
 }
 
 static void DrawBottomHint(Font fontSmall) {
@@ -301,10 +308,10 @@ static void DrawBottomHint(Font fontSmall) {
   (void)hint;
   DrawSmallFrame(Rectangle{SCREEN_WIDTH * 0.5f - 300.0f, 842.0f, 600.0f, 52.0f});
   DrawTextEx(fontSmall, "i", Vector2{SCREEN_WIDTH * 0.5f - 280.0f, 854.0f}, 24.0f, 1.0f,
-             Color{255, 214, 94, 255});
+             Color{116, 24, 50, 255});
   DrawTextEx(fontSmall, "The first player to get 5 in a row wins.",
              Vector2{SCREEN_WIDTH * 0.5f - 225.0f, 856.0f}, 21.0f, 1.0f,
-             Color{255, 236, 194, 240});
+             Color{116, 24, 50, 255});
 }
 
 static void DrawBoardGrid(const AppSettings &settings) {
@@ -330,8 +337,8 @@ static void DrawBoardGrid(const AppSettings &settings) {
 
   const int starCells[5][2] = {{4, 4}, {4, 10}, {7, 7}, {10, 4}, {10, 10}};
   for (int i = 0; i < 5; ++i) {
-    const float cx = BOARD_START_X + starCells[i][1] * CELL_SIZE;
-    const float cy = BOARD_START_Y + starCells[i][0] * CELL_SIZE;
+    const float cx = BOARD_START_X + starCells[i][1] * CELL_SIZE + CELL_SIZE * 0.5f;
+    const float cy = BOARD_START_Y + starCells[i][0] * CELL_SIZE + CELL_SIZE * 0.5f;
     DrawCircleV(Vector2{cx, cy}, 4.5f, Color{68, 49, 35, 210});
   }
 }
@@ -377,6 +384,197 @@ static void DrawWinLine(const AppSettings &settings) {
   float y2 = BOARD_START_Y + current().winLine[count - 1][0] * CELL_SIZE +
              CELL_SIZE * 0.5f;
   DrawLineEx({x1, y1}, {x2, y2}, 5.0f, col);
+}
+
+static bool IsHumanWinInPve()
+{
+  return current().gameMode == MODE_PVE && current().result == RESULT_X_WINS;
+}
+
+static bool IsHumanLossInPve()
+{
+  return current().gameMode == MODE_PVE && current().result == RESULT_O_WINS;
+}
+
+static int GetResultEffectFrame()
+{
+  return static_cast<int>(GetTime() / 0.14) % 2;
+}
+
+static const Texture2D *GetResultEffectTexture()
+{
+  if (current().result == RESULT_ONGOING)
+    return nullptr;
+
+  const int frame = GetResultEffectFrame();
+  if (current().result == RESULT_DRAW)
+    return IsTextureReadyEx(gDrawEffectTex[frame]) ? &gDrawEffectTex[frame] : nullptr;
+  if (IsHumanLossInPve())
+    return IsTextureReadyEx(gLoseEffectTex[frame]) ? &gLoseEffectTex[frame] : nullptr;
+  return IsTextureReadyEx(gWinEffectTex[frame]) ? &gWinEffectTex[frame] : nullptr;
+}
+
+static const Texture2D *GetWinEffectTexture()
+{
+  const int frame = GetResultEffectFrame();
+  return IsTextureReadyEx(gWinEffectTex[frame]) ? &gWinEffectTex[frame] : nullptr;
+}
+
+static const Texture2D *GetLoseEffectTexture()
+{
+  const int frame = GetResultEffectFrame();
+  return IsTextureReadyEx(gLoseEffectTex[frame]) ? &gLoseEffectTex[frame] : nullptr;
+}
+
+static const char *GetResultLabel()
+{
+  if (current().result == RESULT_DRAW)
+    return "DRAW";
+  if (current().gameMode == MODE_PVP)
+    return current().result == RESULT_X_WINS ? "X TEAM WINS" : "O TEAM WINS";
+  return IsHumanWinInPve() ? "YOU WIN" : "YOU LOSE";
+}
+
+static Color GetResultAccentColor()
+{
+  if (current().result == RESULT_DRAW)
+    return Color{255, 214, 84, 255};
+  if (IsHumanLossInPve())
+    return Color{255, 64, 92, 255};
+  if (current().result == RESULT_O_WINS)
+    return Color{102, 178, 255, 255};
+  return Color{120, 230, 160, 255};
+}
+
+static void DrawEffectTextureCentered(const Texture2D &texture, Vector2 center,
+                                      float maxWidth, float maxHeight,
+                                      float pulse)
+{
+  if (!IsTextureReadyEx(texture))
+    return;
+
+  const float fitScale = fminf(maxWidth / texture.width, maxHeight / texture.height);
+  const float drawScale = fitScale * (1.0f + pulse * 0.035f);
+  Rectangle source{0.0f, 0.0f, static_cast<float>(texture.width),
+                   static_cast<float>(texture.height)};
+  Rectangle dest{center.x, center.y, texture.width * drawScale,
+                 texture.height * drawScale};
+  DrawTexturePro(texture, source, dest,
+                 Vector2{dest.width * 0.5f, dest.height * 0.5f},
+                 0.0f, WHITE);
+}
+
+static void DrawResultHeader(Font fontSmall)
+{
+  if (current().result == RESULT_ONGOING)
+    return;
+  if (current().gameMode == MODE_PVP && current().result != RESULT_DRAW)
+    return;
+
+  Rectangle slot{SCREEN_WIDTH * 0.5f - 310.0f, 24.0f, 620.0f, 160.0f};
+  const Color accent = GetResultAccentColor();
+  const float pulse = 0.5f + 0.5f * sinf(static_cast<float>(GetTime()) * 6.0f);
+
+  (void)accent;
+
+  const Texture2D *effect = GetResultEffectTexture();
+  if (effect)
+    DrawEffectTextureCentered(*effect, Vector2{SCREEN_WIDTH * 0.5f, 88.0f},
+                              430.0f, 116.0f, pulse);
+
+  if (!effect) {
+    DrawTextCenteredInRect(fontSmall, GetResultLabel(),
+                           Rectangle{slot.x, slot.y + 132.0f, slot.width, 30.0f},
+                           22.0f, Color{255, 243, 211, 235}, 2.0f);
+  }
+}
+
+static void DrawPvpResultSideEffects(Font fontSmall)
+{
+  if (current().gameMode != MODE_PVP || current().result == RESULT_ONGOING ||
+      current().result == RESULT_DRAW)
+    return;
+
+  const float pulse = 0.5f + 0.5f * sinf(static_cast<float>(GetTime()) * 6.0f);
+  const Texture2D *leftEffect =
+      current().result == RESULT_X_WINS ? GetWinEffectTexture() : GetLoseEffectTexture();
+  const Texture2D *rightEffect =
+      current().result == RESULT_O_WINS ? GetWinEffectTexture() : GetLoseEffectTexture();
+
+  Rectangle leftSlot{PLAYER_LEFT_X + 10.0f, 32.0f, PLAYER_PANEL_W - 20.0f, 120.0f};
+  Rectangle rightSlot{PLAYER_RIGHT_X + 10.0f, 32.0f, PLAYER_PANEL_W - 20.0f, 120.0f};
+
+  if (leftEffect) {
+    DrawEffectTextureCentered(*leftEffect,
+                              Vector2{leftSlot.x + leftSlot.width * 0.5f,
+                                      leftSlot.y + leftSlot.height * 0.5f},
+                              leftSlot.width - 18.0f, leftSlot.height - 18.0f, pulse);
+  } else {
+    DrawTextCenteredInRect(fontSmall,
+                           current().result == RESULT_X_WINS ? "YOU WIN" : "YOU LOSE",
+                           leftSlot, 20.0f, Color{255, 243, 211, 235}, 1.0f);
+  }
+
+  if (rightEffect) {
+    DrawEffectTextureCentered(*rightEffect,
+                              Vector2{rightSlot.x + rightSlot.width * 0.5f,
+                                      rightSlot.y + rightSlot.height * 0.5f},
+                              rightSlot.width - 18.0f, rightSlot.height - 18.0f, pulse);
+  } else {
+    DrawTextCenteredInRect(fontSmall,
+                           current().result == RESULT_O_WINS ? "YOU WIN" : "YOU LOSE",
+                           rightSlot, 20.0f, Color{255, 243, 211, 235}, 1.0f);
+  }
+}
+
+static void DrawResultBoardPulse()
+{
+  if (current().result == RESULT_ONGOING)
+    return;
+
+  const float pulse = 0.5f + 0.5f * sinf(static_cast<float>(GetTime()) * 7.0f);
+  Color accent = GetResultAccentColor();
+  Rectangle frameRect{BOARD_START_X - PLAY_FRAME_PAD, BOARD_START_Y - PLAY_FRAME_PAD,
+                      BOARD_PIXEL_SIZE + PLAY_FRAME_PAD * 2.0f,
+                      BOARD_PIXEL_SIZE + PLAY_FRAME_PAD * 2.0f};
+  DrawRectangleLinesEx(frameRect, 4.0f,
+                       Color{accent.r, accent.g, accent.b,
+                             static_cast<unsigned char>(90 + pulse * 120)});
+}
+
+static bool CanAdvanceDifficulty()
+{
+  return IsHumanWinInPve() && current().botDifficulty >= DIFFICULTY_EASY &&
+         current().botDifficulty < DIFFICULTY_HARD;
+}
+
+static Button MakeResultButton(float x, const char *title, int id)
+{
+  return Button{Vector2{x, 842.0f}, Vector2{250.0f, 56.0f}, title, id,
+                BUTTON_VISUAL_TEXT, BUTTON_ICON_NONE, 22.0f, 1.0f};
+}
+
+static void DrawResultActions(Font fontSmall, const MouseState &mouse)
+{
+  if (current().result == RESULT_ONGOING)
+    return;
+
+  const bool pve = current().gameMode == MODE_PVE;
+  Button buttons[3] = {
+      MakeResultButton(SCREEN_WIDTH * 0.5f - 395.0f, pve ? "BACK" : "SAVE", 0),
+      MakeResultButton(SCREEN_WIDTH * 0.5f - 125.0f, pve ? "NEXT LEVEL" : "CONTINUE", 1),
+      MakeResultButton(SCREEN_WIDTH * 0.5f + 145.0f, pve ? "AGAIN" : "BACK", 2),
+  };
+
+  for (int i = 0; i < 3; ++i) {
+    const bool disabled = pve && i == 1 && !CanAdvanceDifficulty();
+    Rectangle hitRect = GetButtonRect(buttons[i]);
+    bool hovered = !disabled && IsMouseOverRect(mouse, hitRect);
+    bool pressed = hovered && mouse.leftDown;
+    DrawUIButton(80 + i, buttons[i], fontSmall, hovered, pressed);
+    if (disabled)
+      DrawRectangleRounded(hitRect, 0.18f, 8, Color{16, 14, 20, 135});
+  }
 }
 
 static void DrawPieces(Font fontTitle, const AppSettings &settings) {
@@ -516,13 +714,6 @@ void UpdatePlayUI(const MouseState &mouse, float dt, AudioAssets &audio,
     return;
   }
 
-  if (mouse.leftPressed && IsMouseOverRect(mouse, GetResetButtonRect())) {
-    PlayMenuClick(audio, settings);
-    ResetBoard();
-    gBotDelayTimer = 0.0f;
-    return;
-  }
-
   if (IsKeyPressed(KEY_ESCAPE)) {
     gPaused = !gPaused;
     gPauseMessage = "";
@@ -535,8 +726,50 @@ void UpdatePlayUI(const MouseState &mouse, float dt, AudioAssets &audio,
   }
 
   // Nếu game đã có kết quả thắng hòa thì không làm gì thêm
-  if (current().result != RESULT_ONGOING)
+  if (current().result != RESULT_ONGOING) {
+    const bool pve = current().gameMode == MODE_PVE;
+    Button buttons[3] = {
+        MakeResultButton(SCREEN_WIDTH * 0.5f - 395.0f, pve ? "BACK" : "SAVE", 0),
+        MakeResultButton(SCREEN_WIDTH * 0.5f - 125.0f, pve ? "NEXT LEVEL" : "CONTINUE", 1),
+        MakeResultButton(SCREEN_WIDTH * 0.5f + 145.0f, pve ? "AGAIN" : "BACK", 2),
+    };
+
+    for (int i = 0; i < 3; ++i) {
+      const bool disabled = pve && i == 1 && !CanAdvanceDifficulty();
+      bool hovered = false, pressed = false;
+      if (!disabled)
+        UpdateUIButton(80 + i, buttons[i], mouse, dt, audio, settings, hovered, pressed);
+
+      if (!hovered || !mouse.leftPressed)
+        continue;
+
+      PlayMenuClick(audio, settings);
+      if (pve) {
+        if (i == 0) {
+          currentScreen = SCREEN_NOTIFY_BACK_MENU;
+        } else if (i == 1) {
+          current().botDifficulty++;
+          ResetBoard();
+          gBotDelayTimer = 0.0f;
+        } else {
+          ResetBoard();
+          gBotDelayTimer = 0.0f;
+        }
+      } else {
+        if (i == 0) {
+          currentScreen = current().nameGame[0] == '\0' ? SCREEN_SAVE_FIRST : SCREEN_SAVE_SECOND;
+        } else if (i == 1) {
+          ResetBoard();
+          gBotDelayTimer = 0.0f;
+        } else {
+          currentScreen = SCREEN_NOTIFY_BACK_MENU;
+        }
+      }
+      return;
+    }
+
     return;
+  }
 
   // --------- CẬP NHẬT TIMER (Tournament / PVE) ---------
   int timerSignal = UpdateTimer();
@@ -561,9 +794,11 @@ void UpdatePlayUI(const MouseState &mouse, float dt, AudioAssets &audio,
       // LƯU Ý: Vì bạn nói BotMakeMove() đã tự đánh xuống, tự đổi turn(CELL_X),
       // nên bạn chỉ cần gọi trực tiếp nó ở đây.
       BotMakeMove();
+      PlayPieceSound(audio, settings);
 
       // Cập nhật trạng thái thắng/thua sau nước đi của Bot
       UpdateGameStateAfterMove();
+      PlayGameResultSound(audio, current().result, current().gameMode, settings);
 
       if (current().result == RESULT_ONGOING) {
         current().turn = (current().turn == CELL_X) ? CELL_O : CELL_X;
@@ -583,7 +818,9 @@ void UpdatePlayUI(const MouseState &mouse, float dt, AudioAssets &audio,
       int placed = CheckBoard((int)mouse.position.x, (int)mouse.position.y);
 
       if (placed != 0) {
+        PlayPieceSound(audio, settings);
         UpdateGameStateAfterMove();
+        PlayGameResultSound(audio, current().result, current().gameMode, settings);
 
         if (current().result == RESULT_ONGOING) {
           current().turn = (current().turn == CELL_X) ? CELL_O : CELL_X;
@@ -600,7 +837,6 @@ void DrawPlayUI(Font fontTitle, Font fontSmall, const MouseState &mouse,
   DrawBackgroundOnly();
   LoadPlayAssets();
   DrawPlayTopBar(fontTitle, fontSmall, mouse);
-  DrawBoardTitle(fontTitle);
   DrawPlayerPanel(fontTitle, fontSmall, true);
   DrawPlayerPanel(fontTitle, fontSmall, false);
 
@@ -626,8 +862,13 @@ void DrawPlayUI(Font fontTitle, Font fontSmall, const MouseState &mouse,
   DrawBoardGrid(settings);
   DrawHighlightCell(settings);
   DrawWinLine(settings);
+  DrawResultBoardPulse();
   DrawPieces(fontTitle, settings);
-  DrawBottomHint(fontSmall);
+  if (current().result == RESULT_ONGOING)
+    DrawBottomHint(fontSmall);
+  DrawResultHeader(fontSmall);
+  DrawPvpResultSideEffects(fontSmall);
+  DrawResultActions(fontSmall, mouse);
 
   if (gPaused)
     DrawPauseOverlay(fontTitle, fontSmall, mouse);
