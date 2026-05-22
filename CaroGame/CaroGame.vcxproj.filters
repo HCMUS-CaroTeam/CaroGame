@@ -101,12 +101,6 @@
     <Image Include="Assets\bg\background.png">
       <Filter>Resource Files</Filter>
     </Image>
-    <Image Include="Assets\bg\button1.png">
-      <Filter>Resource Files</Filter>
-    </Image>
-    <Image Include="Assets\bg\button2.png">
-      <Filter>Resource Files</Filter>
-    </Image>
     <Image Include="Assets\bg\game name.png">
       <Filter>Resource Files</Filter>
     </Image>
@@ -295,16 +289,7 @@
     <Library Include="raylib\lib\raylibdll.lib" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Assets\audio\menu_hover.ogg" />
-    <None Include="Assets\audio\menu_click.ogg" />
-    <None Include="game_progress.dat" />
     <None Include="packages.config" />
-    <None Include="settings.cfg" />
-    <None Include="saves.dat" />
-  </ItemGroup>
-  <ItemGroup>
-    <Media Include="Assets\audio\lose_sound.mp3" />
-    <Media Include="Assets\audio\win_sound.mp3" />
   </ItemGroup>
   <ItemGroup>
     <Font Include="Assets\fonts\Born2bSportyFS.otf" />

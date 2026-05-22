@@ -168,17 +168,15 @@
     <ClCompile Include="src\View\ui_frame.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <Image Include="Assets\avatar\BossPhases%28Moon%29\pixil-layer-trang-ban.png" />
-    <Image Include="Assets\avatar\BossPhases%28Moon%29\pixil-layer-trang-khuyet.png" />
-    <Image Include="Assets\avatar\BossPhases%28Moon%29\pixil-layer-trang-tron.png" />
+    <Image Include="Assets\avatar\BossPhases(Moon)\pixil-layer-trang-ban.png" />
+    <Image Include="Assets\avatar\BossPhases(Moon)\pixil-layer-trang-khuyet.png" />
+    <Image Include="Assets\avatar\BossPhases(Moon)\pixil-layer-trang-tron.png" />
     <Image Include="Assets\avatars\boss.png" />
     <Image Include="Assets\avatars\character-1.png" />
     <Image Include="Assets\avatars\character-2.png" />
     <Image Include="Assets\avatars\character-3.png" />
     <Image Include="Assets\avatars\character-4.png" />
     <Image Include="Assets\bg\background.png" />
-    <Image Include="Assets\bg\button1.png" />
-    <Image Include="Assets\bg\button2.png" />
     <Image Include="Assets\bg\game name.png" />
     <Image Include="Assets\bg\story_bg.png" />
     <Image Include="Assets\buttons\button1.png" />
@@ -237,14 +235,7 @@
     <ClInclude Include="src\View\ui_frame.h" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Assets\audio\menu_click.ogg" />
-    <None Include="Assets\audio\menu_hover.ogg" />
-    <None Include="game_progress.dat" />
     <None Include="packages.config" />
-    <None Include="saves.dat" />
-    <None Include="settings.cfg" />
-    <Media Include="Assets\audio\lose_sound.mp3" />
-    <Media Include="Assets\audio\win_sound.mp3" />
   </ItemGroup>
   <ItemGroup>
     <Font Include="Assets\fonts\Born2bSportyFS.otf" />
