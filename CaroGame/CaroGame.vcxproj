@@ -214,6 +214,10 @@
     <ClInclude Include="src\Model\AI\ai_evaluation.h" />
     <ClInclude Include="src\Model\AI\ai_hard.h" />
     <ClInclude Include="src\Model\AI\ai_medium.h" />
+    <ClInclude Include="src\Model\ai_bot.h" />
+    <ClInclude Include="src\Model\ai_easy.h" />
+    <ClInclude Include="src\Model\ai_hard.h" />
+    <ClInclude Include="src\Model\ai_medium.h" />
     <ClInclude Include="src\Model\app_settings.h" />
     <ClInclude Include="src\Model\game_data.h" />
     <ClInclude Include="src\Model\logic.h" />
@@ -248,6 +252,18 @@
     <None Include="packages.config" />
     <None Include="saves.dat" />
     <None Include="settings.cfg" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Assets\audio\menu_click.ogg" />
+    <None Include="Assets\audio\menu_hover.ogg" />
+    <None Include="game_progress.dat" />
+    <None Include="packages.config" />
+    <None Include="saves.dat" />
+    <None Include="settings.cfg" />
+    <Media Include="Assets\audio\lose_sound.mp3" />
+    <Media Include="Assets\audio\win_sound.mp3" />
+  </ItemGroup>
+  <ItemGroup>
     <Media Include="Assets\audio\lose_sound.mp3" />
     <Media Include="Assets\audio\win_sound.mp3" />
     <Font Include="Assets\fonts\Born2bSportyFS.otf" />
