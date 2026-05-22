@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
     <Filter Include="Source Files">
@@ -18,7 +18,7 @@
     <ClCompile Include="src\main.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src/Control\input_mouse.cpp">
+    <ClCompile Include="src\Control\input_mouse.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\Scenes\MainMenu\ui_main_menu.cpp">
@@ -196,13 +196,13 @@
     <ClInclude Include="src\audio_manager.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src/Control\input_mouse.h">
+    <ClInclude Include="src\Control\input_mouse.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src/Model\config.h">
+    <ClInclude Include="src\Model\config.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="raylib/include\raylib.h">
+    <ClInclude Include="raylib\include\raylib.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\Scenes\MainMenu\ui_main_menu.h">
