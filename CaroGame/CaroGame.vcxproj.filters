@@ -98,19 +98,7 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <Image Include="Assets\Texture\background.jpg">
-      <Filter>Resource Files</Filter>
-    </Image>
-    <Image Include="x64\Debug\Assets\Texture\background.jpg">
-      <Filter>Resource Files</Filter>
-    </Image>
     <Image Include="Assets\bg\background.png">
-      <Filter>Resource Files</Filter>
-    </Image>
-    <Image Include="Assets\bg\button1.png">
-      <Filter>Resource Files</Filter>
-    </Image>
-    <Image Include="Assets\bg\button2.png">
       <Filter>Resource Files</Filter>
     </Image>
     <Image Include="Assets\bg\game name.png">
@@ -185,15 +173,24 @@
     <Image Include="Assets\texture\pixil-layer-setting1.png">
       <Filter>Resource Files</Filter>
     </Image>
+    <Image Include="Assets\X-O\pixil-layer-0.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Assets\X-O\pixil-layer-1.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Assets\X-O\pixil-layer-2.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Assets\X-O\pixil-layer-3.png">
+      <Filter>Resource Files</Filter>
+    </Image>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="raylib\include\raymath.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="raylib\include\rlgl.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\audio_manager.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src/Control\input_mouse.h">
@@ -265,12 +262,6 @@
     <ClInclude Include="src\Scenes\Save_Load\ui_save.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\Systems\load.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Systems\save.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="src\Systems\save_load.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -298,16 +289,7 @@
     <Library Include="raylib\lib\raylibdll.lib" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Assets\audio\menu_hover.ogg" />
-    <None Include="Assets\audio\menu_click.ogg" />
-    <None Include="game_progress.dat" />
     <None Include="packages.config" />
-    <None Include="settings.cfg" />
-    <None Include="saves.dat" />
-  </ItemGroup>
-  <ItemGroup>
-    <Media Include="Assets\audio\lose_sound.mp3" />
-    <Media Include="Assets\audio\win_sound.mp3" />
   </ItemGroup>
   <ItemGroup>
     <Font Include="Assets\fonts\Born2bSportyFS.otf" />
