@@ -1,0 +1,35 @@
+﻿  input_mouse.cpp
+  name_input_data.cpp
+  ai_bot.cpp
+  ai_easy.cpp
+  ai_evaluation.cpp
+  ai_hard.cpp
+  ai_medium.cpp
+  game_data.cpp
+  ui_about.cpp
+  ui_notify.cpp
+  ui_load.cpp
+  ui_save.cpp
+  ui_setting.cpp
+  ui_name_setup.cpp
+  ui_story.cpp
+  audio_manager.cpp
+  menu_data.cpp
+  main.cpp
+  logic.cpp
+C:\Users\slim5\Desktop\CSLT\DO_AN_MON\CaroGame\src\Model\logic.cpp(61,11): warning C4244: 'initializing': conversion from 'float' to 'int', possible loss of data
+C:\Users\slim5\Desktop\CSLT\DO_AN_MON\CaroGame\src\Model\logic.cpp(62,11): warning C4244: 'initializing': conversion from 'float' to 'int', possible loss of data
+  ui_main_menu.cpp
+  Generating Code...
+  Compiling...
+  ui_pause.cpp
+  ui_play.cpp
+  ui_setup.cpp
+  save_load.cpp
+  ui_background.cpp
+C:\Users\slim5\Desktop\CSLT\DO_AN_MON\CaroGame\src\View\ui_background.cpp(100,26): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
+C:\Users\slim5\Desktop\CSLT\DO_AN_MON\CaroGame\src\View\ui_background.cpp(100,26): warning C4244: 'initializing': conversion from 'double' to 'const float', possible loss of data
+  ui_button.cpp
+  ui_frame.cpp
+  Generating Code...
+  CaroGame.vcxproj -> C:\Users\slim5\Desktop\CSLT\DO_AN_MON\x64\Debug\CaroGame.exe
