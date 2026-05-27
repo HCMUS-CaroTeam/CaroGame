@@ -42,4 +42,7 @@ void DrawNameInputUI(
     const AppSettings& settings
 );
 
+int GetSelectedAvatarP1();
+int GetSelectedAvatarP2();
+
 void ResetNameInputBuffers();

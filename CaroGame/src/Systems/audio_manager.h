@@ -19,18 +19,31 @@
 // Các cờ *Loaded dùng để biết file đó có load thành công hay chưa.
 struct AudioAssets
 {
-    Music bgMusic{};
+    Music regularMusic{};
+    Music battleMusic{};
     Sound clickSound{};
     Sound hoverSound{};
+    Sound pieceSound{};
+    Sound winSound{};
+    Sound loseSound{};
 
-    bool musicLoaded = false;
+    bool regularMusicLoaded = false;
+    bool battleMusicLoaded = false;
     bool clickLoaded = false;
     bool hoverLoaded = false;
+    bool pieceLoaded = false;
+    bool winLoaded = false;
+    bool loseLoaded = false;
+
+    int activeMusic = 0;
 };
 
 void InitGameAudio(AudioAssets& audio);
 void UpdateGameAudio(AudioAssets& audio, const AppSettings& settings);
 void ShutdownGameAudio(AudioAssets& audio);
 
+void SetBattleMusic(AudioAssets& audio, bool battle);
 void PlayMenuClick(AudioAssets& audio, const AppSettings& settings);
 void PlayMenuHover(AudioAssets& audio);
+void PlayPieceSound(AudioAssets& audio, const AppSettings& settings);
+void PlayGameResultSound(AudioAssets& audio, int result, int gameMode, const AppSettings& settings);

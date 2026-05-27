@@ -27,6 +27,7 @@ static SettingTex gBtnPlain;    // pixil-layer-9  — plain label button
 static int         gActiveDrag    = -1;
 static float       gToggleAnim[1] = {};
 static bool        gNeedsReset    = true;
+static bool        gSettingsDirty = false;
 static bool        gSliderHover[3]= {};
 static bool        gToggleHover[1]= {};
 static ScreenState gReturnScreen  = SCREEN_MAIN_MENU;  // màn hình sẽ quay về khi Back
@@ -233,6 +234,7 @@ void InitSettingUI()
 
     gActiveDrag  = -1;
     gNeedsReset  = true;
+    gSettingsDirty = false;
     for (int i = 0; i < 3; ++i) gSliderHover[i] = false;
     gToggleAnim[0]  = 0.0f;
     gToggleHover[0] = false;
@@ -295,10 +297,22 @@ void UpdateSettingUI(
             if (mouse.leftDown)
             {
                 float t = (mouse.position.x - SLD_TRACK_X[i]) / SLD_W;
-                *sliders[i] = max(0.0f, min(1.0f, t));
+                float newValue = max(0.0f, min(1.0f, t));
+                if (*sliders[i] != newValue)
+                {
+                    *sliders[i] = newValue;
+                    gSettingsDirty = true;
+                }
             }
             if (mouse.leftReleased)
+            {
+                if (gSettingsDirty)
+                {
+                    SaveSettings(settings);
+                    gSettingsDirty = false;
+                }
                 gActiveDrag = -1;
+            }
         }
     }
 
@@ -315,6 +329,7 @@ void UpdateSettingUI(
         {
             PlayMenuClick(audio, settings);
             *toggles[i] = !(*toggles[i]);
+            SaveSettings(settings);
         }
 
         // Animate knob toward current bool value
@@ -332,6 +347,11 @@ void UpdateSettingUI(
         if (hovered && mouse.leftPressed)
         {
             PlayMenuClick(audio, settings);
+            if (gSettingsDirty)
+            {
+                SaveSettings(settings);
+                gSettingsDirty = false;
+            }
             currentScreen = gReturnScreen;
             gNeedsReset   = true;
         }
@@ -339,6 +359,11 @@ void UpdateSettingUI(
 
     if (IsKeyPressed(KEY_ESCAPE))
     {
+        if (gSettingsDirty)
+        {
+            SaveSettings(settings);
+            gSettingsDirty = false;
+        }
         currentScreen = gReturnScreen;
         gNeedsReset   = true;
     }

@@ -509,6 +509,16 @@ void DrawNameInputUI(
     }
 }
 
+int GetSelectedAvatarP1()
+{
+    return gAvatarP1;
+}
+
+int GetSelectedAvatarP2()
+{
+    return gAvatarP2;
+}
+
 void ResetNameInputBuffers()
 {
     gNameBuf1[0] = '\0'; gNameLen1 = 0;
