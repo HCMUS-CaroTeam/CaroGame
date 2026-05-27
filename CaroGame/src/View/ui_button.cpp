@@ -17,9 +17,9 @@ static ButtonTextureAsset gIconArrowLeftPressed;
 static ButtonTextureAsset gIconArrowLeftIdle;
 static ButtonTextureAsset gIconArrowRightIdle;
 
-static bool  gWasHover[32] = {};
-static float gHoverAnim[32] = {};
-static float gPressAnim[32] = {};
+static bool  gWasHover[128] = {};
+static float gHoverAnim[128] = {};
+static float gPressAnim[128] = {};
 
 static bool IsTextureReadyEx(const Texture2D& tex)
 {
@@ -195,7 +195,7 @@ void InitUIButtonSystem()
 {
     LoadButtonAssets();
 
-    for (int i = 0; i < 32; ++i)
+    for (int i = 0; i < 128; ++i)
     {
         gWasHover[i] = false;
         gHoverAnim[i] = 0.0f;

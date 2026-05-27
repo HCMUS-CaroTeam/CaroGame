@@ -95,11 +95,11 @@ Icon button:
 // Main Menu Buttons
 Button gMainMenuButtons[] =
 {
-    { Vector2{ 45.0f, 690.0f },  Vector2{ 280.0f, 80.0f } , "PLAY",    BTN_PLAY,    BUTTON_VISUAL_TEXT, BUTTON_ICON_NONE, 28.0f, 2.0f },
-	{ Vector2{ 350.0f, 690.0f },  Vector2{ 280.0f, 80.0f }, "LOAD",    BTN_LOAD,    BUTTON_VISUAL_TEXT, BUTTON_ICON_NONE, 28.0f, 2.0f },
-    { Vector2{ 655.0f, 690.0f },  Vector2{ 280.0f, 80.0f }, "ABOUT",   BTN_ABOUT,   BUTTON_VISUAL_TEXT, BUTTON_ICON_NONE, 28.0f, 2.0f },
-    { Vector2{ 960.0f, 690.0f }, Vector2{ 280.0f, 80.0f } , "SETTING", BTN_SETTING, BUTTON_VISUAL_TEXT, BUTTON_ICON_NONE, 28.0f, 2.0f },
-    { Vector2{ 1265.0f, 690.0f }, Vector2{ 280.0f, 80.0f }, "EXIT",    BTN_EXIT,    BUTTON_VISUAL_TEXT, BUTTON_ICON_NONE, 28.0f, 2.0f }
+    { Vector2{ 110.0f, 420.0f }, Vector2{ 266.0f, 50.0f }, "PLAY",    BTN_PLAY,    BUTTON_VISUAL_TEXT, BUTTON_ICON_NONE, 24.0f, 4.0f },
+    { Vector2{ 110.0f, 478.0f }, Vector2{ 248.0f, 46.0f }, "LOAD",    BTN_LOAD,    BUTTON_VISUAL_TEXT, BUTTON_ICON_NONE, 20.0f, 3.0f },
+    { Vector2{ 110.0f, 538.0f }, Vector2{ 248.0f, 46.0f }, "ABOUT",   BTN_ABOUT,   BUTTON_VISUAL_TEXT, BUTTON_ICON_NONE, 20.0f, 3.0f },
+    { Vector2{ 110.0f, 592.0f }, Vector2{ 248.0f, 46.0f }, "SETTING", BTN_SETTING, BUTTON_VISUAL_TEXT, BUTTON_ICON_NONE, 20.0f, 3.0f },
+    { Vector2{ 110.0f, 652.0f }, Vector2{ 248.0f, 46.0f }, "EXIT",    BTN_EXIT,    BUTTON_VISUAL_TEXT, BUTTON_ICON_NONE, 20.0f, 3.0f }
 };
 
 int gMainMenuButtonCount = sizeof(gMainMenuButtons) / sizeof(gMainMenuButtons[0]);

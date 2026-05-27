@@ -32,18 +32,21 @@ static void LoadFrameAssets()
         "pixil-layer-1.png"
     );
     gPanelLoaded = IsTextureReadyEx(gPanelFrame);
+    if (gPanelLoaded) SetTextureFilter(gPanelFrame, TEXTURE_FILTER_POINT);
 
     gSmallFrame = LoadTextureFromCandidates(
         "assets/frame/pixil-layer-2.png",
         "pixil-layer-2.png"
     );
     gSmallLoaded = IsTextureReadyEx(gSmallFrame);
+    if (gSmallLoaded) SetTextureFilter(gSmallFrame, TEXTURE_FILTER_POINT);
 
     gCardFrame = LoadTextureFromCandidates(
         "assets/frame/pixil-layer-3.png",
         "pixil-layer-3.png"
     );
     gCardLoaded = IsTextureReadyEx(gCardFrame);
+    if (gCardLoaded) SetTextureFilter(gCardFrame, TEXTURE_FILTER_POINT);
 }
 
 static void DrawFrameFallback(Rectangle dest)
@@ -62,10 +65,10 @@ static void DrawTextureFrameNPatch(const Texture2D& tex, Rectangle dest, int lef
 
     NPatchInfo patch{};
     patch.source = Rectangle{
-        0.0f,
-        0.0f,
-        static_cast<float>(tex.width),
-        static_cast<float>(tex.height)
+        1.0f,
+        1.0f,
+        static_cast<float>(tex.width - 2),
+        static_cast<float>(tex.height - 2)
     };
     patch.left = left;
     patch.top = top;
