@@ -23,7 +23,7 @@
 
 static int* GetVietnameseCodepoints(int& codepointCount)
 {
-    static int codepoints[95 + 64 + 128 + 90] = {};
+    static int codepoints[95 + 64 + 256 + 90] = {};
     static bool initialized = false;
 
     if (!initialized)
@@ -36,7 +36,7 @@ static int* GetVietnameseCodepoints(int& codepointCount)
         for (int c = 0x00C0; c <= 0x00FF; ++c)
             codepoints[index++] = c;
 
-        for (int c = 0x0100; c <= 0x017F; ++c)
+        for (int c = 0x0100; c <= 0x01FF; ++c)
             codepoints[index++] = c;
 
         for (int c = 0x1EA0; c <= 0x1EF9; ++c)
