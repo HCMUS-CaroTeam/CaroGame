@@ -1,0 +1,312 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;c++;cppm;ixx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hh;hpp;hxx;h++;hm;inl;inc;ipp;xsd</Extensions>
+    </Filter>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="src\main.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src/Control\input_mouse.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Scenes\MainMenu\ui_main_menu.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Control\menu_data.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Model\logic.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Scenes\Setup\ui_setup.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Scenes\Play\ui_play.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\View\ui_background.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\View\ui_button.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Scenes\Play\ui_pause.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Systems\audio_manager.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\View\ui_frame.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Scenes\Setting\ui_setting.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Model\AI\ai_bot.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Model\AI\ai_easy.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Model\AI\ai_medium.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Model\game_data.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Scenes\About\ui_about.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Scenes\Save_Load\ui_load.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Scenes\Save_Load\ui_save.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Systems\save_load.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Model\AI\ai_hard.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Scenes\Notify\ui_notify.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Model\AI\ai_evaluation.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Scenes\Setup\ui_name_setup.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Control\name_input_data.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Scenes\Story\ui_story.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="Assets\bg\background.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Assets\bg\button1.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Assets\bg\button2.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Assets\bg\game name.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Assets\frame\pixil-layer-1.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Assets\frame\pixil-layer-2.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Assets\frame\pixil-layer-3.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Assets\bg\story_bg.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Assets\avatars\boss.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Assets\avatars\character-1.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Assets\avatars\character-2.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Assets\avatars\character-3.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Assets\avatars\character-4.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Assets\buttons\button1.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Assets\buttons\pixil-layer-13.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Assets\buttons\pixil-layer-12.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Assets\buttons\pixil-layer-11.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Assets\buttons\pixil-layer-10.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Assets\buttons\pixil-layer-9.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Assets\buttons\pixil-layer-8.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Assets\buttons\pixil-layer-6.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Assets\buttons\pixil-layer-4.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Assets\buttons\button2.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Assets\buttons\pixil-layer-5.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Assets\buttons\pixil-layer-7.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Assets\texture\pixil-layer-setting2.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Assets\texture\pixil-layer-setting1.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Assets\X-O\pixil-layer-0.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Assets\X-O\pixil-layer-1.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Assets\X-O\pixil-layer-2.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Assets\X-O\pixil-layer-3.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="raylib\include\raymath.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="raylib\include\rlgl.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src/Control\input_mouse.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src/Model\config.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="raylib/include\raylib.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Scenes\MainMenu\ui_main_menu.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Control\menu_data.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Model\app_settings.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Shared\Common.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Model\logic.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Scenes\Setup\ui_setup.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Scenes\Play\ui_play.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\View\ui_background.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\View\ui_button.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Scenes\Play\ui_pause.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Systems\audio_manager.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\View\ui_frame.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Scenes\Setting\ui_setting.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Model\AI\ai_bot.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Model\AI\ai_easy.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Model\AI\ai_medium.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Model\game_data.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Scenes\About\ui_about.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Scenes\Save_Load\ui_load.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Scenes\Save_Load\ui_save.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Systems\save_load.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Model\AI\ai_hard.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Scenes\Notify\ui_notify.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Model\AI\ai_evaluation.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Scenes\Setup\ui_name_setup.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Control\name_input_data.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Scenes\Story\ui_story.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <Library Include="raylib\lib\raylib.lib" />
+    <Library Include="raylib\lib\raylibdll.lib" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Assets\audio\menu_hover.ogg" />
+    <None Include="Assets\audio\menu_click.ogg" />
+    <None Include="game_progress.dat" />
+    <None Include="packages.config" />
+    <None Include="settings.cfg" />
+    <None Include="saves.dat" />
+  </ItemGroup>
+  <ItemGroup>
+    <Media Include="Assets\audio\lose_sound.mp3" />
+    <Media Include="Assets\audio\win_sound.mp3" />
+  </ItemGroup>
+  <ItemGroup>
+    <Font Include="Assets\fonts\Born2bSportyFS.otf" />
+  </ItemGroup>
+</Project>
