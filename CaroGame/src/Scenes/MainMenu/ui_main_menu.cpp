@@ -311,15 +311,6 @@ static void DrawMainMenuHud(Font fontSmall)
 {
     DrawTextEx(fontSmall, "v1.0", Vector2{ 110.0f, 862.0f }, 13.0f, 2.0f, Color{ 168, 152, 112, 90 });
 
-    const float blink = 0.5f + sinf(static_cast<float>(GetTime()) * 3.9f) * 0.5f;
-    DrawTextEx(
-        fontSmall,
-        "CLICK TO SELECT",
-        Vector2{ 1330.0f, 862.0f },
-        13.0f,
-        2.0f,
-        Color{ 196, 24, 64, static_cast<unsigned char>(70 + blink * 95.0f) }
-    );
 }
 
 void InitMainMenuUI()
