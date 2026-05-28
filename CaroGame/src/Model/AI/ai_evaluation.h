@@ -31,6 +31,7 @@ enum PatternType {
   BLOCKED_2,
   OPEN_1,
   BLOCKED_1,
+  OVERLINE,      // MỚI: Quá 5 quân liên tiếp → không thắng, phạt điểm
   PATTERN_NONE
 };
 
@@ -44,7 +45,8 @@ constexpr long long HARD_SCORES[] = {
     100000LL,      // OPEN_2     (enum index 5)
     100LL,         // BLOCKED_2  (enum index 6)
     10LL,          // OPEN_1     (enum index 7)
-    1LL            // BLOCKED_1  (enum index 8)
+    1LL,           // BLOCKED_1  (enum index 8)
+    -50000000LL    // OVERLINE   (enum index 9) — Quá 5 quân = phạt nặng, bot phải tránh
 };
 
 // BẢNG ĐIỂM DÀNH CHO HEURISTIC (Bot Medium)
@@ -57,7 +59,8 @@ constexpr long long MEDIUM_SCORES[] = {
     100LL,        // OPEN_2
     10LL,         // BLOCKED_2
     2LL,          // OPEN_1
-    1LL           // BLOCKED_1
+    1LL,          // BLOCKED_1
+    -5000000LL    // OVERLINE — Quá 5 quân = phạt nặng
 };
 
 // BẢNG ĐIỂM DÀNH CHO BOT EASY (Chỉ nhận ra mối nguy trước mắt, còn lại gần như
@@ -71,7 +74,8 @@ constexpr long long EASY_SCORES[] = {
     1LL,          // OPEN_2
     0LL,          // BLOCKED_2
     0LL,          // OPEN_1
-    0LL           // BLOCKED_1
+    0LL,          // BLOCKED_1
+    -1000000LL    // OVERLINE   — Bot Easy cũng phải biết tránh overline
 };
 
 PatternType ClassifyLine(int count, int blocks, int gaps);

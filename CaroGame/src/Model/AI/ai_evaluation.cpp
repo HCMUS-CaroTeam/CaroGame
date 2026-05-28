@@ -2,30 +2,32 @@
 #include "Model/game_data.h"
 
 PatternType ClassifyLine(int count, int blocks, int gaps) {
-  // LUẬT VIỆT NAM: Đủ 5 con nhưng bị chặn 2 đầu => Vô giá trị
+  // ============================================================
+  // LUẬT CARO CHUẨN VIỆT NAM + OVERLINE:
+  //   - Bị chặn cả 2 đầu => Vô giá trị
+  //   - ĐÚNG 5 quân liên tiếp (không gap, không bị chặn 2 đầu) => THẮNG
+  //   - QUÁ 5 quân (Overline) => KHÔNG THẮNG, phạt điểm nặng
+  // ============================================================
 
-    if (blocks >= 2)
-        return PATTERN_NONE;
+  // Chặn cả 2 đầu => vô giá trị dù bao nhiêu quân
+  if (blocks >= 2)
+    return PATTERN_NONE;
 
-    // FIX LỖI: NẾU CÓ KHOẢNG TRỐNG (GAP) THÌ TUYỆT ĐỐI KHÔNG ĐƯỢC TÍNH LÀ WIN!
-    if (gaps > 0) {
-        if (count >= 5)
-            count = 4; // Giáng cấp: 5 quân đứt khúc chỉ tương đương 1 chuỗi 4 cực mạnh
-    } else {
-        if (count >= 5)
-            return WIN; // Không có gap -> Win xịn -> Thắng luôn
-    }
-
-  // FIX LỖI: NẾU CÓ KHOẢNG TRỐNG (GAP) THÌ TUYỆT ĐỐI KHÔNG ĐƯỢC TÍNH LÀ WIN!
+  // --- XỬ LÝ CHUỖI CÓ KHOẢNG TRỐNG (GAP) ---
   if (gaps > 0) {
+    // Chuỗi đứt khúc: giáng cấp count xuống tối đa 4
+    // (vì không phải chuỗi liền mạch nên không bao giờ WIN hay OVERLINE)
     if (count >= 5)
-      count =
-          4; // Giáng cấp: 5 quân đứt khúc chỉ tương đương 1 chuỗi 4 cực mạnh
+      count = 4;
   } else {
-    if (count >= 5)
-      return WIN; // Không có gap -> Win xịn -> Thắng luôn
+    // --- CHUỖI LIỀN MẠCH (KHÔNG CÓ GAP) ---
+    if (count > 5)
+      return OVERLINE; // QUÁ 5 quân => Overline => phạt điểm
+    if (count == 5)
+      return WIN;      // ĐÚNG 5 quân => Thắng
   }
 
+  // --- PHÂN LOẠI CHUỖI 1-4 QUÂN ---
   if (blocks == 0) {
     switch (count) {
     case 4:
@@ -155,11 +157,13 @@ long long EvaluatePositionMedium(int r, int c, int piece) {
         break;
     }
 
-    // Áp dụng bảng điểm Medium (Học theo hàm CalculateLineScore cũ của bạn)
+    // Áp dụng bảng điểm Medium + Luật Overline
     if (blocks == 2 && count < 5)
       continue;
-    if (count >= 5)
-      totalScore += MEDIUM_SCORES[WIN];
+    if (count > 5)
+      totalScore += MEDIUM_SCORES[OVERLINE]; // Overline = phạt điểm nặng
+    else if (count == 5)
+      totalScore += MEDIUM_SCORES[WIN];      // Đúng 5 = thắng
     else if (count == 4)
       totalScore +=
           (blocks == 0) ? MEDIUM_SCORES[OPEN_4] : MEDIUM_SCORES[BLOCKED_4];

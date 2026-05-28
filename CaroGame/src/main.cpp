@@ -231,7 +231,6 @@ int main()
     SaveGamesToFile(gameSaves);
 
     SaveSettings(settings);
-    ShutdownAboutUI();
     ShutdownSettingUI();
     ShutdownPlayUI();
     ShutdownSetupUI();

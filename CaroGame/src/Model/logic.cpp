@@ -98,8 +98,8 @@ int TestBoard(int lastRow, int lastCol) {
     int count = 1;  // Tính luôn quân vừa đánh
     int blocks = 0; // Đếm số đầu bị chặn
 
-    // Quét chiều TỚI
-    for (int step = 1; step <= 5; step++) {
+    // Quét chiều TỚI — KHÔNG giới hạn step để đếm chính xác toàn bộ chuỗi
+    for (int step = 1; ; step++) {
       int nr = lastRow + step * dx[dir];
       int nc = lastCol + step * dy[dir];
 
@@ -117,8 +117,8 @@ int TestBoard(int lastRow, int lastCol) {
         break; // Ô trống thì dừng
     }
 
-    // Quét chiều LÙI
-    for (int step = 1; step <= 5; step++) {
+    // Quét chiều LÙI — KHÔNG giới hạn step
+    for (int step = 1; ; step++) {
       int nr = lastRow - step * dx[dir];
       int nc = lastCol - step * dy[dir];
 
@@ -135,66 +135,52 @@ int TestBoard(int lastRow, int lastCol) {
         break;
     }
 
-    // --- XÉT ĐIỀU KIỆN THẮNG THEO MODE ---
-    if (count >= 5) {
-      bool isWin = false;
-      if (current().pvpMode == TOURNAMENT || current().gameMode == MODE_PVE) {
-        if (blocks < 2)
-          isWin = true;
-      } else {
-        isWin = true;
-      }
+    // --- LUẬT OVERLINE THỐNG NHẤT CHO MỌI MODE ---
+    // Chỉ thắng khi ĐÚNG 5 quân liên tiếp.
+    // Overline (> 5 quân) => KHÔNG THẮNG, bỏ qua hướng này.
+    if (count != WIN_LENGTH)
+      continue; // count < 5 => chưa đủ, count > 5 => overline
 
-      if (isWin) {
-        // Nếu thắng thì lưu lại đường thắng vào current().winLine để UI có thể
-        // vẽ đường thắng
+    // Luật chặn 2 đầu: CHỈ áp dụng cho Tournament và PvE
+    // Classic mode: đủ đúng 5 là thắng, không cần kiểm tra chặn 2 đầu
+    bool applyBlockRule = (current().pvpMode == TOURNAMENT ||
+                           current().gameMode == MODE_PVE);
+    if (applyBlockRule && blocks >= 2)
+      continue;
 
-        // Tìm phạm vi của chuỗi quân cờ liên tiếp (để tránh lấy nhầm quân không
-        // liền kề hoặc vượt quá mảng)
-        int startStep = 0;
-        while (true) {
-          int nr = lastRow + (startStep - 1) * dx[dir];
-          int nc = lastCol + (startStep - 1) * dy[dir];
-          if (nr < 0 || nr >= BOARD_SIZE || nc < 0 || nc >= BOARD_SIZE)
-            break;
-          if (current().board[nr][nc] == player)
-            startStep--;
-          else
-            break;
-        }
+    // === THẮNG! Lưu đường thắng vào current().winLine ===
 
-        int endStep = 0;
-        while (true) {
-          int nr = lastRow + (endStep + 1) * dx[dir];
-          int nc = lastCol + (endStep + 1) * dy[dir];
-          if (nr < 0 || nr >= BOARD_SIZE || nc < 0 || nc >= BOARD_SIZE)
-            break;
-          if (current().board[nr][nc] == player)
-            endStep++;
-          else
-            break;
-        }
-
-        int idx = 0;
-        for (int step = startStep; step <= endStep; step++) {
-          if (idx >= MAX_WIN_LINE)
-            break; // Dùng MAX_WIN_LINE thay vì WIN_LENGTH để lưu toàn bộ chuỗi
-          int nr = lastRow + step * dx[dir];
-          int nc = lastCol + step * dy[dir];
-          current().winLine[idx][0] = nr;
-          current().winLine[idx][1] = nc;
-          idx++;
-        }
-        current().winLineCount = idx; // Lưu số ô thực tế của chuỗi thắng
-        if (player == CELL_X) {
-          current().scorePlayer1++;
-        } else if (player == CELL_O) {
-          current().scorePlayer2++;
-        }
-        // Cập nhật kết quả vào current() để Control có thể xử lý
-        return (player == CELL_X) ? RESULT_X_WINS : RESULT_O_WINS;
-      }
+    // Tìm điểm bắt đầu của chuỗi 5 quân (đi ngược từ lastRow/lastCol)
+    int startStep = 0;
+    while (true) {
+      int nr = lastRow + (startStep - 1) * dx[dir];
+      int nc = lastCol + (startStep - 1) * dy[dir];
+      if (nr < 0 || nr >= BOARD_SIZE || nc < 0 || nc >= BOARD_SIZE)
+        break;
+      if (current().board[nr][nc] == player)
+        startStep--;
+      else
+        break;
     }
+
+    // Lưu đúng WIN_LENGTH (5) ô vào winLine
+    int idx = 0;
+    for (int step = startStep; idx < WIN_LENGTH; step++) {
+      int nr = lastRow + step * dx[dir];
+      int nc = lastCol + step * dy[dir];
+      current().winLine[idx][0] = nr;
+      current().winLine[idx][1] = nc;
+      idx++;
+    }
+    current().winLineCount = WIN_LENGTH; // Luôn đúng 5 ô
+
+    if (player == CELL_X) {
+      current().scorePlayer1++;
+    } else if (player == CELL_O) {
+      current().scorePlayer2++;
+    }
+    // Cập nhật kết quả vào current() để Control có thể xử lý
+    return (player == CELL_X) ? RESULT_X_WINS : RESULT_O_WINS;
   }
   return RESULT_ONGOING; // Chưa có ai thắng, tiếp tục chơi
 }
