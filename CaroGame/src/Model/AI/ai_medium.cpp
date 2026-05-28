@@ -1,78 +1,230 @@
 #include "ai_medium.h"
 #include "Model/game_data.h"
-#include "raylib.h"
 #include "ai_evaluation.h"
+#include "raylib.h"
+#include <algorithm>
+#include <cstring>
 
 // ========================================================================
-// THUẬT TOÁN MEDIUM: HEURISTIC EVALUATION (Đánh Giá Điểm Tĩnh)
-// Phiên bản mới: Dùng "Simulate & Compare" để phòng thủ thông minh
-// + Attack Bias để bot chủ động tấn công
+// THUẬT TOÁN MEDIUM: MINIMAX DEPTH-2
+// Bot "nghĩ trước" 1 nước của đối thủ, mạnh hơn hẳn Greedy nhưng
+// vẫn yếu hơn Hard (depth-5 + Alpha-Beta + Move Ordering nâng cao).
 // ========================================================================
-void GetMediumMove(int& outRow, int& outCol) {
-    int botPiece = current().turn;
-    int playerPiece = (botPiece == CELL_X) ? CELL_O : CELL_X;
 
-    long long maxScore = -1;
-    struct Point { int r, c; };
-    Point bestMoves[BOARD_SIZE * BOARD_SIZE];
-    int bestCount = 0;
+static constexpr int MEDIUM_MAX_DEPTH = 2;
+static constexpr int MEDIUM_BEAM_WIDTH = 12;
+static const long long MEDIUM_INF = 10000000000000000LL;
 
-    for (int r = 0; r < BOARD_SIZE; r++) {
-        for (int c = 0; c < BOARD_SIZE; c++) {
-            if (current().board[r][c] == 0) {
-                // 1. Tính điểm CÔNG - Đặt vào đây Bot được lợi gì?
-                long long attackScore = EvaluatePositionMedium(r, c, botPiece);
-                // 2. Nếu Người chơi đánh vào đây thì độ nguy hiểm là bao nhiêu?
-                long long defenseScore = EvaluatePositionMedium(r, c, playerPiece);
+typedef int ScratchBoard[BOARD_SIZE][BOARD_SIZE];
 
-                // 3. Tổng điểm = Công + Thủ 
-                // Mẹo: Nhân thủ với 1.5 để Bot ưu tiên tính "chắc cốp", thấy nguy hiểm là chặn ngay
-                long long totalScore = attackScore + (defenseScore * 3 / 2);
+struct MediumMove {
+  int r, c;
+  long long score;
+};
 
-                //// Ưu tiên Tuyệt đối #1: Đánh vào đây là THẮNG LUÔN -> Đánh ngay.
-                //if (attackScore >= SCORE_WIN) {
-                //    outRow = r; outCol = c;
-                //    return; 
-                //}
+// ========================================================================
+// SAO CHÉP BÀN CỜ
+// ========================================================================
+static void CopyBoard(const int src[BOARD_SIZE][BOARD_SIZE], ScratchBoard dst) {
+  memcpy(dst, src, sizeof(int) * BOARD_SIZE * BOARD_SIZE);
+}
 
-                //// 2. Tính điểm THỦ - Nếu không chạm vào, đối thủ đặt vào đây nguy hiểm cỡ nào?
-                //long long defenseScore = EvaluatePosition(r, c, playerPiece);
+// ========================================================================
+// TÌM CÁC NƯỚC ĐI TIỀM NĂNG (Neighbor filter + Move Ordering)
+// ========================================================================
+static int GenerateMovesMedium(MediumMove moves[], int botPiece,
+                                int playerPiece, const ScratchBoard scratch) {
+  int count = 0;
+  for (int r = 0; r < BOARD_SIZE; r++) {
+    for (int c = 0; c < BOARD_SIZE; c++) {
+      if (scratch[r][c] != 0)
+        continue;
 
-                //long long totalScore = 0;
-
-                //// Ưu tiên Tuyệt đối #2: Đối thủ Mở 4 hoặc Sắp Thắng -> BẮT BUỘC PHẢI CHẶN.
-                //// Cho điểm cực lớn để bot ưu tiên ô này hơn bất kỳ ô tấn công lặt vặt nào.
-                //if (defenseScore >= SCORE_OPEN4) {
-                //    totalScore = SCORE_OPEN4 * 10; 
-                //}
-                //// Nếu mình không cận kề cái chết, thì tính điểm cộng dồn bình thường:
-                //else {
-                //    // Cân bằng lại: Ở mức Medium, tính "cẩn thận" vẫn cần đặt lên cao hơn 1 xíu.
-                //    // Việc cộng dồn cả hai sẽ tự động chọn ô "vừa công vừa thủ" tốt nhất.
-                //    totalScore = attackScore + (defenseScore * 1.5);
-                //}
-
-                // Cập nhật kỷ lục
-                if (totalScore > maxScore) {
-                    maxScore = totalScore;
-                    bestCount = 0; 
-                    bestMoves[bestCount++] = { r, c };
-                }
-                else if (totalScore == maxScore) {
-                    bestMoves[bestCount++] = { r, c };
-                }
-            }
+      // Neighbor filter: bán kính 2
+      bool hasNeighbor = false;
+      for (int dr = -2; dr <= 2 && !hasNeighbor; dr++) {
+        for (int dc = -2; dc <= 2 && !hasNeighbor; dc++) {
+          int nr = r + dr, nc = c + dc;
+          if (nr >= 0 && nr < BOARD_SIZE && nc >= 0 && nc < BOARD_SIZE &&
+              scratch[nr][nc] != 0) {
+            hasNeighbor = true;
+          }
         }
-    }
+      }
+      if (!hasNeighbor)
+        continue;
 
-    // Lựa chọn nước đi
-    if (bestCount > 0) {
-        int idx = GetRandomValue(0, bestCount - 1);
-        outRow = bestMoves[idx].r;
-        outCol = bestMoves[idx].c;
+      // Chấm điểm tức thời để ưu tiên (Move Ordering)
+      long long atk = EvaluatePositionMedium(r, c, botPiece, scratch);
+      long long def = EvaluatePositionMedium(r, c, playerPiece, scratch);
+      moves[count++] = {r, c, atk + def};
     }
-    else {
-        outRow = BOARD_SIZE / 2;
-        outCol = BOARD_SIZE / 2;
+  }
+
+  // Sort giảm dần để nước có điểm cao nhất xét trước
+  std::sort(moves, moves + count,
+            [](const MediumMove &a, const MediumMove &b) {
+              return a.score > b.score;
+            });
+
+  // Giới hạn beam width
+  return std::min(count, MEDIUM_BEAM_WIDTH);
+}
+
+// ========================================================================
+// ĐÁNH GIÁ TOÀN CỤC BÀN CỜ (Dùng bảng điểm Medium)
+// ========================================================================
+static long long EvaluateBoardMedium(int botPiece, int playerPiece,
+                                      const ScratchBoard scratch) {
+  long long totalScore = 0;
+  for (int r = 0; r < BOARD_SIZE; r++) {
+    for (int c = 0; c < BOARD_SIZE; c++) {
+      if (scratch[r][c] == botPiece) {
+        long long score = EvaluatePositionMedium(r, c, botPiece, scratch);
+        if (score >= MEDIUM_SCORES[WIN])
+          return MEDIUM_INF / 2;
+        totalScore += score;
+      } else if (scratch[r][c] == playerPiece) {
+        long long score = EvaluatePositionMedium(r, c, playerPiece, scratch);
+        if (score >= MEDIUM_SCORES[WIN])
+          return -MEDIUM_INF / 2;
+        totalScore -= score;
+      }
     }
+  }
+  return totalScore;
+}
+
+// ========================================================================
+// MINIMAX DEPTH-2 (Đơn giản, không cần Alpha-Beta vì depth quá nông)
+// ========================================================================
+static long long MinimaxMedium(int depth, bool isMaximizing, int botPiece,
+                                int playerPiece, ScratchBoard scratch) {
+  if (depth == 0)
+    return EvaluateBoardMedium(botPiece, playerPiece, scratch);
+
+  MediumMove moves[BOARD_SIZE * BOARD_SIZE];
+  int moveCount =
+      GenerateMovesMedium(moves, botPiece, playerPiece, scratch);
+
+  if (moveCount == 0)
+    return EvaluateBoardMedium(botPiece, playerPiece, scratch);
+
+  if (isMaximizing) {
+    long long maxEval = -MEDIUM_INF;
+    for (int i = 0; i < moveCount; i++) {
+      int r = moves[i].r;
+      int c = moves[i].c;
+
+      scratch[r][c] = botPiece;
+
+      long long eval;
+      // Dừng sớm nếu thắng luôn
+      if (EvaluatePositionMedium(r, c, botPiece, scratch) >=
+          MEDIUM_SCORES[WIN]) {
+        eval = MEDIUM_INF / 2 + depth;
+      } else {
+        eval = MinimaxMedium(depth - 1, false, botPiece, playerPiece, scratch);
+      }
+
+      scratch[r][c] = 0;
+
+      if (eval > maxEval)
+        maxEval = eval;
+    }
+    return maxEval;
+  } else {
+    long long minEval = MEDIUM_INF;
+    for (int i = 0; i < moveCount; i++) {
+      int r = moves[i].r;
+      int c = moves[i].c;
+
+      scratch[r][c] = playerPiece;
+
+      long long eval;
+      if (EvaluatePositionMedium(r, c, playerPiece, scratch) >=
+          MEDIUM_SCORES[WIN]) {
+        eval = -MEDIUM_INF / 2 - depth;
+      } else {
+        eval = MinimaxMedium(depth - 1, true, botPiece, playerPiece, scratch);
+      }
+
+      scratch[r][c] = 0;
+
+      if (eval < minEval)
+        minEval = eval;
+    }
+    return minEval;
+  }
+}
+
+// ========================================================================
+// HÀM CHÍNH: TÌM NƯỚC ĐI CHO BOT MEDIUM
+// ========================================================================
+void GetMediumMove(int &outRow, int &outCol) {
+  int botPiece = current().turn;
+  int playerPiece = (botPiece == CELL_X) ? CELL_O : CELL_X;
+
+  // Tạo scratch board
+  ScratchBoard scratch;
+  CopyBoard(current().board, scratch);
+
+  MediumMove moves[BOARD_SIZE * BOARD_SIZE];
+  int moveCount =
+      GenerateMovesMedium(moves, botPiece, playerPiece, scratch);
+
+  if (moveCount == 0) {
+    outRow = BOARD_SIZE / 2;
+    outCol = BOARD_SIZE / 2;
+    return;
+  }
+
+  // ƯU TIÊN #1: Kiểm tra thắng ngay 1 nước
+  for (int i = 0; i < moveCount; i++) {
+    int r = moves[i].r, c = moves[i].c;
+    scratch[r][c] = botPiece;
+    if (EvaluatePositionMedium(r, c, botPiece, scratch) >=
+        MEDIUM_SCORES[WIN]) {
+      outRow = r;
+      outCol = c;
+      return;
+    }
+    scratch[r][c] = 0;
+  }
+
+  // ƯU TIÊN #2: Chặn đối thủ thắng ngay
+  for (int i = 0; i < moveCount; i++) {
+    int r = moves[i].r, c = moves[i].c;
+    scratch[r][c] = playerPiece;
+    if (EvaluatePositionMedium(r, c, playerPiece, scratch) >=
+        MEDIUM_SCORES[WIN]) {
+      outRow = r;
+      outCol = c;
+      scratch[r][c] = 0;
+      return;
+    }
+    scratch[r][c] = 0;
+  }
+
+  // ƯU TIÊN #3: Minimax depth-2
+  long long bestScore = -MEDIUM_INF;
+  int bestRow = -1, bestCol = -1;
+
+  for (int i = 0; i < moveCount; i++) {
+    int r = moves[i].r, c = moves[i].c;
+    scratch[r][c] = botPiece;
+
+    long long score = MinimaxMedium(MEDIUM_MAX_DEPTH - 1, false, botPiece,
+                                     playerPiece, scratch);
+    scratch[r][c] = 0;
+
+    if (score > bestScore) {
+      bestScore = score;
+      bestRow = r;
+      bestCol = c;
+    }
+  }
+
+  outRow = bestRow;
+  outCol = bestCol;
 }

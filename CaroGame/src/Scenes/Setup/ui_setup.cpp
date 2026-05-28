@@ -235,12 +235,12 @@ void DrawSetupUI(Font fontTitle, Font fontSmall, const MouseState &mouse,
       titleText = "CLASSIC";
       descText = "";
       detailText =
-          "- Du 5 quan lien tiep la thang\n- Khong ap dung luat chan 2 dau";
+          "- Align exactly 5 pieces to win.\n- Overline (6+) does not count.";
     } else if (settings.pvpMode == TOURNAMENT) {
       titleText = "TOURNAMENT";
       descText = "";
       detailText =
-          "- 5 quan bi chan 2 dau khong tinh\n- Het thoi gian se bi tuoc luot";
+          "- Align exactly 5 pieces.\n- Must NOT be blocked at both ends.\n- Timeout forfeits your turn.";
     }
   }
 

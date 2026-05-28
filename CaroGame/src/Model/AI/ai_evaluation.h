@@ -82,7 +82,8 @@ PatternType ClassifyLine(int count, int blocks, int gaps);
 
 // Tách riêng hàm đánh giá điểm cho từng level:
 long long EvaluatePositionEasy(int r, int c, int piece);
-long long EvaluatePositionMedium(int r, int c, int piece);
+long long EvaluatePositionMedium(int r, int c, int piece,
+                                  const int (*board)[BOARD_SIZE]);
 long long EvaluatePositionHard(int r, int c, int piece,
                                const int (*board)[BOARD_SIZE],
                                bool isBoardEval = false);

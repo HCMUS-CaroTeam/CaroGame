@@ -112,9 +112,10 @@ long long EvaluatePositionEasy(int r, int c, int piece) {
 }
 
 // ========================================================================
-// HÀM CHO BOT MEDIUM (Khôi phục nguyên gốc siêu nhẹ của bạn)
+// HÀM CHO BOT MEDIUM (Nhận board parameter để hỗ trợ Minimax scratch board)
 // ========================================================================
-long long EvaluatePositionMedium(int r, int c, int piece) {
+long long EvaluatePositionMedium(int r, int c, int piece,
+                                  const int (*board)[BOARD_SIZE]) {
   long long totalScore = 0;
   int dx[] = {1, 0, 1, 1};
   int dy[] = {0, 1, 1, -1};
@@ -131,9 +132,9 @@ long long EvaluatePositionMedium(int r, int c, int piece) {
         blocks++;
         break;
       }
-      if (current().board[nr][nc] == piece)
+      if (board[nr][nc] == piece)
         count++;
-      else if (current().board[nr][nc] != 0) {
+      else if (board[nr][nc] != 0) {
         blocks++;
         break;
       } else
@@ -148,9 +149,9 @@ long long EvaluatePositionMedium(int r, int c, int piece) {
         blocks++;
         break;
       }
-      if (current().board[nr][nc] == piece)
+      if (board[nr][nc] == piece)
         count++;
-      else if (current().board[nr][nc] != 0) {
+      else if (board[nr][nc] != 0) {
         blocks++;
         break;
       } else
