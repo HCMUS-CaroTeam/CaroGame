@@ -1,307 +1,337 @@
 #include "ai_hard.h"
-#include "Model/game_data.h"
+
 #include "ai_evaluation.h"
-#include <algorithm> // Để xài hàm std::max, std::min
-#include <cstring>   // Để xài hàm memcpy
+#include <algorithm>
+#include <chrono>
+#include <cstdio>
+#include <cstring>
 
-constexpr int MAX_DEPTH = 5; // Dùng constexpr thay cho #define cho an toàn hơn
-const long long INF = 10000000000000000LL;
-
-// Định nghĩa kiểu bàn cờ "ảo" (scratch board) để tránh thay đổi bàn cờ thật
+static constexpr long long SEARCH_INF = 10000000000000000LL;
 typedef int ScratchBoard[BOARD_SIZE][BOARD_SIZE];
 
-struct Move {
-  int r, c;
+struct SearchMove {
+  int row;
+  int col;
   long long score;
-}; // Thêm điểm số vào Struct ảo để Sort
+};
 
-// ========================================================================
-// HÀM HỖ TRỢ: SAO CHÉP BÀN CỜ THẬT SANG BÀN CỜ ẢO
-// ========================================================================
-static void CopyBoard(const int src[BOARD_SIZE][BOARD_SIZE], ScratchBoard dst) {
-  memcpy(dst, src, sizeof(int) * BOARD_SIZE * BOARD_SIZE);
+struct SearchContext {
+  long long deadlineNs;
+  int timedOut;
+  SearchConfig config;
+  SearchStats *stats;
+};
+
+static SearchResult lastHardSearchResult = {};
+
+static long long GetNowNs() {
+  return std::chrono::duration_cast<std::chrono::nanoseconds>(
+             std::chrono::steady_clock::now().time_since_epoch())
+      .count();
 }
 
-// ========================================================================
-// HÀM HỖ TRỢ: GHI BÀN CỜ ẢO NGƯỢC LẠI BÀN CỜ THẬT (phục hồi an toàn)
-// ========================================================================
-static void RestoreBoard(int dst[BOARD_SIZE][BOARD_SIZE],
-                         const ScratchBoard src) {
-  memcpy(dst, src, sizeof(int) * BOARD_SIZE * BOARD_SIZE);
+static int IsSearchTimedOut(SearchContext *context) {
+  if (context->timedOut)
+    return 1;
+  if (GetNowNs() < context->deadlineNs)
+    return 0;
+  context->timedOut = 1;
+  context->stats->timedOut = 1;
+  return 1;
 }
 
-// ========================================================================
-// HÀM HỖ TRỢ: TẠM THỜI ĐỒNG BỘ BÀN CỜ ẢO VÀO current().board
-// Vì EvaluatePosition đọc trực tiếp từ current().board, ta cần đồng bộ
-// bàn cờ ảo vào current().board trước khi gọi hàm đánh giá.
-// ========================================================================
-// static void SyncToLiveBoard(const ScratchBoard scratch) {
-//    memcpy(current().board, scratch, sizeof(int) * BOARD_SIZE * BOARD_SIZE);
-//}
-
-static int GetBeamWidth(int depth, int totalMoves) {
-  // Giai đoạn đầu game (ít quân): quét rộng hơn để không bỏ nước khai cuộc
-  // Càng sâu trong Minimax: cắt càng mạnh để tiết kiệm thời gian
-  if (totalMoves < 10)
-    return std::min(totalMoves, 25); // Đầu game: rộng
-  if (depth >= 4)
-    return std::min(
-        totalMoves,
-        15); // Sâu nhất: vừa phải (cũ: 10 → quá hẹp, bỏ sót nước thủ)
-  if (depth >= 2)
-    return std::min(totalMoves, 20); // Giữa: thoáng (cũ: 15)
-  return std::min(totalMoves, 25);   // Nông: rộng nhất
-}
-
-static int GetSearchRadius(const ScratchBoard scratch) {
-  // Đếm số quân đang có trên bàn
-  int pieceCount = 0;
-  for (int r = 0; r < BOARD_SIZE; r++)
-    for (int c = 0; c < BOARD_SIZE; c++)
-      if (scratch[r][c] != 0)
-        pieceCount++;
-
-  if (pieceCount <= 6)
-    return 3; // Khai cuộc: quét rộng
-  if (pieceCount <= 20)
-    return 2; // Trung cuộc: vừa
-  return 1;   // Tàn cuộc: hẹp lại cho nhanh
-}
-
-// ========================================================================
-// HÀM HỖ TRỢ 1: TÌM CÁC NƯỚC ĐI TIỀM NĂNG (Khoanh vùng tìm kiếm)
-// Giờ đọc từ scratch board thay vì current().board
-// ========================================================================
-static int GeneratePotentialMoves(Move moves[], int botPiece, int playerPiece,
-                                  ScratchBoard scratch, int depth) {
-  int radius = GetSearchRadius(scratch); // ← tính một lần trước vòng lặp
+static int CountPieces(const ScratchBoard board) {
   int count = 0;
-  for (int r = 0; r < BOARD_SIZE; r++) {
-    for (int c = 0; c < BOARD_SIZE; c++) {
-      if (scratch[r][c] == 0) {
-        // Kiểm tra neighbor siêu tốc (chỉ cần 1 ô bên cạnh có cờ là đủ, ko cần
-        // quét bán kính 2)
-        bool hasNeighbor = false;
-        for (int dr = -radius; dr <= radius && !hasNeighbor;
-             dr++) { // ← radius động
-          for (int dc = -radius; dc <= radius && !hasNeighbor; dc++) {
-            int nr = r + dr, nc = c + dc;
-            if (nr >= 0 && nr < BOARD_SIZE && nc >= 0 && nc < BOARD_SIZE &&
-                scratch[nr][nc] != 0) {
-              hasNeighbor = true;
-            }
-          }
-        }
+  for (int row = 0; row < BOARD_SIZE; row++)
+    for (int col = 0; col < BOARD_SIZE; col++)
+      if (board[row][col] != CELL_EMPTY)
+        count++;
+  return count;
+}
 
-        if (hasNeighbor) {
-          // Chấm điểm tức thời để ưu tiên
-          long long atk = EvaluatePositionHard(r, c, botPiece, scratch);
-          long long def = EvaluatePositionHard(r, c, playerPiece, scratch);
-          moves[count++] = {r, c, atk + def};
-        }
-      }
+static int GetSearchRadius(const ScratchBoard board) {
+  const int pieceCount = CountPieces(board);
+  if (pieceCount <= 6)
+    return 3;
+  if (pieceCount <= 20)
+    return 2;
+  return 1;
+}
+
+static int GetBeamWidth(int depth, int totalMoves, SearchConfig config) {
+  if (config.beamWidth > 0)
+    return std::min(totalMoves, config.beamWidth);
+  if (depth >= 4)
+    return std::min(totalMoves, 15);
+  if (depth >= 2)
+    return std::min(totalMoves, 20);
+  return std::min(totalMoves, 25);
+}
+
+static int HasNeighbor(const ScratchBoard board, int row, int col, int radius) {
+  for (int deltaRow = -radius; deltaRow <= radius; deltaRow++) {
+    for (int deltaCol = -radius; deltaCol <= radius; deltaCol++) {
+      const int nextRow = row + deltaRow;
+      const int nextCol = col + deltaCol;
+      if (nextRow >= 0 && nextRow < BOARD_SIZE && nextCol >= 0 &&
+          nextCol < BOARD_SIZE && board[nextRow][nextCol] != CELL_EMPTY)
+        return 1;
+    }
+  }
+  return 0;
+}
+
+static bool CompareSearchMoves(const SearchMove &left,
+                               const SearchMove &right) {
+  return left.score > right.score;
+}
+
+static int GeneratePotentialMoves(SearchMove moves[], int botPiece,
+                                  int playerPiece, ScratchBoard board,
+                                  int depth, SearchConfig config) {
+  const int radius = GetSearchRadius(board);
+  int count = 0;
+
+  for (int row = 0; row < BOARD_SIZE; row++) {
+    for (int col = 0; col < BOARD_SIZE; col++) {
+      if (board[row][col] != CELL_EMPTY ||
+          !HasNeighbor(board, row, col, radius))
+        continue;
+
+      const long long attack =
+          EvaluatePositionHard(row, col, botPiece, board);
+      const long long defense =
+          EvaluatePositionHard(row, col, playerPiece, board);
+      moves[count++] = {row, col, attack + defense};
     }
   }
 
-  // Sort các nước đi để Alpha-Beta Pruning làm việc hiệu suất tối đa (Move
-  // Ordering)
-  std::sort(moves, moves + count,
-            [](const Move &a, const Move &b) { return a.score > b.score; });
-
-  // Trong GeneratePotentialMoves, thay dòng cuối:
-  // return std::min(count, 15);  ← Xóa dòng này
-  return GetBeamWidth(depth, count); // ← Truyền depth vào hàm
+  std::sort(moves, moves + count, CompareSearchMoves);
+  return GetBeamWidth(depth, count, config);
 }
 
-// ========================================================================
-// HÀM HỖ TRỢ 2: ĐÁNH GIÁ TOÀN CỤC BÀN CỜ
-// Giờ đọc từ scratch board thay vì current().board
-// ========================================================================
-static long long EvaluateBoard(int botPiece, int playerPiece,
-                               ScratchBoard scratch) {
-
+static long long EvaluateBoard(const ScratchBoard board, int botPiece,
+                               int playerPiece) {
   long long totalScore = 0;
-  for (int r = 0; r < BOARD_SIZE; r++) {
-    for (int c = 0; c < BOARD_SIZE; c++) {
-      if (scratch[r][c] == botPiece) {
-        long long score = EvaluatePositionHard(r, c, botPiece, scratch, true);
-        // Nếu BOT xếp được 5 quân -> Thắng chắc -> Dừng hàm!
+  for (int row = 0; row < BOARD_SIZE; row++) {
+    for (int col = 0; col < BOARD_SIZE; col++) {
+      if (board[row][col] == botPiece) {
+        const long long score =
+            EvaluatePositionHard(row, col, botPiece, board, true);
         if (score >= HARD_SCORES[WIN])
-          return INF / 2;
+          return SEARCH_INF / 2;
         totalScore += score;
-      } else if (scratch[r][c] == playerPiece) {
-        long long score =
-            EvaluatePositionHard(r, c, playerPiece, scratch, true);
-        // Nếu NGƯỜI CHƠI xếp được 5 quân -> Thua chắc -> Dừng hàm!
+      } else if (board[row][col] == playerPiece) {
+        const long long score =
+            EvaluatePositionHard(row, col, playerPiece, board, true);
         if (score >= HARD_SCORES[WIN])
-          return -INF / 2;
-        totalScore -=
-            score * 3 / 2; // Dùng số nguyên thay vì 1.5 để tránh truncation
+          return -SEARCH_INF / 2;
+        totalScore -= score * 3 / 2;
       }
     }
   }
   return totalScore;
 }
 
-// ========================================================================
-// THUẬT TOÁN MINIMAX KẾT HỢP ALPHA-BETA PRUNING
-// Giờ thao tác trên scratch board thay vì current().board
-// ========================================================================
-static long long Minimax(int depth, long long alpha, long long beta,
-                         bool isMaximizing, int botPiece, int playerPiece,
-                         ScratchBoard scratch) {
-  // CHỈ đánh giá toàn cục khi chạm đáy hoặc hết bàn cờ
+static long long AlphaBeta(ScratchBoard board, int depth, long long alpha,
+                           long long beta, int maximizing, int botPiece,
+                           int playerPiece, SearchContext *context) {
+  context->stats->visitedNodes++;
+  if (IsSearchTimedOut(context))
+    return 0;
   if (depth == 0)
-    return EvaluateBoard(botPiece, playerPiece, scratch);
+    return EvaluateBoard(board, botPiece, playerPiece);
 
-  Move potentialMoves[BOARD_SIZE * BOARD_SIZE];
-  int moveCount = GeneratePotentialMoves(potentialMoves, botPiece, playerPiece,
-                                         scratch, depth);
-
+  SearchMove moves[BOARD_SIZE * BOARD_SIZE];
+  const int moveCount = GeneratePotentialMoves(
+      moves, botPiece, playerPiece, board, depth, context->config);
   if (moveCount == 0)
-    return EvaluateBoard(botPiece, playerPiece, scratch);
+    return EvaluateBoard(board, botPiece, playerPiece);
 
-  if (isMaximizing) {
-    long long maxEval = -INF;
+  if (maximizing) {
+    long long best = -SEARCH_INF;
     for (int i = 0; i < moveCount; i++) {
-      int r = potentialMoves[i].r;
-      int c = potentialMoves[i].c;
+      const int row = moves[i].row;
+      const int col = moves[i].col;
+      board[row][col] = botPiece;
 
-      scratch[r][c] = botPiece; // Đánh thử trên bàn cờ ẢO
+      long long score;
+      if (EvaluatePositionHard(row, col, botPiece, board) >= HARD_SCORES[WIN])
+        score = SEARCH_INF / 2 + depth;
+      else
+        score = AlphaBeta(board, depth - 1, alpha, beta, 0, botPiece,
+                          playerPiece, context);
+      board[row][col] = CELL_EMPTY;
 
-      long long eval = 0;
-      // KIỂM TRA DỪNG SỚM SIÊU TỐC: Chỉ chấm điểm đúng ô vừa đánh
-      // Cần đồng bộ trước khi gọi EvaluatePosition
-      if (EvaluatePositionHard(r, c, botPiece, scratch) >= HARD_SCORES[WIN]) {
-        eval = INF / 2 + depth; // Ưu tiên thắng nhanh
-      } else {
-        eval = Minimax(depth - 1, alpha, beta, false, botPiece, playerPiece,
-                       scratch);
-      }
-
-      scratch[r][c] = 0; // Backtracking trên bàn cờ ẢO
-
-      maxEval = std::max(maxEval, eval);
-      alpha = std::max(alpha, eval);
-      if (beta <= alpha)
+      if (context->timedOut)
+        return 0;
+      best = std::max(best, score);
+      alpha = std::max(alpha, score);
+      if (beta <= alpha) {
+        context->stats->prunedBranches += moveCount - i - 1;
         break;
-    }
-    return maxEval;
-  } else {
-    long long minEval = INF;
-    for (int i = 0; i < moveCount; i++) {
-      int r = potentialMoves[i].r;
-      int c = potentialMoves[i].c;
-
-      scratch[r][c] = playerPiece; // Người đánh thử trên bàn cờ ẢO
-
-      long long eval = 0;
-      // Kịch bản xấu: Người chơi đi nước này là mình thua luôn
-      if (EvaluatePositionHard(r, c, playerPiece, scratch) >=
-          HARD_SCORES[WIN]) {
-        eval = -INF / 2 - depth; // Ưu tiên thua chậm (phòng thủ)
-      } else {
-        eval = Minimax(depth - 1, alpha, beta, true, botPiece, playerPiece,
-                       scratch);
       }
-
-      scratch[r][c] = 0; // Backtracking trên bàn cờ ẢO
-
-      minEval = std::min(minEval, eval);
-      beta = std::min(beta, eval);
-      if (beta <= alpha)
-        break;
     }
-    return minEval;
+    return best;
   }
+
+  long long best = SEARCH_INF;
+  for (int i = 0; i < moveCount; i++) {
+    const int row = moves[i].row;
+    const int col = moves[i].col;
+    board[row][col] = playerPiece;
+
+    long long score;
+    if (EvaluatePositionHard(row, col, playerPiece, board) >= HARD_SCORES[WIN])
+      score = -SEARCH_INF / 2 - depth;
+    else
+      score = AlphaBeta(board, depth - 1, alpha, beta, 1, botPiece,
+                        playerPiece, context);
+    board[row][col] = CELL_EMPTY;
+
+    if (context->timedOut)
+      return 0;
+    best = std::min(best, score);
+    beta = std::min(beta, score);
+    if (beta <= alpha) {
+      context->stats->prunedBranches += moveCount - i - 1;
+      break;
+    }
+  }
+  return best;
 }
 
-// ========================================================================
-// HÀM CHÍNH CHO TRÙM CUỐI
-// ========================================================================
-void GetHardMove(int &outRow, int &outCol) {
-  int botPiece = current().turn;
-  int playerPiece = (botPiece == CELL_X) ? CELL_O : CELL_X;
+static SearchResult MakeImmediateResult(int row, int col, long long score,
+                                        long long startNs) {
+  SearchResult result = {};
+  result.row = row;
+  result.col = col;
+  result.score = score;
+  result.stats.elapsedMs = (GetNowNs() - startNs) / 1000000.0;
+  return result;
+}
 
-  // === AN TOÀN: Tạo bản sao toàn bộ bàn cờ thật ===
-  ScratchBoard backup;
-  CopyBoard(current().board, backup);
+SearchResult FindHardMove(const int board[][BOARD_SIZE], int botPiece,
+                          SearchConfig config) {
+  const long long startNs = GetNowNs();
+  if (config.maxDepth < 1)
+    config.maxDepth = 1;
+  if (config.timeLimitMs < 1)
+    config.timeLimitMs = 1;
 
-  // === Tạo scratch board cho toàn bộ quá trình tìm kiếm ===
+  SearchResult result = {};
+  result.row = -1;
+  result.col = -1;
+  result.score = -SEARCH_INF;
+
+  const int playerPiece = (botPiece == CELL_X) ? CELL_O : CELL_X;
   ScratchBoard scratch;
-  CopyBoard(current().board, scratch);
+  std::memcpy(scratch, board, sizeof(scratch));
 
-  Move potentialMoves[BOARD_SIZE * BOARD_SIZE];
-  int moveCount = GeneratePotentialMoves(potentialMoves, botPiece, playerPiece,
-                                         scratch, MAX_DEPTH);
+  SearchMove rootMoves[BOARD_SIZE * BOARD_SIZE];
+  const int rootMoveCount = GeneratePotentialMoves(
+      rootMoves, botPiece, playerPiece, scratch, config.maxDepth, config);
 
-  if (moveCount == 0) {
-    outRow = BOARD_SIZE / 2;
-    outCol = BOARD_SIZE / 2;
-    // Phục hồi bàn cờ thật trước khi return
-    RestoreBoard(current().board, backup);
-    return;
+  if (rootMoveCount == 0) {
+    const int center = BOARD_SIZE / 2;
+    if (scratch[center][center] == CELL_EMPTY) {
+      result.row = center;
+      result.col = center;
+      result.score = 0;
+    }
+    result.stats.elapsedMs = (GetNowNs() - startNs) / 1000000.0;
+    return result;
   }
 
-  long long bestScore = -INF;
-  int bestRow = -1, bestCol = -1;
+  for (int i = 0; i < rootMoveCount; i++) {
+    const int row = rootMoves[i].row;
+    const int col = rootMoves[i].col;
+    scratch[row][col] = botPiece;
+    const long long score = EvaluatePositionHard(row, col, botPiece, scratch);
+    scratch[row][col] = CELL_EMPTY;
+    if (score >= HARD_SCORES[WIN])
+      return MakeImmediateResult(row, col, SEARCH_INF / 2, startNs);
+  }
 
-  for (int i = 0; i < moveCount; i++) {
-    int r = potentialMoves[i].r;
-    int c = potentialMoves[i].c;
+  for (int i = 0; i < rootMoveCount; i++) {
+    const int row = rootMoves[i].row;
+    const int col = rootMoves[i].col;
+    scratch[row][col] = playerPiece;
+    const long long score =
+        EvaluatePositionHard(row, col, playerPiece, scratch);
+    scratch[row][col] = CELL_EMPTY;
+    if (score >= HARD_SCORES[WIN])
+      return MakeImmediateResult(row, col, SEARCH_INF / 2 - 1, startNs);
+  }
 
-    scratch[r][c] = botPiece; // Đánh thử trên bàn cờ ẢO
+  SearchContext context = {};
+  context.deadlineNs = startNs + (long long)config.timeLimitMs * 1000000LL;
+  context.config = config;
+  context.stats = &result.stats;
 
-    long long score = 0;
-    // ƯU TIÊN #1: Kiểm tra xem bước này có thắng luôn không
-    if (EvaluatePositionHard(r, c, botPiece, scratch) >= HARD_SCORES[WIN]) {
-      outRow = r;
-      outCol = c;
-      // Phục hồi bàn cờ thật trước khi return
-      RestoreBoard(current().board, backup);
-      return; // Trúng Jackpot, trả kết quả về luôn!
+  for (int targetDepth = 1; targetDepth <= config.maxDepth; targetDepth++) {
+    long long iterationBestScore = -SEARCH_INF;
+    int iterationBestRow = -1;
+    int iterationBestCol = -1;
+    long long alpha = -SEARCH_INF;
+
+    for (int i = 0; i < rootMoveCount; i++) {
+      if (IsSearchTimedOut(&context))
+        break;
+
+      const int row = rootMoves[i].row;
+      const int col = rootMoves[i].col;
+      scratch[row][col] = botPiece;
+      const long long score =
+          AlphaBeta(scratch, targetDepth - 1, alpha, SEARCH_INF, 0, botPiece,
+                    playerPiece, &context);
+      scratch[row][col] = CELL_EMPTY;
+
+      if (context.timedOut)
+        break;
+      if (score > iterationBestScore) {
+        iterationBestScore = score;
+        iterationBestRow = row;
+        iterationBestCol = col;
+      }
+      alpha = std::max(alpha, score);
     }
 
-    scratch[r][c] = 0; // Backtracking trên bàn cờ ẢO (cho lượt check tấn công)
+    if (context.timedOut)
+      break;
+    result.row = iterationBestRow;
+    result.col = iterationBestCol;
+    result.score = iterationBestScore;
+    result.stats.completedDepth = targetDepth;
   }
 
-  // ƯU TIÊN #2: Kiểm tra phòng thủ ngay lập tức — nếu đối thủ đánh vào ô nào đó
-  // là THẮNG LUÔN → chặn ngay!
-  for (int i = 0; i < moveCount; i++) {
-    int r = potentialMoves[i].r;
-    int c = potentialMoves[i].c;
-
-    scratch[r][c] = playerPiece; // Giả lập đối thủ đánh vào đây
-    if (EvaluatePositionHard(r, c, playerPiece, scratch) >= HARD_SCORES[WIN]) {
-      outRow = r;
-      outCol = c;
-      RestoreBoard(current().board, backup);
-      return; // Phải chặn ngay, không thì thua!
-    }
-    scratch[r][c] = 0; // Backtracking
+  if (result.row < 0) {
+    result.row = rootMoves[0].row;
+    result.col = rootMoves[0].col;
+    result.score = rootMoves[0].score;
   }
+  result.stats.elapsedMs = (GetNowNs() - startNs) / 1000000.0;
+  return result;
+}
 
-  // ƯU TIÊN #3: Nếu không có thắng/thua ngay → chạy Minimax để tìm nước tốt
-  // nhất
-  for (int i = 0; i < moveCount; i++) {
-    int r = potentialMoves[i].r;
-    int c = potentialMoves[i].c;
+SearchResult GetLastHardSearchResult() { return lastHardSearchResult; }
 
-    scratch[r][c] = botPiece;
-    long long score = Minimax(MAX_DEPTH - 1, -INF, INF, false, botPiece,
-                              playerPiece, scratch);
-    scratch[r][c] = 0;
+void PrintHardSearchStats(SearchResult result) {
+  std::printf("\n[HARD AI SEARCH]\n");
+  std::printf("Move: (%d, %d)  Score: %lld\n", result.row, result.col,
+              result.score);
+  std::printf("Depth: %d  Nodes: %llu  Pruned: %llu\n",
+              result.stats.completedDepth, result.stats.visitedNodes,
+              result.stats.prunedBranches);
+  std::printf("Time: %.2f ms  Timeout: %s\n", result.stats.elapsedMs,
+              result.stats.timedOut ? "yes" : "no");
+}
 
-    if (score > bestScore) {
-      bestScore = score;
-      bestRow = r;
-      bestCol = c;
-    }
-  }
-
-  // === PHỤC HỒI BÀN CỜ THẬT (đảm bảo không bao giờ bị hỏng) ===
-  RestoreBoard(current().board, backup);
-
-  outRow = bestRow;
-  outCol = bestCol;
+void GetHardMove(int &outRow, int &outCol) {
+  SearchConfig config = {5, 300, 0};
+  lastHardSearchResult =
+      FindHardMove(current().board, current().turn, config);
+  outRow = lastHardSearchResult.row;
+  outCol = lastHardSearchResult.col;
+  PrintHardSearchStats(lastHardSearchResult);
 }

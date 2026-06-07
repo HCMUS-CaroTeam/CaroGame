@@ -3,6 +3,7 @@
 #include "ai_medium.h"
 #include "ai_hard.h"
 #include "Model/game_data.h"
+#include "Model/logic.h"
 #include "raylib.h"
 
 
@@ -23,9 +24,8 @@ void BotMakeMove() {
         GetHardMove(r, c);
     }
     // Thực hiện nước đi
-    if (r != -1 && c != -1 && current().board[r][c] == 0) {
-        current().board[r][c] = current().turn;
-        current().lastMoveRow = r;
-        current().lastMoveCol = c;
-    }
+    GameMove move = {r, c, current().turn};
+    GameMoveResult result = ApplyMove(&current(), move);
+    if (result.accepted)
+        ResetTurnTimer();
 }
