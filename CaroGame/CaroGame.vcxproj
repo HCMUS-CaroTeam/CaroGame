@@ -142,6 +142,7 @@
     <ClCompile Include="src/Control\input_mouse.cpp" />
     <ClCompile Include="src\Control\name_input_data.cpp" />
     <ClCompile Include="src\Model\AI\ai_bot.cpp" />
+    <ClCompile Include="src\Model\AI\ai_technical_demo.cpp" />
     <ClCompile Include="src\Model\AI\ai_easy.cpp" />
     <ClCompile Include="src\Model\AI\ai_evaluation.cpp" />
     <ClCompile Include="src\Model\AI\ai_hard.cpp" />
