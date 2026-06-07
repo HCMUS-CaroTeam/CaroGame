@@ -92,14 +92,15 @@ Icon button:
 ============================================================
 */
 
-// Main Menu Buttons
+// Main Menu Buttons — 5 nút dàn ngang phía dưới
+// Layout: 5 x (220 x 55), gap 20, tổng 1180, căn giữa trong 1600 → startX=210, Y=810
 Button gMainMenuButtons[] =
 {
-    { Vector2{ 110.0f, 420.0f }, Vector2{ 266.0f, 50.0f }, "PLAY",    BTN_PLAY,    BUTTON_VISUAL_TEXT, BUTTON_ICON_NONE, 24.0f, 4.0f },
-    { Vector2{ 110.0f, 478.0f }, Vector2{ 248.0f, 46.0f }, "LOAD",    BTN_LOAD,    BUTTON_VISUAL_TEXT, BUTTON_ICON_NONE, 20.0f, 3.0f },
-    { Vector2{ 110.0f, 538.0f }, Vector2{ 248.0f, 46.0f }, "ABOUT",   BTN_ABOUT,   BUTTON_VISUAL_TEXT, BUTTON_ICON_NONE, 20.0f, 3.0f },
-    { Vector2{ 110.0f, 592.0f }, Vector2{ 248.0f, 46.0f }, "SETTING", BTN_SETTING, BUTTON_VISUAL_TEXT, BUTTON_ICON_NONE, 20.0f, 3.0f },
-    { Vector2{ 110.0f, 652.0f }, Vector2{ 248.0f, 46.0f }, "EXIT",    BTN_EXIT,    BUTTON_VISUAL_TEXT, BUTTON_ICON_NONE, 20.0f, 3.0f }
+    { Vector2{ 210.0f, 810.0f }, Vector2{ 220.0f, 55.0f }, "PLAY",    BTN_PLAY,    BUTTON_VISUAL_TEXT, BUTTON_ICON_NONE, 22.0f, 3.0f },
+    { Vector2{ 450.0f, 810.0f }, Vector2{ 220.0f, 55.0f }, "LOAD",    BTN_LOAD,    BUTTON_VISUAL_TEXT, BUTTON_ICON_NONE, 22.0f, 3.0f },
+    { Vector2{ 690.0f, 810.0f }, Vector2{ 220.0f, 55.0f }, "ABOUT",   BTN_ABOUT,   BUTTON_VISUAL_TEXT, BUTTON_ICON_NONE, 22.0f, 3.0f },
+    { Vector2{ 930.0f, 810.0f }, Vector2{ 220.0f, 55.0f }, "SETTING", BTN_SETTING, BUTTON_VISUAL_TEXT, BUTTON_ICON_NONE, 22.0f, 3.0f },
+    { Vector2{ 1170.0f, 810.0f }, Vector2{ 220.0f, 55.0f }, "EXIT",   BTN_EXIT,    BUTTON_VISUAL_TEXT, BUTTON_ICON_NONE, 22.0f, 3.0f }
 };
 
 int gMainMenuButtonCount = sizeof(gMainMenuButtons) / sizeof(gMainMenuButtons[0]);

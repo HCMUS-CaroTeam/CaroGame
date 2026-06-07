@@ -40,24 +40,26 @@ static void DrawBossPreview(Texture2D avatar, Rectangle dialogBounds, BossData d
     float leftWidth = 220.0f;
     float rightWidth = dialogBounds.width - leftWidth;
 
-    // 2. NỬA TRÁI - Avatar (Ép tự động vừa ô)
-    Rectangle leftPane = { dialogBounds.x, dialogBounds.y, leftWidth, dialogBounds.height };
-    
+    // 2. NỬA TRÁI - Avatar với khung giống màn Play
+    const float frameSize = dialogBounds.height - 20.0f;
+    Rectangle avatarFrameRect = {
+        dialogBounds.x + (leftWidth - frameSize) * 0.5f,
+        dialogBounds.y + 10.0f,
+        frameSize,
+        frameSize
+    };
+    DrawCardFrame(avatarFrameRect);
+    DrawRectangleRounded(
+        Rectangle{ avatarFrameRect.x + 8.0f, avatarFrameRect.y + 8.0f, avatarFrameRect.width - 16.0f, avatarFrameRect.height - 16.0f },
+        0.04f, 5, Color{ 206, 218, 170, 210 }
+    );
+
     if (avatar.id != 0) {
-        // Tự động tính tỷ lệ scale sao cho avatar không vượt quá 150 pixel
-        float maxAvatarSize = 150.0f;
-        float scaleX = maxAvatarSize / static_cast<float>(avatar.width);
-        float scaleY = maxAvatarSize / static_cast<float>(avatar.height);
-        float finalScale = (scaleX < scaleY) ? scaleX : scaleY; // Lấy scale nhỏ hơn để ko bị méo
-
-        float scaledW = avatar.width * finalScale;
-        float scaledH = avatar.height * finalScale;
-        
-        // Căn giữa hình sau khi đã resize
-        float avatarX = leftPane.x + (leftPane.width - scaledW) / 2.0f;
-        float avatarY = leftPane.y + (leftPane.height - scaledH) / 2.0f;
-
-        DrawTextureEx(avatar, Vector2{ avatarX, avatarY }, 0.0f, finalScale, WHITE);
+        const float pad = 14.0f;
+        Rectangle dest = { avatarFrameRect.x + pad, avatarFrameRect.y + pad, avatarFrameRect.width - pad * 2.0f, avatarFrameRect.height - pad * 2.0f };
+        DrawTexturePro(avatar,
+            Rectangle{ 0.0f, 0.0f, static_cast<float>(avatar.width), static_cast<float>(avatar.height) },
+            dest, Vector2{ 0.0f, 0.0f }, 0.0f, WHITE);
     }
 
     // 3. NỬA PHẢI - Text (Canh trái với padding nhỏ gọn)

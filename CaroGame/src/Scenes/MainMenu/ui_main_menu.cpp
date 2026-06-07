@@ -40,7 +40,7 @@ static void LoadMainMenuAssets()
         return;
     }
 
-    gMenuBg = LoadTextureFromCandidates("assets/bg/story_bg.png", "Assets/bg/story_bg.png");
+    gMenuBg = LoadTextureFromCandidates("assets/bg/main_menu.png", "Assets/bg/main_menu.png");
     gMenuLogo = LoadTextureFromCandidates("assets/bg/game name.png", "Assets/bg/game name.png");
     gMenuButtonIdle = LoadTextureFromCandidates("assets/buttons/button1.png", "Assets/buttons/button1.png");
     gMenuButtonHover = LoadTextureFromCandidates("assets/buttons/pixil-layer-9.png", "Assets/buttons/pixil-layer-9.png");
@@ -192,17 +192,17 @@ static void DrawMainMenuLogo()
     }
 
     const float time = static_cast<float>(GetTime());
-    const float targetWidth = 390.0f;
+    const float targetWidth = 900.0f;
     const float scale = targetWidth / static_cast<float>(gMenuLogo.width);
     const float targetHeight = static_cast<float>(gMenuLogo.height) * scale;
     const float floatOffset = sinf(time * 1.05f) * 7.0f;
-    const float menuCenterX = 110.0f + 266.0f * 0.5f;
-    const float logoX = menuCenterX - targetWidth * 0.5f;
+    const float logoX = SCREEN_WIDTH * 0.5f - targetWidth * 0.5f;
+    const float logoY = (SCREEN_HEIGHT - targetHeight) * 0.5f + floatOffset;
 
     DrawTexturePro(
         gMenuLogo,
         Rectangle{ 0.0f, 0.0f, static_cast<float>(gMenuLogo.width), static_cast<float>(gMenuLogo.height) },
-        Rectangle{ logoX, 240.0f + floatOffset, targetWidth, targetHeight },
+        Rectangle{ logoX, logoY, targetWidth, targetHeight },
         Vector2{ 0.0f, 0.0f },
         0.0f,
         WHITE
@@ -271,23 +271,10 @@ static void DrawMainMenuButton(const Button& button, Font fontTitle, bool hovere
         DrawRectangleRoundedLinesEx(rect, 0.18f, 8, 2.0f, Color{ 196, 24, 64, 255 });
     }
 
-    const Texture2D* pipTex = hovered && IsTextureReadyEx(gMenuPipHover) ? &gMenuPipHover : &gMenuPipIdle;
-    const Rectangle pipRect{
-        rect.x + 15.0f,
-        rect.y + rect.height * 0.5f - 9.0f,
-        hovered ? 17.0f : 14.0f,
-        hovered ? 17.0f : 14.0f
-    };
-
-    if (pipTex && IsTextureReadyEx(*pipTex))
-    {
-        DrawTextureIntoRect(*pipTex, pipRect, WHITE);
-    }
-
     const char* text = button.title.c_str();
     const Vector2 textSize = MeasureTextEx(fontTitle, text, button.fontSize, button.textSpacing);
     const Vector2 textPos{
-        rect.x + rect.width * 0.5f - textSize.x * 0.5f + 9.0f,
+        rect.x + rect.width * 0.5f - textSize.x * 0.5f,
         rect.y + rect.height * 0.5f - textSize.y * 0.5f - 5.0f
     };
 
@@ -392,11 +379,6 @@ void DrawMainMenuUI(Font fontTitle, Font fontSmall, const MouseState& mouse)
         const Rectangle hitRect = GetButtonRect(gMainMenuButtons[i]);
         const bool hovered = IsMouseOverRect(mouse, hitRect);
         const bool pressed = hovered && mouse.leftDown;
-
-        if (i == 2 || i == 4)
-        {
-            DrawMainMenuDivider(GetButtonRect(gMainMenuButtons[i - 1]), hitRect);
-        }
 
         DrawMainMenuButton(gMainMenuButtons[i], fontTitle, hovered, pressed);
     }
