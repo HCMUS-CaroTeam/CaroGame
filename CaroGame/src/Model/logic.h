@@ -18,6 +18,31 @@
 #ifndef LOGIC_H
 #define LOGIC_H
 
+#include "Model/game_data.h"
+
+struct GameMove {
+  int row;
+  int col;
+  int piece;
+};
+
+struct GameMoveResult {
+  int accepted;
+  int placedPiece;
+};
+
+struct GameWinInfo {
+  int result;
+  int lineCount;
+  int line[MAX_WIN_LINE][2];
+};
+
+int IsValidMove(const int board[][BOARD_SIZE], int row, int col);
+GameMoveResult ApplyMove(DataGame *game, GameMove move);
+GameWinInfo CheckWinOnBoard(const int board[][BOARD_SIZE], int lastRow,
+                            int lastCol, int applyBlockRule);
+void ResetTurnTimer();
+
 /**
  * @brief Cập nhật bộ đếm thời gian mỗi frame.
  *

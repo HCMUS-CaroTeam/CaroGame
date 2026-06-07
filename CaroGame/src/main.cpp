@@ -17,6 +17,8 @@
 #include "Scenes/Notify/ui_notify.h"
 #include "Scenes/Setup/ui_name_setup.h"
 #include "Scenes/Story/ui_story.h"
+#include "Model/AI/ai_technical_demo.h"
+#include <cstring>
 
 
 
@@ -62,8 +64,21 @@ static Font LoadFontSafe(const char* path, int size)
 }
 
 
-int main()
+int main(int argc, char *argv[])
 {
+    if (argc > 1 && std::strcmp(argv[1], "--ai-tests") == 0)
+        return RunLogicAITechnicalTests();
+    if (argc > 1 && std::strcmp(argv[1], "--heuristic-demo") == 0)
+    {
+        PrintHeuristicHeatmapDemo();
+        return 0;
+    }
+    if (argc > 1 && std::strcmp(argv[1], "--ai-vs-ai") == 0)
+    {
+        RunAIVsAIDemo(3);
+        return 0;
+    }
+
     InitWindow(SCREEN_WIDTH, SCREEN_HEIGHT, "CaroGame");
     SetExitKey(KEY_NULL);
     SetTargetFPS(TARGET_FPS);
