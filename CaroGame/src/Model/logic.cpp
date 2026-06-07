@@ -1,236 +1,229 @@
-#include "Logic.h" // Chứa khai báo của các hàm bên dưới
+#include "Logic.h"
+
 #include "../raylib/include/raylib.h"
 #include "Model/game_data.h"
 
-static float TIME_LIMIT =
-    0.0f; // Thời gian tối đa cho mỗi lượt đi, dùng để reset khi hết giờ
-static float TIME_LEFT =
-    0.0f; // Biến toàn cục để theo dõi thời gian còn lại cho lượt đi hiện tại
-static bool timerInitialized =
-    false; // Biến toàn cục để theo dõi trạng thái khởi tạo timer
+static float TIME_LIMIT = 0.0f;
+static float TIME_LEFT = 0.0f;
+static bool timerInitialized = false;
+
+int IsValidMove(const int board[][BOARD_SIZE], int row, int col) {
+  if (row < 0 || row >= BOARD_SIZE || col < 0 || col >= BOARD_SIZE)
+    return 0;
+  return board[row][col] == CELL_EMPTY;
+}
+
+GameMoveResult ApplyMove(DataGame *game, GameMove move) {
+  GameMoveResult result = {0, CELL_EMPTY};
+  if (game == nullptr || !IsValidMove(game->board, move.row, move.col))
+    return result;
+  if (move.piece != CELL_X && move.piece != CELL_O)
+    return result;
+
+  game->board[move.row][move.col] = move.piece;
+  game->lastMoveRow = move.row;
+  game->lastMoveCol = move.col;
+  result.accepted = 1;
+  result.placedPiece = move.piece;
+  return result;
+}
+
+GameWinInfo CheckWinOnBoard(const int board[][BOARD_SIZE], int lastRow,
+                            int lastCol, int applyBlockRule) {
+  GameWinInfo info = {};
+  info.result = RESULT_ONGOING;
+
+  if (lastRow < 0 || lastRow >= BOARD_SIZE || lastCol < 0 ||
+      lastCol >= BOARD_SIZE)
+    return info;
+
+  const int player = board[lastRow][lastCol];
+  if (player != CELL_X && player != CELL_O)
+    return info;
+
+  const int deltaRows[] = {0, 1, 1, 1};
+  const int deltaCols[] = {1, 0, 1, -1};
+
+  for (int direction = 0; direction < 4; direction++) {
+    int count = 1;
+    int blockedEnds = 0;
+
+    for (int step = 1;; step++) {
+      const int row = lastRow + step * deltaRows[direction];
+      const int col = lastCol + step * deltaCols[direction];
+      if (row < 0 || row >= BOARD_SIZE || col < 0 || col >= BOARD_SIZE) {
+        blockedEnds++;
+        break;
+      }
+      if (board[row][col] == player) {
+        count++;
+      } else {
+        if (board[row][col] != CELL_EMPTY)
+          blockedEnds++;
+        break;
+      }
+    }
+
+    for (int step = 1;; step++) {
+      const int row = lastRow - step * deltaRows[direction];
+      const int col = lastCol - step * deltaCols[direction];
+      if (row < 0 || row >= BOARD_SIZE || col < 0 || col >= BOARD_SIZE) {
+        blockedEnds++;
+        break;
+      }
+      if (board[row][col] == player) {
+        count++;
+      } else {
+        if (board[row][col] != CELL_EMPTY)
+          blockedEnds++;
+        break;
+      }
+    }
+
+    if (count != WIN_LENGTH ||
+        (applyBlockRule && blockedEnds >= 2))
+      continue;
+
+    int startStep = 0;
+    while (true) {
+      const int row =
+          lastRow + (startStep - 1) * deltaRows[direction];
+      const int col =
+          lastCol + (startStep - 1) * deltaCols[direction];
+      if (row < 0 || row >= BOARD_SIZE || col < 0 || col >= BOARD_SIZE ||
+          board[row][col] != player)
+        break;
+      startStep--;
+    }
+
+    for (int index = 0; index < WIN_LENGTH; index++) {
+      info.line[index][0] =
+          lastRow + (startStep + index) * deltaRows[direction];
+      info.line[index][1] =
+          lastCol + (startStep + index) * deltaCols[direction];
+    }
+    info.lineCount = WIN_LENGTH;
+    info.result = player == CELL_X ? RESULT_X_WINS : RESULT_O_WINS;
+    return info;
+  }
+
+  return info;
+}
 
 int UpdateTimer() {
-  // Chỉ đếm giờ khi đang ở chế độ PVP TOURNAMENT hoặc MODE_PVE, còn lại thì bỏ
-  // qua phần đếm giờ
   if (current().gameMode == MODE_PVP && current().pvpMode != TOURNAMENT)
     return 0;
-
-  // Nếu không có giới hạn thời gian thì bỏ qua
   if (current().timeLeft == TIME_LIMIT_NONE)
     return 0;
 
   if (!timerInitialized) {
     timerInitialized = true;
-    switch (current().timeLeft) {
-    case TIME_LIMIT_5S:
+    if (current().timeLeft == TIME_LIMIT_5S)
       TIME_LIMIT = 5.0f;
-      break;
-    case TIME_LIMIT_10S:
+    else if (current().timeLeft == TIME_LIMIT_10S)
       TIME_LIMIT = 10.0f;
-      break;
-    case TIME_LIMIT_15S:
+    else
       TIME_LIMIT = 15.0f;
-      break;
-    default:
-      TIME_LIMIT = 15.0f; // Fallback an toàn — tránh TIME_LIMIT=0
-      break;
-    }
     TIME_LEFT = TIME_LIMIT;
   }
 
-  // Safeguard: nếu TIME_LIMIT không hợp lệ thì không đếm
   if (TIME_LIMIT <= 0.0f)
     return 0;
 
   TIME_LEFT -= GetFrameTime();
-
-  if (TIME_LEFT <= 0.0f) {
-    // Đổi lượt rõ ràng bằng ternary (tránh dùng negation)
-    current().turn = (current().turn == CELL_X) ? CELL_O : CELL_X;
-    TIME_LEFT = TIME_LIMIT;
-    return -99;
-  }
-
-  return 0;
-}
-
-int CheckBoard(int pX, int pY) {
-  if (pX < BOARD_START_X || pY < BOARD_START_Y)
-    return 0; // Sửa lỗi tính toán sai khi click âm phía trên bên trái
-
-  int col = static_cast<int>((pX - BOARD_START_X) / CELL_SIZE);
-  int row = static_cast<int>((pY - BOARD_START_Y) / CELL_SIZE);
-
-  // Rớt ngoài bàn cờ thì cút
-  if (row < 0 || row >= BOARD_SIZE || col < 0 || col >= BOARD_SIZE)
+  if (TIME_LEFT > 0.0f)
     return 0;
 
-  // Nếu ô trống thì cho đánh
-  if (current().board[row][col] == 0) {
-    current().board[row][col] = (current().turn == CELL_X) ? CELL_X : CELL_O;
+  current().turn = current().turn == CELL_X ? CELL_O : CELL_X;
+  TIME_LEFT = TIME_LIMIT;
+  return -99;
+}
 
-    // Cập nhật vị trí nước đi cuối cùng
-    current().lastMoveRow = row;
-    current().lastMoveCol = col;
+int CheckBoard(int pixelX, int pixelY) {
+  if (pixelX < BOARD_START_X || pixelY < BOARD_START_Y)
+    return 0;
 
-    // Đánh xong thì reset Timer
-    // Chỉ reset timer khi đang ở chế độ có giới hạn thời gian
-    if (current().gameMode == MODE_PVE || current().pvpMode == TOURNAMENT) {
-      TIME_LEFT = TIME_LIMIT;
-    }
+  const int col = static_cast<int>((pixelX - BOARD_START_X) / CELL_SIZE);
+  const int row = static_cast<int>((pixelY - BOARD_START_Y) / CELL_SIZE);
+  GameMove move = {row, col, current().turn};
+  GameMoveResult result = ApplyMove(&current(), move);
+  if (!result.accepted)
+    return 0;
 
-    return current().board[row][col]; // Trả về con cờ vừa đánh
-  }
+  ResetTurnTimer();
+  return result.placedPiece;
+}
 
-  return 0; // Click trùng ô đã đánh
+void ResetTurnTimer() {
+  if (current().gameMode == MODE_PVE || current().pvpMode == TOURNAMENT)
+    TIME_LEFT = TIME_LIMIT;
 }
 
 int TestBoard(int lastRow, int lastCol) {
-  // 4 hướng: Ngang, Dọc, Chéo chính, Chéo phụ
-  int dx[] = {0, 1, 1, 1};
-  int dy[] = {1, 0, 1, -1};
+  const int applyBlockRule =
+      current().pvpMode == TOURNAMENT || current().gameMode == MODE_PVE;
+  GameWinInfo info =
+      CheckWinOnBoard(current().board, lastRow, lastCol, applyBlockRule);
+  if (info.result == RESULT_ONGOING)
+    return RESULT_ONGOING;
 
-  int player = current().board[lastRow][lastCol];
-  if (player == 0)
-    return 0;
-
-  for (int dir = 0; dir < 4; dir++) {
-    int count = 1;  // Tính luôn quân vừa đánh
-    int blocks = 0; // Đếm số đầu bị chặn
-
-    // Quét chiều TỚI — KHÔNG giới hạn step để đếm chính xác toàn bộ chuỗi
-    for (int step = 1; ; step++) {
-      int nr = lastRow + step * dx[dir];
-      int nc = lastCol + step * dy[dir];
-
-      if (nr < 0 || nr >= BOARD_SIZE || nc < 0 || nc >= BOARD_SIZE) {
-        blocks++;
-        break; // Đụng tường = Bị chặn
-      }
-      if (current().board[nr][nc] == player)
-        count++;
-      else if (current().board[nr][nc] != 0) {
-        blocks++;
-        break;
-      } // Đụng địch = Bị chặn
-      else
-        break; // Ô trống thì dừng
-    }
-
-    // Quét chiều LÙI — KHÔNG giới hạn step
-    for (int step = 1; ; step++) {
-      int nr = lastRow - step * dx[dir];
-      int nc = lastCol - step * dy[dir];
-
-      if (nr < 0 || nr >= BOARD_SIZE || nc < 0 || nc >= BOARD_SIZE) {
-        blocks++;
-        break;
-      }
-      if (current().board[nr][nc] == player)
-        count++;
-      else if (current().board[nr][nc] != 0) {
-        blocks++;
-        break;
-      } else
-        break;
-    }
-
-    // --- LUẬT OVERLINE THỐNG NHẤT CHO MỌI MODE ---
-    // Chỉ thắng khi ĐÚNG 5 quân liên tiếp.
-    // Overline (> 5 quân) => KHÔNG THẮNG, bỏ qua hướng này.
-    if (count != WIN_LENGTH)
-      continue; // count < 5 => chưa đủ, count > 5 => overline
-
-    // Luật chặn 2 đầu: CHỈ áp dụng cho Tournament và PvE
-    // Classic mode: đủ đúng 5 là thắng, không cần kiểm tra chặn 2 đầu
-    bool applyBlockRule = (current().pvpMode == TOURNAMENT ||
-                           current().gameMode == MODE_PVE);
-    if (applyBlockRule && blocks >= 2)
-      continue;
-
-    // === THẮNG! Lưu đường thắng vào current().winLine ===
-
-    // Tìm điểm bắt đầu của chuỗi 5 quân (đi ngược từ lastRow/lastCol)
-    int startStep = 0;
-    while (true) {
-      int nr = lastRow + (startStep - 1) * dx[dir];
-      int nc = lastCol + (startStep - 1) * dy[dir];
-      if (nr < 0 || nr >= BOARD_SIZE || nc < 0 || nc >= BOARD_SIZE)
-        break;
-      if (current().board[nr][nc] == player)
-        startStep--;
-      else
-        break;
-    }
-
-    // Lưu đúng WIN_LENGTH (5) ô vào winLine
-    int idx = 0;
-    for (int step = startStep; idx < WIN_LENGTH; step++) {
-      int nr = lastRow + step * dx[dir];
-      int nc = lastCol + step * dy[dir];
-      current().winLine[idx][0] = nr;
-      current().winLine[idx][1] = nc;
-      idx++;
-    }
-    current().winLineCount = WIN_LENGTH; // Luôn đúng 5 ô
-
-    if (player == CELL_X) {
-      current().scorePlayer1++;
-    } else if (player == CELL_O) {
-      current().scorePlayer2++;
-    }
-    // Cập nhật kết quả vào current() để Control có thể xử lý
-    return (player == CELL_X) ? RESULT_X_WINS : RESULT_O_WINS;
+  current().winLineCount = info.lineCount;
+  for (int index = 0; index < info.lineCount; index++) {
+    current().winLine[index][0] = info.line[index][0];
+    current().winLine[index][1] = info.line[index][1];
   }
-  return RESULT_ONGOING; // Chưa có ai thắng, tiếp tục chơi
+
+  if (info.result == RESULT_X_WINS)
+    current().scorePlayer1++;
+  else if (info.result == RESULT_O_WINS)
+    current().scorePlayer2++;
+  return info.result;
 }
 
 void ResetBoard() {
-  for (int r = 0; r < BOARD_SIZE; r++)
-    for (int c = 0; c < BOARD_SIZE; c++)
-      current().board[r][c] = 0;
-  current().turn = CELL_X; // Mặc định X đi trước
-  current().result =
-      RESULT_ONGOING;       // Reset kết quả về ongoing khi reset bàn cờ
-  timerInitialized = false; // Reset trạng thái khởi tạo timer khi reset bàn cờ
-  current().lastMoveRow =
-      -1; // Reset vị trí nước đi cuối cùng về giá trị không hợp lệ
-  current().lastMoveCol =
-      -1; // Reset vị trí nước đi cuối cùng về giá trị không hợp lệ
-  current().winLine[0][0] = -1; // Reset đường thắng về giá trị không hợp lệ
-  current().winLineCount = 0;   // Reset số ô đường thắng
+  for (int row = 0; row < BOARD_SIZE; row++)
+    for (int col = 0; col < BOARD_SIZE; col++)
+      current().board[row][col] = CELL_EMPTY;
+
+  current().turn = CELL_X;
+  current().result = RESULT_ONGOING;
+  current().lastMoveRow = -1;
+  current().lastMoveCol = -1;
+  current().winLineCount = 0;
+  for (int index = 0; index < MAX_WIN_LINE; index++) {
+    current().winLine[index][0] = -1;
+    current().winLine[index][1] = -1;
+  }
+
+  timerInitialized = false;
+  TIME_LEFT = 0.0f;
 }
 
 void InitNewGame() {
   ResetBoard();
-  current().nameGame[0] = '\0';              // Reset tên game
-  current().namePlayer1[0] = '\0';           // Reset tên người chơi 1
-  current().scorePlayer1 = 0;                // Reset điểm số người chơi 1
-  current().namePlayer2[0] = '\0';           // Reset tên người chơi 2
-  current().scorePlayer2 = 0;                // Reset điểm số người chơi 2
-  current().gameMode = MODE_PVP;             // Mặc định chế độ chơi là PVP
-  current().botDifficulty = DIFFICULTY_NONE; // Mặc định không có Bot
-  current().pvpMode = NONE;             // Mặc định không có chế độ PVP đặc biệt
-  current().timeLeft = TIME_LIMIT_NONE; // Mặc định không giới hạn thời gian
+  current().nameGame[0] = '\0';
+  current().namePlayer1[0] = '\0';
+  current().scorePlayer1 = 0;
+  current().namePlayer2[0] = '\0';
+  current().scorePlayer2 = 0;
+  current().gameMode = MODE_PVP;
+  current().botDifficulty = DIFFICULTY_NONE;
+  current().pvpMode = NONE;
+  current().timeLeft = TIME_LIMIT_NONE;
   TIME_LIMIT = 0.0f;
-  TIME_LEFT = 0.0f;
-  // Có thể thêm các thiết lập khác khi bắt đầu game mới nếu cần
 }
 
 bool IsBoardFull() {
-  for (int r = 0; r < BOARD_SIZE; r++)
-    for (int c = 0; c < BOARD_SIZE; c++)
-      if (current().board[r][c] == 0)
+  for (int row = 0; row < BOARD_SIZE; row++)
+    for (int col = 0; col < BOARD_SIZE; col++)
+      if (current().board[row][col] == CELL_EMPTY)
         return false;
   return true;
 }
 
 float GetTimeLeft() {
-  // Chỉ trả về thời gian còn lại khi mode có giới hạn thời gian
   if (current().gameMode == MODE_PVP && current().pvpMode != TOURNAMENT)
-    return -1.0f; // Không có giới hạn thời gian
-  // Nếu không có giới hạn thời gian (TIME_LIMIT_NONE) thì không hiển thị
-  // countdown
+    return -1.0f;
   if (current().timeLeft == TIME_LIMIT_NONE)
     return -1.0f;
   return TIME_LEFT;
