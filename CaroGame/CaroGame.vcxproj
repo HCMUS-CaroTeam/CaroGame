@@ -146,6 +146,7 @@
     <ClCompile Include="src\Model\AI\ai_evaluation.cpp" />
     <ClCompile Include="src\Model\AI\ai_hard.cpp" />
     <ClCompile Include="src\Model\AI\ai_medium.cpp" />
+    <ClCompile Include="src\Model\AI\ai_technical_demo.cpp" />
     <ClCompile Include="src\Model\game_data.cpp" />
     <ClCompile Include="src\Scenes\About\ui_about.cpp" />
     <ClCompile Include="src\Scenes\Notify\ui_notify.cpp" />
@@ -168,6 +169,8 @@
     <ClCompile Include="src\View\ui_frame.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <Image Include="..\..\Mode\classic.png" />
+    <Image Include="..\..\Mode\tour.png" />
     <Image Include="Assets\avatar\BossPhases(Moon)\pixil-layer-trang-ban.png" />
     <Image Include="Assets\avatar\BossPhases(Moon)\pixil-layer-trang-khuyet.png" />
     <Image Include="Assets\avatar\BossPhases(Moon)\pixil-layer-trang-tron.png" />
@@ -194,6 +197,8 @@
     <Image Include="Assets\frame\pixil-layer-1.png" />
     <Image Include="Assets\frame\pixil-layer-2.png" />
     <Image Include="Assets\frame\pixil-layer-3.png" />
+    <Image Include="Assets\Modes\classic.png" />
+    <Image Include="Assets\Modes\tour.png" />
     <Image Include="Assets\texture\pixil-layer-setting1.png" />
     <Image Include="Assets\texture\pixil-layer-setting2.png" />
     <Image Include="Assets\X-O\pixil-layer-0.png" />
@@ -214,6 +219,7 @@
     <ClInclude Include="src\Model\AI\ai_evaluation.h" />
     <ClInclude Include="src\Model\AI\ai_hard.h" />
     <ClInclude Include="src\Model\AI\ai_medium.h" />
+    <ClInclude Include="src\Model\AI\ai_technical_demo.h" />
     <ClInclude Include="src\Model\app_settings.h" />
     <ClInclude Include="src\Model\game_data.h" />
     <ClInclude Include="src\Model\logic.h" />
