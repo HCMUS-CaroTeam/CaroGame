@@ -26,6 +26,10 @@ static Texture2D texBoss1Avatar;
 static Texture2D texBoss2Avatar;
 static Texture2D texBoss3Avatar;
 
+// khai báo thêm cho PVP
+static Texture2D texClassicMode;
+static Texture2D texTourMode;
+
 struct BossData {
     const char* title;
     const char* desc;
@@ -60,21 +64,23 @@ static void DrawBossPreview(Texture2D avatar, Rectangle dialogBounds, BossData d
         DrawTextureEx(avatar, Vector2{ avatarX, avatarY }, 0.0f, finalScale, WHITE);
     }
 
-    // 3. NỬA PHẢI - Text (Canh trái với padding nhỏ gọn)
     Rectangle rightPane = { dialogBounds.x + leftWidth, dialogBounds.y, rightWidth, dialogBounds.height };
-    float textPaddingX = 10.0f;
-    float currentY = rightPane.y + 35.0f;
+    float textPaddingX = 20.0f; // Tăng lề trái lên một chút cho thoáng
+    float currentY = rightPane.y + 40.0f; // Vị trí bắt đầu của dòng đầu tiên
 
-    // Title (Vd: BOSS 2)
-    DrawTextEx(fontTitle, data.title, Vector2{ rightPane.x + textPaddingX, currentY }, 32.0f, 2.0f, Color{ 128, 0, 32, 255 });
-    currentY += 40.0f;
+    // Title (Vd: BOSS 3 hoặc CLASSIC)
+    // Chỉnh fontSize lên 44.0f, đổi màu sang Nâu đậm (60, 40, 30, 255)
+    DrawTextEx(fontTitle, data.title, Vector2{ rightPane.x + textPaddingX, currentY }, 44.0f, 2.0f, Color{ 128, 0, 32, 255 });
+    currentY += 50.0f; // Khoảng cách đẩy xuống cho dòng tiếp theo
 
-    // Name (Vd: Half Moon Demon)
-    DrawTextEx(fontSmall, data.desc, Vector2{ rightPane.x + textPaddingX, currentY }, 22.0f, 2.0f, Color{ 128, 0, 32, 255 });
-    currentY += 45.0f;
+    // Name (Vd: Full Moon Demon)
+    // Chỉnh fontSize lên 28.0f, đổi màu nhạt hơn chút (80, 60, 50, 255)
+    DrawTextEx(fontSmall, data.desc, Vector2{ rightPane.x + textPaddingX, currentY }, 28.0f, 2.0f, Color{ 128, 0, 32, 255 });
+    currentY += 55.0f; // Khoảng cách đẩy xuống cho dòng tiếp theo
 
     // Description (Vd: - The Demon guard...)
-    DrawTextEx(fontSmall, data.detail, Vector2{ rightPane.x + textPaddingX, currentY }, 18.0f, 2.0f, Color{ 130, 40, 60, 255 });
+    // Chỉnh fontSize lên 22.0f
+    DrawTextEx(fontSmall, data.detail, Vector2{ rightPane.x + textPaddingX, currentY }, 22.0f, 2.0f, Color{ 128, 0, 32, 255 });
 }
 
 void InitSetupUI() { 
@@ -83,6 +89,9 @@ void InitSetupUI() {
     texBoss1Avatar = LoadTexture("Assets/avatar/BossPhases(Moon)/pixil-layer-trang-khuyet.png"); 
     texBoss2Avatar = LoadTexture("Assets/avatar/BossPhases(Moon)/pixil-layer-trang-ban.png");
     texBoss3Avatar = LoadTexture("Assets/avatar/BossPhases(Moon)/pixil-layer-trang-tron.png");
+
+    texClassicMode = LoadTexture("Assets/Modes/classic.png"); 
+    texTourMode = LoadTexture("Assets/Modes/tour.png");       
 }
 
 void ShutdownSetupUI() { 
@@ -91,6 +100,9 @@ void ShutdownSetupUI() {
     UnloadTexture(texBoss1Avatar);
     UnloadTexture(texBoss2Avatar);
     UnloadTexture(texBoss3Avatar);
+
+    UnloadTexture(texClassicMode);
+    UnloadTexture(texTourMode);
 }
 
 void UpdateSetupUI(const MouseState &mouse, float dt, AudioAssets &audio,
@@ -200,14 +212,12 @@ void DrawSetupUI(Font fontTitle, Font fontSmall, const MouseState &mouse,
   // ==========================================
 
   // Khung nền chính: Căn giữa màn hình 1600x900
-  DrawPanelFrame({200.0f, 150.0f, 1200.0f, 600.0f});
+  DrawPanelFrame({ 200.0f, 150.0f, 1200.0f, 480.0f });
 
   // Khung vàng (Card) chứa nội dung: trả về chiều rộng 600.0f để không đè nút
-  Rectangle cardRect = {350.0f, 220.0f, 600.0f, 320.0f};
-  DrawCardFrame(cardRect);
+  Rectangle cardRect = { 350.0f, 230.0f, 600.0f, 320.0f };
+  DrawCardFrame(cardRect);;
 
-  // Khung nhỏ chứa kích thước bàn cờ (Cao 60 pixel thôi, đừng để 400 nữa nha
-  // ông!)
 
   // ==========================================
   // 2. XỬ LÝ LOGIC CHỮ (Controller)
@@ -218,27 +228,27 @@ void DrawSetupUI(Font fontTitle, Font fontSmall, const MouseState &mouse,
 
   if (settings.gameMode == MODE_PVE) {
     if (settings.botDifficulty == DIFFICULTY_EASY) {
-      titleText = "BOSS 1";
+      titleText = "PHASE 1";
       descText = "Crescent Moon Demon";
       detailText = "- The Demon imp with depleted magic.\n- Acts on instinct, attacks randomly.\n- Easy as pie, a simple warm-up.";
     } else if (settings.botDifficulty == DIFFICULTY_MEDIUM) {
-      titleText = "BOSS 2";
+      titleText = "PHASE 2";
       descText = "Half Moon Demon";
-      detailText = "- The Demon guard with restoring magic.\n- Possesses tactical thinking and sets traps.\n- Blocks both ends, not easily fooled!";
+      detailText = "- The Demon guard with restoring magic.\n- Tactical thinking and sets traps.\n- Blocks both ends, not easily fooled.";
     } else if (settings.botDifficulty == DIFFICULTY_HARD) {
-      titleText = "BOSS 3";
+      titleText = "PHASE 3";
       descText = "Full Moon Demon";
-      detailText = "- The Moon Lord who kidnapped Yuki.\n- Ultimate power, manipulates the entire board.\n- Sees the future, the undefeated champion!";
+      detailText = "- The Moon Lord who kidnapped Yuki.\n- Manipulates the entire board.\n- Predicts the future, the undefeated.";
     }
   } else if (settings.gameMode == MODE_PVP) {
     if (settings.pvpMode == CLASSIC) {
       titleText = "CLASSIC";
-      descText = "";
+      descText = "Standard Match";
       detailText =
           "- Align exactly 5 pieces to win.\n- Overline (6+) does not count.";
     } else if (settings.pvpMode == TOURNAMENT) {
       titleText = "TOURNAMENT";
-      descText = "";
+      descText = "Competitive Rules";
       detailText =
           "- Align exactly 5 pieces.\n- Must NOT be blocked at both ends.\n- Timeout forfeits your turn.";
     }
@@ -261,21 +271,23 @@ void DrawSetupUI(Font fontTitle, Font fontSmall, const MouseState &mouse,
       DrawBossPreview(currentAvatar, cardRect, bData, avatarScale, fontTitle, fontSmall);
   }
   else {
-      // 3B. NẾU LÀ PVP -> DÙNG GIAO DIỆN CHỮ CŨ (CĂN GIỮA)
-      DrawCardFrame(cardRect);
+      // 3B. NẾU LÀ PVP -> DÙNG GIAO DIỆN CÓ HÌNH NHƯ PVE
+      BossData pvpData = { titleText, descText, detailText };
 
-      Vector2 titleSize = MeasureTextEx(fontTitle, titleText, 36.0f, 2.0f);
-      float titleX = cardRect.x + (cardRect.width / 2.0f) - (titleSize.x / 2.0f);
-      DrawTextEx(fontTitle, titleText, Vector2{ titleX, cardRect.y + 30.0f }, 36.0f, 2.0f, Color{ 128, 0, 32, 255 });
+      Texture2D currentPvpAvatar = texClassicMode; // Mặc định
+      float avatarScale = 3.0f; // Scale này thực ra trong hàm DrawBossPreview đã tự động chỉnh lại cho vừa khung 150px rồi
 
-      Vector2 descSize = MeasureTextEx(fontSmall, descText, 24.0f, 2.0f);
-      float descX = cardRect.x + (cardRect.width / 2.0f) - (descSize.x / 2.0f);
-      DrawTextEx(fontSmall, descText, Vector2{ descX, cardRect.y + 80.0f }, 24.0f, 2.0f, Color{ 128, 0, 32, 255 });
+      // Kiểm tra xem đang chọn mode nào để đưa ảnh tương ứng vào
+      if (settings.pvpMode == CLASSIC) {
+          currentPvpAvatar = texClassicMode;
+      }
+      else if (settings.pvpMode == TOURNAMENT) {
+          currentPvpAvatar = texTourMode;
+      }
 
-      DrawTextEx(fontSmall, detailText, Vector2{ cardRect.x + 60.0f, cardRect.y + 140.0f }, 22.0f, 2.0f, Color{ 130, 40, 60, 255 });
+      // Tái sử dụng hàm DrawBossPreview để vẽ: Hình nằm ô trái, Chữ nằm ô phải
+      DrawBossPreview(currentPvpAvatar, cardRect, pvpData, avatarScale, fontTitle, fontSmall);
   }
-
-  // In kích thước bàn cờ vào Khung Nhỏ
 
   // ==========================================
   // --- VẼ NÚT BẤM VÀ CÁC THÀNH PHẦN KHÁC ---
@@ -291,8 +303,6 @@ void DrawSetupUI(Font fontTitle, Font fontSmall, const MouseState &mouse,
     DrawUIButton(animIndex, gSetupButtons[i], fontTitle, hovered, pressed);
   }
 
-  DrawCenteredText(fontSmall, "PRESS ESC TO BACK", 850.0f, 20.0f,
-                   Color{220, 205, 205, 180});
 }
 
 

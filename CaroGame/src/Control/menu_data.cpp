@@ -113,17 +113,17 @@ int gMainMenuButtonCount = sizeof(gMainMenuButtons) / sizeof(gMainMenuButtons[0]
 
 Button gSetupButtons[] =
 {
-    { Vector2{ 1050.0f, 250.0f }, Vector2{ 200.0f, 60.0f }, "PVP", SETUP_BTN_PVP, BUTTON_VISUAL_TEXT, BUTTON_ICON_NONE, 28.0f, 2.0f },
-    { Vector2{ 1050.0f, 410.0f }, Vector2{ 200.0f, 60.0f }, "PVE", SETUP_BTN_PVE, BUTTON_VISUAL_TEXT, BUTTON_ICON_NONE, 28.0f, 2.0f },
+    // Cụm 3 nút PVP, PVE, PLAY thẳng hàng bên phải 
+    { Vector2{ 1100.0f, 260.0f }, Vector2{ 200.0f, 60.0f }, "PVP", SETUP_BTN_PVP, BUTTON_VISUAL_TEXT, BUTTON_ICON_NONE, 28.0f, 2.0f },
+    { Vector2{ 1100.0f, 350.0f }, Vector2{ 200.0f, 60.0f }, "PVE", SETUP_BTN_PVE, BUTTON_VISUAL_TEXT, BUTTON_ICON_NONE, 28.0f, 2.0f },
+    { Vector2{ 1100.0f, 440.0f }, Vector2{ 200.0f, 60.0f }, "PLAY", SETUP_BTN_PLAY, BUTTON_VISUAL_TEXT, BUTTON_ICON_NONE, 28.0f, 2.0f },
 
-    // Nút Play ở giữa
-    { Vector2{ 550.0f, 570.0f }, Vector2{ 200.0f, 60.0f }, "PLAY", SETUP_BTN_PLAY, BUTTON_VISUAL_TEXT, BUTTON_ICON_NONE, 28.0f, 2.0f },
-
-    // Nút mũi tên trái / phải
+    // Nút mũi tên trái / phải cho Avatar (Giữ nguyên vị trí cũ kẹp hai bên khung Card)
     { Vector2{ 258.0f, 336.0f }, Vector2{ 72.0f, 88.0f }, "", SETUP_BTN_PREV, BUTTON_VISUAL_ICON, BUTTON_ICON_ARROW_LEFT, 0.0f, 0.0f },
     { Vector2{ 970.0f, 336.0f }, Vector2{ 72.0f, 88.0f }, "", SETUP_BTN_NEXT, BUTTON_VISUAL_ICON, BUTTON_ICON_ARROW_RIGHT, 0.0f, 0.0f },
 
-    { Vector2{ 1050.0f, 570.0f }, Vector2{ 200.0f, 60.0f }, "BACK", SETUP_BTN_BACK, BUTTON_VISUAL_TEXT, BUTTON_ICON_NONE, 28.0f, 2.0f }
+    // Nút Back nằm độc lập ở dưới cùng, canh giữa màn hình
+    { Vector2{ 700.0f, 720.0f }, Vector2{ 200.0f, 60.0f }, "BACK", SETUP_BTN_BACK, BUTTON_VISUAL_TEXT, BUTTON_ICON_NONE, 28.0f, 2.0f }
 };
 int gSetupButtonCount = sizeof(gSetupButtons) / sizeof(gSetupButtons[0]);
 
@@ -185,7 +185,7 @@ Button gNotifyButtons[] = {
     { Vector2{ SCREEN_WIDTH * 0.5f - 160.0f, 680.0f }, Vector2{ 320.0f, 60.0f }, "BACK", NOTIFY_BTN_BACK, BUTTON_VISUAL_TEXT, BUTTON_ICON_NONE, 24.0f, 1.5f }
 };
 
-// Khai báo nút SKIP chuẩn theo cấu trúc của team
+// Khai báo nút SKIP chuẩn theo cấu trúc 
 Button skipBtn = {
     Vector2{ 1080.0f, 660.0f },  Vector2{ 160.0f, 50.0f }, "SKIP", 99, BUTTON_VISUAL_TEXT, BUTTON_ICON_NONE, 24.0f, 2.0f};
 

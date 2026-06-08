@@ -96,6 +96,9 @@
     <ClCompile Include="src\Scenes\Story\ui_story.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\Model\AI\ai_technical_demo.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Image Include="Assets\bg\background.png">
@@ -185,6 +188,27 @@
     <Image Include="Assets\X-O\pixil-layer-3.png">
       <Filter>Resource Files</Filter>
     </Image>
+    <Image Include="Assets\avatar\BossPhases(Moon)\pixil-layer-trang-ban.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Assets\avatar\BossPhases(Moon)\pixil-layer-trang-khuyet.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Assets\avatar\BossPhases(Moon)\pixil-layer-trang-tron.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="..\..\Mode\classic.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="..\..\Mode\tour.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Assets\Modes\classic.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Assets\Modes\tour.png">
+      <Filter>Resource Files</Filter>
+    </Image>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="raylib\include\raymath.h">
@@ -209,9 +233,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\Model\app_settings.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Shared\Common.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\Model\logic.h">
@@ -283,10 +304,9 @@
     <ClInclude Include="src\Scenes\Story\ui_story.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-  </ItemGroup>
-  <ItemGroup>
-    <Library Include="raylib\lib\raylib.lib" />
-    <Library Include="raylib\lib\raylibdll.lib" />
+    <ClInclude Include="src\Model\AI\ai_technical_demo.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
