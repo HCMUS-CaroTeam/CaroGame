@@ -303,16 +303,6 @@ static void DrawPlayTopBar(Font fontTitle, Font fontSmall, const MouseState &mou
   (void)mouse;
 }
 
-static void DrawBottomHint(Font fontSmall) {
-  Rectangle hint{SCREEN_WIDTH * 0.5f - 300.0f, 914.0f, 600.0f, 72.0f};
-  (void)hint;
-  DrawSmallFrame(Rectangle{SCREEN_WIDTH * 0.5f - 300.0f, 842.0f, 600.0f, 52.0f});
-  DrawTextEx(fontSmall, "i", Vector2{SCREEN_WIDTH * 0.5f - 280.0f, 854.0f}, 24.0f, 1.0f,
-             Color{116, 24, 50, 255});
-  DrawTextEx(fontSmall, "The first player to get 5 in a row wins.",
-             Vector2{SCREEN_WIDTH * 0.5f - 225.0f, 856.0f}, 21.0f, 1.0f,
-             Color{116, 24, 50, 255});
-}
 
 static void DrawBoardGrid(const AppSettings &settings) {
   Rectangle boardRect = GetBoardRect();
@@ -864,8 +854,6 @@ void DrawPlayUI(Font fontTitle, Font fontSmall, const MouseState &mouse,
   DrawWinLine(settings);
   DrawResultBoardPulse();
   DrawPieces(fontTitle, settings);
-  if (current().result == RESULT_ONGOING)
-    DrawBottomHint(fontSmall);
   DrawResultHeader(fontSmall);
   DrawPvpResultSideEffects(fontSmall);
   DrawResultActions(fontSmall, mouse);

@@ -92,14 +92,21 @@ Icon button:
 ============================================================
 */
 
-// Main Menu Buttons
+// Main Menu Buttons — hàng ngang bên dưới
+// 5 nút × 220px rộng, gap 20px → tổng 5*220+4*20 = 1180px, căn giữa: (1600-1180)/2 = 210
+static constexpr float MM_BTN_Y      = 800.0f;
+static constexpr float MM_BTN_W      = 220.0f;
+static constexpr float MM_BTN_H      = 54.0f;
+static constexpr float MM_BTN_GAP    = 20.0f;
+static constexpr float MM_BTN_START  = (1600.0f - (5.0f * MM_BTN_W + 4.0f * MM_BTN_GAP)) * 0.5f;
+
 Button gMainMenuButtons[] =
 {
-    { Vector2{ 110.0f, 420.0f }, Vector2{ 266.0f, 50.0f }, "PLAY",    BTN_PLAY,    BUTTON_VISUAL_TEXT, BUTTON_ICON_NONE, 24.0f, 4.0f },
-    { Vector2{ 110.0f, 478.0f }, Vector2{ 248.0f, 46.0f }, "LOAD",    BTN_LOAD,    BUTTON_VISUAL_TEXT, BUTTON_ICON_NONE, 20.0f, 3.0f },
-    { Vector2{ 110.0f, 538.0f }, Vector2{ 248.0f, 46.0f }, "ABOUT",   BTN_ABOUT,   BUTTON_VISUAL_TEXT, BUTTON_ICON_NONE, 20.0f, 3.0f },
-    { Vector2{ 110.0f, 592.0f }, Vector2{ 248.0f, 46.0f }, "SETTING", BTN_SETTING, BUTTON_VISUAL_TEXT, BUTTON_ICON_NONE, 20.0f, 3.0f },
-    { Vector2{ 110.0f, 652.0f }, Vector2{ 248.0f, 46.0f }, "EXIT",    BTN_EXIT,    BUTTON_VISUAL_TEXT, BUTTON_ICON_NONE, 20.0f, 3.0f }
+    { Vector2{ MM_BTN_START + 0*(MM_BTN_W+MM_BTN_GAP), MM_BTN_Y }, Vector2{ MM_BTN_W, MM_BTN_H }, "PLAY",    BTN_PLAY,    BUTTON_VISUAL_TEXT, BUTTON_ICON_NONE, 22.0f, 3.0f },
+    { Vector2{ MM_BTN_START + 1*(MM_BTN_W+MM_BTN_GAP), MM_BTN_Y }, Vector2{ MM_BTN_W, MM_BTN_H }, "LOAD",    BTN_LOAD,    BUTTON_VISUAL_TEXT, BUTTON_ICON_NONE, 22.0f, 3.0f },
+    { Vector2{ MM_BTN_START + 2*(MM_BTN_W+MM_BTN_GAP), MM_BTN_Y }, Vector2{ MM_BTN_W, MM_BTN_H }, "ABOUT",   BTN_ABOUT,   BUTTON_VISUAL_TEXT, BUTTON_ICON_NONE, 22.0f, 3.0f },
+    { Vector2{ MM_BTN_START + 3*(MM_BTN_W+MM_BTN_GAP), MM_BTN_Y }, Vector2{ MM_BTN_W, MM_BTN_H }, "SETTING", BTN_SETTING, BUTTON_VISUAL_TEXT, BUTTON_ICON_NONE, 22.0f, 3.0f },
+    { Vector2{ MM_BTN_START + 4*(MM_BTN_W+MM_BTN_GAP), MM_BTN_Y }, Vector2{ MM_BTN_W, MM_BTN_H }, "EXIT",    BTN_EXIT,    BUTTON_VISUAL_TEXT, BUTTON_ICON_NONE, 22.0f, 3.0f }
 };
 
 int gMainMenuButtonCount = sizeof(gMainMenuButtons) / sizeof(gMainMenuButtons[0]);

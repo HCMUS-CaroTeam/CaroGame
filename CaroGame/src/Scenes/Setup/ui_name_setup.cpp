@@ -152,16 +152,22 @@ static void DrawAvatarSelector(Font fontSmall, float ax, float ay,
 {
     clickedLeft = clickedRight = false;
 
-    // Khung avatar
+    // Khung avatar — đóng khung như màn play
     Rectangle avatarRect = { ax, ay, AVA_SIZE, AVA_SIZE };
-    DrawRectangleLinesEx(avatarRect, 3.0f, Color{ 220, 200, 255, 200 });
+    DrawCardFrame(avatarRect);
+    DrawRectangleRounded(
+        Rectangle{ ax + 6.0f, ay + 6.0f, AVA_SIZE - 12.0f, AVA_SIZE - 12.0f },
+        0.04f, 5, Color{ 206, 218, 170, 210 });
+
+    constexpr float AVA_PAD = 10.0f;
+    Rectangle innerRect = { ax + AVA_PAD, ay + AVA_PAD, AVA_SIZE - AVA_PAD * 2.0f, AVA_SIZE - AVA_PAD * 2.0f };
 
     if (gAvatarLoaded[avatarIdx])
     {
         DrawTexturePro(gAvatarTex[avatarIdx],
             Rectangle{ 0, 0, (float)gAvatarTex[avatarIdx].width,
                              (float)gAvatarTex[avatarIdx].height },
-            avatarRect, Vector2{ 0,0 }, 0.0f, WHITE);
+            innerRect, Vector2{ 0,0 }, 0.0f, WHITE);
     }
     else
     {
