@@ -19,10 +19,10 @@
 /// @name Hằng số bàn cờ
 /// @{
 static constexpr int BOARD_SIZE = 15;          ///< Kích thước bàn cờ (15x15 ô).
-static constexpr float CELL_SIZE = 40.0f;      ///< Kích thước mỗi ô tính bằng pixel.
+static constexpr float CELL_SIZE = 38.0f;      ///< Kích thước mỗi ô tính bằng pixel.
 static constexpr float BOARD_PIXEL_SIZE = BOARD_SIZE * CELL_SIZE; ///< Tổng kích thước bàn cờ (pixel).
 static constexpr float BOARD_START_X = SCREEN_WIDTH * 0.5f - BOARD_PIXEL_SIZE * 0.5f; ///< Tọa độ X góc trên-trái bàn cờ (căn giữa màn hình).
-static constexpr float BOARD_START_Y = 205.0f; ///< Tọa độ Y góc trên-trái bàn cờ (cố định).
+static constexpr float BOARD_START_Y = 150.0f; ///< Tọa độ Y góc trên-trái bàn cờ (cố định).
 static constexpr int WIN_LENGTH = 5;           ///< Số quân liên tiếp cần để thắng (đúng 5, không quá 5 — luật Overline).
 static constexpr int MAX_WIN_LINE = BOARD_SIZE; ///< Kích thước tối đa mảng winLine.
 /// @}

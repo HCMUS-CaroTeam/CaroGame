@@ -192,7 +192,7 @@ static void DrawMainMenuLogo()
     }
 
     const float time = static_cast<float>(GetTime());
-    const float targetWidth = 700.0f;
+    const float targetWidth = 1090.0f;
     const float scale = targetWidth / static_cast<float>(gMenuLogo.width);
     const float targetHeight = static_cast<float>(gMenuLogo.height) * scale;
     const float floatOffset = sinf(time * 1.05f) * 7.0f;
@@ -201,7 +201,7 @@ static void DrawMainMenuLogo()
     DrawTexturePro(
         gMenuLogo,
         Rectangle{ 0.0f, 0.0f, static_cast<float>(gMenuLogo.width), static_cast<float>(gMenuLogo.height) },
-        Rectangle{ logoX, 280.0f + floatOffset, targetWidth, targetHeight },
+        Rectangle{ logoX, 160.0f + floatOffset, targetWidth, targetHeight },
         Vector2{ 0.0f, 0.0f },
         0.0f,
         WHITE
@@ -310,6 +310,88 @@ void ShutdownMainMenuUI()
     ShutdownUIButtonSystem();
 }
 
+static void SetupFlexibleButtonLayout()
+{
+    // Cấu hình kích thước đồng bộ cho các nút trên hàng ngang
+    const float normW = 200.0f; // Độ rộng nút thường
+    const float normH = 62.0f;  // Chiều cao nút thường
+    const float playW = 245.0f; // Nút PLAY làm bự hơn để tạo điểm nhấn ở giữa
+    const float playH = 75.0f;
+
+    // Cao độ trục Y cho cả hàng 
+    const float rowY = 680.0f;
+    const float spacingX = 25.0f; // Khoảng cách ngang giữa các nút
+
+    // Tâm màn hình trục X
+    const float centerX = SCREEN_WIDTH * 0.5f;
+
+    // Tổng độ rộng của cả cụm 5 nút (4 nút thường + 1 nút PLAY + 4 khoảng cách)
+    const float totalMenuWidth = (normW * 4.0f) + playW + (spacingX * 4.0f);
+
+    // Điểm xuất phát X đầu tiên ở cạnh bên trái cùng của hàng
+    const float startX = centerX - (totalMenuWidth * 0.5f);
+
+    for (int i = 0; i < gMainMenuButtonCount; ++i)
+    {
+        // Gán font size mặc định cho các nút thường
+        gMainMenuButtons[i].fontSize = 20.0f;
+
+        switch (gMainMenuButtons[i].id)
+        {
+            // Vị trí 1: LOAD (Bên trái cùng)
+        case BTN_LOAD:
+            gMainMenuButtons[i].size.x = normW;
+            gMainMenuButtons[i].size.y = normH;
+            gMainMenuButtons[i].position.x = startX;
+            gMainMenuButtons[i].position.y = rowY;
+            break;
+
+            // Vị trí 2: SETTING
+        case BTN_SETTING:
+            gMainMenuButtons[i].size.x = normW;
+            gMainMenuButtons[i].size.y = normH;
+            // startX + nút LOAD + 1 khoảng cách
+            gMainMenuButtons[i].position.x = startX + normW + spacingX;
+            gMainMenuButtons[i].position.y = rowY;
+            break;
+
+            // Vị trí 3: PLAY (NẰM CHÍNH GIỮA HÀNG)
+        case BTN_PLAY:
+            gMainMenuButtons[i].size.x = playW;
+            gMainMenuButtons[i].size.y = playH;
+            // startX + nút LOAD + nút SETTING + 2 khoảng cách
+            gMainMenuButtons[i].position.x = startX + (normW * 2.0f) + (spacingX * 2.0f);
+            gMainMenuButtons[i].position.y = rowY - (playH - normH) * 0.5f; // Căn giữa trục Y với các nút cạnh
+            gMainMenuButtons[i].fontSize = 24.0f; // Chữ to hơn cho nổi bật
+            break;
+
+            // Vị trí 4: ABOUT
+        case BTN_ABOUT:
+            gMainMenuButtons[i].size.x = normW;
+            gMainMenuButtons[i].size.y = normH;
+            // Vị trí sau nút PLAY: startX + 2 nút thường + 1 nút PLAY + 3 khoảng cách
+            gMainMenuButtons[i].position.x = startX + (normW * 2.0f) + playW + (spacingX * 3.0f);
+            gMainMenuButtons[i].position.y = rowY;
+            break;
+
+            // Vị trí 5: EXIT (Bên phải cùng)
+        case BTN_EXIT:
+            gMainMenuButtons[i].size.x = normW;
+            gMainMenuButtons[i].size.y = normH;
+            // Vị trí sau nút ABOUT: startX + 3 nút thường + 1 nút PLAY + 4 khoảng cách
+            gMainMenuButtons[i].position.x = startX + (normW * 3.0f) + playW + (spacingX * 4.0f);
+            gMainMenuButtons[i].position.y = rowY;
+            break;
+        }
+
+        // Cập nhật lại struct Rectangle tương ứng để đồng bộ hitbox click
+        gMainMenuButtons[i].position.x = gMainMenuButtons[i].position.x;
+        gMainMenuButtons[i].position.y = gMainMenuButtons[i].position.y;
+        gMainMenuButtons[i].size.x = gMainMenuButtons[i].size.x;
+        gMainMenuButtons[i].size.y = gMainMenuButtons[i].size.y;
+    }
+}
+
 void UpdateMainMenuUI(
     const MouseState& mouse,
     float dt,
@@ -319,6 +401,8 @@ void UpdateMainMenuUI(
     bool& shouldClose
 )
 {
+    SetupFlexibleButtonLayout();
+
     for (int i = 0; i < gMainMenuButtonCount; ++i)
     {
         bool hovered = false;
@@ -368,6 +452,8 @@ void UpdateMainMenuUI(
 
 void DrawMainMenuUI(Font fontTitle, Font fontSmall, const MouseState& mouse)
 {
+    SetupFlexibleButtonLayout();
+
     DrawMainMenuBackground();
     DrawMainMenuParticles();
     DrawMainMenuLogo();
