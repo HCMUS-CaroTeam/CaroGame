@@ -32,10 +32,10 @@ static Texture2D gWinEffectTex[2]{};
 static bool gPlayAssetsLoaded = false;
 
 static constexpr float PLAY_FRAME_PAD = 14.0f;
-static constexpr float PLAYER_PANEL_Y = 187.0f;
-static constexpr float PLAYER_PANEL_W = 305.0f;
-static constexpr float PLAYER_PANEL_H = 682.0f;
-static constexpr float PLAYER_LEFT_X = 58.0f;
+static constexpr float PLAYER_PANEL_Y = 190.0f;
+static constexpr float PLAYER_PANEL_W = 260.0f;
+static constexpr float PLAYER_PANEL_H = 620.0f;
+static constexpr float PLAYER_LEFT_X = 80.0f;
 static constexpr float PLAYER_RIGHT_X = SCREEN_WIDTH - PLAYER_LEFT_X - PLAYER_PANEL_W;
 
 static bool IsTextureReadyEx(const Texture2D &tex)
@@ -231,63 +231,70 @@ static void DrawStatRow(Font fontSmall, Rectangle row, const char *label,
                        0.08f, 6, Color{40, 32, 23, 130});
   DrawTextEx(fontSmall, label, Vector2{row.x + 56.0f, row.y + 15.0f}, 21.0f, 1.0f,
              Color{255, 236, 194, 240});
-  Vector2 valueSize = MeasureTextEx(fontSmall, value, 21.0f, 1.0f);
+  Vector2 valueSize = MeasureTextEx(fontSmall, value, 28.0f, 1.0f);
   DrawTextEx(fontSmall, value,
              Vector2{row.x + row.width - valueSize.x - 20.0f, row.y + 15.0f},
              21.0f, 1.0f, valueColor);
 }
 
 static void DrawPlayerPanel(Font fontTitle, Font fontSmall, bool playerOne) {
-  const float x = playerOne ? PLAYER_LEFT_X : PLAYER_RIGHT_X;
-  Rectangle panel{x, PLAYER_PANEL_Y, PLAYER_PANEL_W, PLAYER_PANEL_H};
-  DrawPanelFrame(panel);
+    const float x = playerOne ? PLAYER_LEFT_X : PLAYER_RIGHT_X;
+    Rectangle panel{ x, PLAYER_PANEL_Y, PLAYER_PANEL_W, PLAYER_PANEL_H };
+    DrawPanelFrame(panel);
 
-  Rectangle header{x + 22.0f, panel.y + 20.0f, PLAYER_PANEL_W - 44.0f, 58.0f};
-  DrawRectangleRounded(header, 0.08f, 8, Color{172, 42, 55, 235});
-  DrawRectangleLinesEx(Rectangle{header.x + 4.0f, header.y + header.height - 1.0f,
-                                 header.width - 8.0f, 1.0f},
-                       2.0f, Color{98, 28, 32, 220});
-  DrawTextFitCenteredInRect(fontSmall, GetPlayerName(playerOne), header,
-                            24.0f, 15.0f, Color{255, 243, 211, 255}, 2.0f);
+    Rectangle header{ x + 20.0f, panel.y + 20.0f, PLAYER_PANEL_W - 40.0f, 75.0f };
+    DrawRectangleRounded(header, 0.08f, 8, Color{ 165, 42, 70, 235 });
+    DrawRectangleLinesEx(Rectangle{ header.x + 4.0f, header.y + header.height - 1.0f,
+                                   header.width - 8.0f, 1.0f },
+        2.0f, Color{ 98, 28, 32, 220 });
+    Rectangle nameRect{header.x, header.y + 8.0f, header.width, 30.0f};
+    DrawTextFitCenteredInRect(fontSmall, GetPlayerName(playerOne), nameRect,
+                            30.0f, 14.0f, Color{255, 243, 211, 255}, 2.0f);
+    Rectangle teamRect{ header.x, header.y + 42.0f, header.width, 25.0f };
+    Color teamColor = playerOne ? Color{ 255, 155, 200, 255 } : Color{ 160, 255, 180, 255 }; // Màu nhẹ dịu hơn phù hợp chữ nhỏ
+    DrawTextCenteredInRect(fontSmall, playerOne ? "X TEAM" : "O TEAM", teamRect,
+        25.0f, teamColor, 1.0f);
 
-  const Texture2D &avatar = playerOne ? GetPlayerAvatarTexture(true)
+    const Texture2D &avatar = playerOne ? GetPlayerAvatarTexture(true)
                                       : (current().gameMode == MODE_PVE ? GetBotAvatarTexture()
                                                                         : GetPlayerAvatarTexture(false));
-  DrawFramedAvatar(avatar, Rectangle{x + 66.0f, panel.y + 92.0f, 172.0f, 172.0f});
-
-  const bool active = current().result == RESULT_ONGOING &&
-                      ((playerOne && current().turn == CELL_X) ||
-                       (!playerOne && current().turn == CELL_O));
-  DrawTextCenteredInRect(fontTitle, playerOne ? "X TEAM" : "O TEAM",
-                         Rectangle{x + 52.0f, panel.y + 284.0f, 202.0f, 46.0f},
-                         30.0f,
-                         playerOne ? Color{255, 92, 98, 255} : Color{102, 178, 255, 255},
-                         1.0f);
-
-  char wins[16];
-  char moves[16];
-  snprintf(wins, sizeof(wins), "%d", playerOne ? current().scorePlayer1 : current().scorePlayer2);
+    DrawFramedAvatar(avatar, Rectangle{x + 44.0f, panel.y + 115.0f, 172.0f, 172.0f});
+    
+    char wins[16];
+    char moves[16];
+    snprintf(wins, sizeof(wins), "%d", playerOne ? current().scorePlayer1 : current().scorePlayer2);
 
   int moveCount = 0;
   const int piece = playerOne ? CELL_X : CELL_O;
   for (int r = 0; r < BOARD_SIZE; ++r)
-    for (int c = 0; c < BOARD_SIZE; ++c)
-      if (current().board[r][c] == piece)
-        ++moveCount;
+      for (int c = 0; c < BOARD_SIZE; ++c)
+          if (current().board[r][c] == piece)
+              ++moveCount;
   snprintf(moves, sizeof(moves), "%d", moveCount);
 
+  const bool active = current().result == RESULT_ONGOING &&
+                      ((playerOne && current().turn == CELL_X) ||
+                       (!playerOne && current().turn == CELL_O));
+
   const float rowX = x + 20.0f;
-  DrawStatRow(fontSmall, Rectangle{rowX, panel.y + 342.0f, 265.0f, 55.0f}, "Wins", wins,
-              playerOne ? Color{255, 92, 98, 255} : Color{102, 178, 255, 255});
-  DrawStatRow(fontSmall, Rectangle{rowX, panel.y + 407.0f, 265.0f, 55.0f}, "Moves", moves,
-              playerOne ? Color{255, 92, 98, 255} : Color{102, 178, 255, 255});
-  DrawStatRow(fontSmall, Rectangle{rowX, panel.y + 472.0f, 265.0f, 55.0f}, "Status",
+  const float rowW = PLAYER_PANEL_W - 40.0f; 
+  const float rowH = 50.0f;
+
+  DrawStatRow(fontSmall, Rectangle{rowX, panel.y + 315.0f, rowW, rowH}, "Wins", wins,
+              playerOne ? Color{ 255, 155, 200, 255 } : Color{ 160, 255, 180, 255 });
+  DrawStatRow(fontSmall, Rectangle{rowX, panel.y + 375.0f, rowW, rowH}, "Moves", moves,
+              playerOne ? Color{ 255, 155, 200, 255 } : Color{ 160, 255, 180, 255 });
+  DrawStatRow(fontSmall, Rectangle{rowX, panel.y + 435.0f, rowW, rowH}, "Status",
               active ? "Turn" : (current().result == RESULT_ONGOING ? "Ready" : "Done"),
               active ? Color{255, 214, 84, 255} : Color{255, 236, 194, 230});
 
+  float btnW = 210.0f;
+  float btnH = 54.0f;
+  float btnX = x + (PLAYER_PANEL_W - btnW) * 0.5f;
+
   Button stateButton{
-      Vector2{x + 40.0f, panel.y + 590.0f},
-      Vector2{225.0f, 58.0f},
+      Vector2{btnX, panel.y + 540.0f},
+      Vector2{btnW, btnH},
       active ? "YOUR TURN" : "WAITING",
       0,
       BUTTON_VISUAL_TEXT,
@@ -470,12 +477,12 @@ static void DrawResultHeader(Font fontSmall)
   const Texture2D *effect = GetResultEffectTexture();
   if (effect)
     DrawEffectTextureCentered(*effect, Vector2{SCREEN_WIDTH * 0.5f, 88.0f},
-                              430.0f, 116.0f, pulse);
+                              320.0f, 86.0f, pulse);
 
   if (!effect) {
     DrawTextCenteredInRect(fontSmall, GetResultLabel(),
                            Rectangle{slot.x, slot.y + 132.0f, slot.width, 30.0f},
-                           22.0f, Color{255, 243, 211, 235}, 2.0f);
+                           40.0f, Color{255, 243, 211, 235}, 2.0f);
   }
 }
 
@@ -498,22 +505,22 @@ static void DrawPvpResultSideEffects(Font fontSmall)
     DrawEffectTextureCentered(*leftEffect,
                               Vector2{leftSlot.x + leftSlot.width * 0.5f,
                                       leftSlot.y + leftSlot.height * 0.5f},
-                              leftSlot.width - 18.0f, leftSlot.height - 18.0f, pulse);
+                              leftSlot.width - 10.0f, leftSlot.height - 10.0f, pulse);
   } else {
     DrawTextCenteredInRect(fontSmall,
                            current().result == RESULT_X_WINS ? "YOU WIN" : "YOU LOSE",
-                           leftSlot, 20.0f, Color{255, 243, 211, 235}, 1.0f);
+                           leftSlot, 50.0f, Color{255, 243, 211, 235}, 1.0f);
   }
 
   if (rightEffect) {
     DrawEffectTextureCentered(*rightEffect,
                               Vector2{rightSlot.x + rightSlot.width * 0.5f,
                                       rightSlot.y + rightSlot.height * 0.5f},
-                              rightSlot.width - 18.0f, rightSlot.height - 18.0f, pulse);
+                              rightSlot.width - 10.0f, rightSlot.height - 10.0f, pulse);
   } else {
     DrawTextCenteredInRect(fontSmall,
                            current().result == RESULT_O_WINS ? "YOU WIN" : "YOU LOSE",
-                           rightSlot, 20.0f, Color{255, 243, 211, 235}, 1.0f);
+                           rightSlot, 50.0f, Color{255, 243, 211, 235}, 1.0f);
   }
 }
 
@@ -540,7 +547,7 @@ static bool CanAdvanceDifficulty()
 
 static Button MakeResultButton(float x, const char *title, int id)
 {
-  return Button{Vector2{x, 842.0f}, Vector2{250.0f, 56.0f}, title, id,
+  return Button{Vector2{x, 790.0f}, Vector2{180.0f, 56.0f}, title, id,
                 BUTTON_VISUAL_TEXT, BUTTON_ICON_NONE, 22.0f, 1.0f};
 }
 
@@ -550,10 +557,17 @@ static void DrawResultActions(Font fontSmall, const MouseState &mouse)
     return;
 
   const bool pve = current().gameMode == MODE_PVE;
+
+  float btnW = 180.0f; 
+  float spacing = 15.0f; 
+
+  float totalWidth = (btnW * 3.0f) + (spacing * 2.0f);
+  float startX = (SCREEN_WIDTH - totalWidth) * 0.5f;
+
   Button buttons[3] = {
-      MakeResultButton(SCREEN_WIDTH * 0.5f - 395.0f, pve ? "BACK" : "SAVE", 0),
-      MakeResultButton(SCREEN_WIDTH * 0.5f - 125.0f, pve ? "NEXT LEVEL" : "CONTINUE", 1),
-      MakeResultButton(SCREEN_WIDTH * 0.5f + 145.0f, pve ? "AGAIN" : "BACK", 2),
+      MakeResultButton(startX, pve ? "BACK" : "SAVE", 0),
+      MakeResultButton(startX + btnW + spacing, pve ? "NEXT LEVEL" : "CONTINUE", 1),
+      MakeResultButton(startX + (btnW + spacing) * 2.0f, pve ? "AGAIN" : "BACK", 2),
   };
 
   for (int i = 0; i < 3; ++i) {
@@ -718,10 +732,16 @@ void UpdatePlayUI(const MouseState &mouse, float dt, AudioAssets &audio,
   // Nếu game đã có kết quả thắng hòa thì không làm gì thêm
   if (current().result != RESULT_ONGOING) {
     const bool pve = current().gameMode == MODE_PVE;
+
+    float btnW = 180.0f;
+    float spacing = 15.0f; // Phải trùng khớp với spacing bên hàm DrawResultActions
+    float totalWidth = (btnW * 3.0f) + (spacing * 2.0f);
+    float startX = (SCREEN_WIDTH - totalWidth) * 0.5f;
+
     Button buttons[3] = {
-        MakeResultButton(SCREEN_WIDTH * 0.5f - 395.0f, pve ? "BACK" : "SAVE", 0),
-        MakeResultButton(SCREEN_WIDTH * 0.5f - 125.0f, pve ? "NEXT LEVEL" : "CONTINUE", 1),
-        MakeResultButton(SCREEN_WIDTH * 0.5f + 145.0f, pve ? "AGAIN" : "BACK", 2),
+        MakeResultButton(startX, pve ? "BACK" : "SAVE", 0),
+        MakeResultButton(startX + btnW + spacing, pve ? "NEXT LEVEL" : "CONTINUE", 1),
+        MakeResultButton(startX + (btnW + spacing) * 2.0f, pve ? "AGAIN" : "BACK", 2),
     };
 
     for (int i = 0; i < 3; ++i) {
@@ -846,12 +866,21 @@ void DrawPlayUI(Font fontTitle, Font fontSmall, const MouseState &mouse,
     DrawTextCenteredInRect(fontSmall, timerBuf,
                            Rectangle{BOARD_START_X + BOARD_PIXEL_SIZE - 126.0f,
                                      BOARD_START_Y - 58.0f, 128.0f, 36.0f},
-                           20.0f, timerColor, 1.0f);
+                           30.0f, timerColor, 1.0f);
   }
 
   DrawBoardGrid(settings);
   DrawHighlightCell(settings);
   DrawWinLine(settings);
+
+  if (current().result == RESULT_ONGOING) {
+      // Lấy tọa độ Y ngay dưới đáy bàn cờ + 25 pixel
+      float tipY = BOARD_START_Y + BOARD_PIXEL_SIZE + 30.0f;
+
+      // Vẽ chữ căn giữa màn hình, dùng font thô/nhỏ (fontSmall), size 18.0f gọn gàng
+      DrawCenteredText(fontSmall, "Press ESC to Pause or Exit", tipY, 20.0f, Color{ 255, 243, 211, 150 });
+  }
+
   DrawResultBoardPulse();
   DrawPieces(fontTitle, settings);
   DrawResultHeader(fontSmall);

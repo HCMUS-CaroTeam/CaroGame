@@ -47,16 +47,17 @@ static float gCursorTimer = 0.0f;
 //  LAYOUT CONSTANTS  (chỉnh tại đây để thay đổi giao diện)
 // ============================================================
 
-// Panel
-static constexpr float PANEL_X = SCREEN_WIDTH * 0.5f - 550.0f;
+// Panel PVP
+static constexpr float PANEL_X = SCREEN_WIDTH * 0.5f - 500.0f;
 static constexpr float PANEL_Y = 120.0f;
-static constexpr float PANEL_W = 1100.0f;
+static constexpr float PANEL_W = 1000.0f;
 static constexpr float PANEL_H = 600.0f;
+
 
 // Avatar display
 static constexpr float AVA_SIZE = 150.0f;
-static constexpr float AVA_P1_X = PANEL_X + 200.0f;   // ← P1 cột trái
-static constexpr float AVA_P2_X = PANEL_X + 200.0f;   // ← P2 cùng cột (dọc)
+static constexpr float AVA_P1_X = PANEL_X + PANEL_W * 0.25f - AVA_SIZE * 0.5f;   // ← P1 cột trái
+static constexpr float AVA_P2_X = PANEL_X + PANEL_W * 0.25f - AVA_SIZE * 0.5f;  // ← P2 cùng cột (dọc)
 static constexpr float AVA_Y = PANEL_Y + 130.0f;   // ← Y hàng P1
 static constexpr float ROW2_OFFSET = 200.0f;              // ← khoảng cách P2 so với P1
 
@@ -67,9 +68,35 @@ static constexpr float ARR_H = 50.0f;
 // Input box
 static constexpr float BOX_W = 340.0f;
 static constexpr float BOX_H = 50.0f;
-static constexpr float BOX_P1_X = PANEL_X + 560.0f;
-static constexpr float BOX_P2_X = PANEL_X + 560.0f;
+static constexpr float BOX_P1_X = PANEL_X + PANEL_W * 0.7f - BOX_W * 0.5f;
+static constexpr float BOX_P2_X = PANEL_X + PANEL_W * 0.7f - BOX_W * 0.5f;
 static constexpr float BOX_Y = PANEL_Y + 180.0f;
+
+// PANEL PVE
+static constexpr float PANEL_PVE_X = SCREEN_WIDTH * 0.5f - 500.0f;
+static constexpr float PANEL_PVE_W = 1000.0f;
+static constexpr float PANEL_PVE_H = 450.0f;
+static constexpr float PANEL_PVE_Y = (SCREEN_HEIGHT - PANEL_PVE_H) * 0.5f;
+
+// Avatar and input box for PvE mode 
+static constexpr float AVA_PVE_X = PANEL_PVE_X + PANEL_PVE_W * 0.25f - AVA_SIZE * 0.5f;
+static constexpr float AVA_PVE_Y = PANEL_PVE_Y + PANEL_PVE_H * 0.5f - AVA_SIZE * 0.5f;
+static constexpr float BOX_PVE_X = PANEL_PVE_X + PANEL_PVE_W * 0.7f - BOX_W * 0.5f;
+static constexpr float BOX_PVE_Y = PANEL_PVE_Y + PANEL_PVE_H * 0.5f - BOX_H * 0.5f; 
+
+// Button size
+static constexpr float BTN_W = 150.0f;
+static constexpr float BTN_H = 54.0f;
+static constexpr float BTN_X = (SCREEN_WIDTH - BTN_W) * 0.5f;
+
+// Button position for PvP
+static constexpr float BTN_PLAY_PVP_Y = PANEL_Y + PANEL_H * 0.85f;
+static constexpr float BTN_BACK_PVP_Y = PANEL_Y + PANEL_H + 30.0f;
+
+// Button position for PvE
+static constexpr float BTN_PLAY_PVE_Y = PANEL_PVE_Y + PANEL_PVE_H * 0.8f;
+static constexpr float BTN_BACK_PVE_Y = PANEL_PVE_Y + PANEL_PVE_H + 30.0f;
+
 
 // ============================================================
 //  HELPER
@@ -331,8 +358,22 @@ void UpdateNameInputUI(
     bool isPvE = (current().gameMode == MODE_PVE);
 
     // --- Click vào ô nhập để chọn field ---
-    Rectangle boxP1 = { BOX_P1_X, BOX_Y, BOX_W, BOX_H };
-    Rectangle boxP2 = { BOX_P2_X, BOX_Y + ROW2_OFFSET, BOX_W, BOX_H };
+    Rectangle boxP1, boxP2;
+    float avP1x, avP2x, avY1, avY2;
+
+    if (isPvE) {
+        boxP1 = { BOX_PVE_X, BOX_PVE_Y, BOX_W, BOX_H };
+        avP1x = AVA_PVE_X;
+        avY1 = AVA_PVE_Y;
+    }
+    else {
+        boxP1 = { BOX_P1_X, BOX_Y, BOX_W, BOX_H };
+        boxP2 = { BOX_P2_X, BOX_Y + ROW2_OFFSET, BOX_W, BOX_H };
+        avP1x = AVA_P1_X;
+        avP2x = AVA_P2_X;
+        avY1 = AVA_Y;
+        avY2 = AVA_Y + ROW2_OFFSET;
+    }
 
     if (mouse.leftPressed)
     {
@@ -365,17 +406,17 @@ void UpdateNameInputUI(
         gActiveField ^= 1;
 
     // --- Avatar selector ---
-    // Avatar P1: được xử lý cùng với vẽ (click detected in Draw helper,
-    // nhưng để rõ ràng ta xử lý hit-test ở đây)
-    float avP1x = AVA_P1_X;
-    float avP2x = AVA_P2_X;
-    float avY1 = AVA_Y;
-    float avY2 = AVA_Y + ROW2_OFFSET;   // ← Y riêng cho P2
-
-    Rectangle leftP1 = { avP1x - ARR_W - 8.0f, avY1 + AVA_SIZE * 0.5f - ARR_H * 0.5f, ARR_W, ARR_H };
-    Rectangle rightP1 = { avP1x + AVA_SIZE + 8.0f, avY1 + AVA_SIZE * 0.5f - ARR_H * 0.5f, ARR_W, ARR_H };
-    Rectangle leftP2 = { avP2x - ARR_W - 8.0f, avY2 + AVA_SIZE * 0.5f - ARR_H * 0.5f, ARR_W, ARR_H };
-    Rectangle rightP2 = { avP2x + AVA_SIZE + 8.0f, avY2 + AVA_SIZE * 0.5f - ARR_H * 0.5f, ARR_W, ARR_H };
+    Rectangle leftP1, rightP1, leftP2, rightP2;
+    if (isPvE) {
+        leftP1 = { avP1x - ARR_W - 8.0f, avY1 + AVA_SIZE * 0.5f - ARR_H * 0.5f, ARR_W, ARR_H };
+        rightP1 = { avP1x + AVA_SIZE + 8.0f, avY1 + AVA_SIZE * 0.5f - ARR_H * 0.5f, ARR_W, ARR_H };
+    }
+    else {
+        leftP1 = { avP1x - ARR_W - 8.0f, avY1 + AVA_SIZE * 0.5f - ARR_H * 0.5f, ARR_W, ARR_H };
+        rightP1 = { avP1x + AVA_SIZE + 8.0f, avY1 + AVA_SIZE * 0.5f - ARR_H * 0.5f, ARR_W, ARR_H };
+        leftP2 = { avP2x - ARR_W - 8.0f, avY2 + AVA_SIZE * 0.5f - ARR_H * 0.5f, ARR_W, ARR_H };
+        rightP2 = { avP2x + AVA_SIZE + 8.0f, avY2 + AVA_SIZE * 0.5f - ARR_H * 0.5f, ARR_W, ARR_H };
+    }
 
     if (mouse.leftPressed)
     {
@@ -391,8 +432,25 @@ void UpdateNameInputUI(
                 gAvatarP2 = (gAvatarP2 + 1) % AVATAR_COUNT;
         }
     }
+
+    float btnPlayY, btnBackY, btnX;
+    btnX = BTN_X;
+    if (!isPvE) {
+        btnPlayY = BTN_PLAY_PVP_Y;
+        btnBackY = BTN_BACK_PVP_Y;
+    }
+    else {
+        btnPlayY = BTN_PLAY_PVE_Y;
+        btnBackY = BTN_BACK_PVE_Y;
+    }
+
     // --- Nút PLAY  ---
     {
+        gNameInputButtons[0].position.x = btnX;
+        gNameInputButtons[0].position.y = btnPlayY;
+        gNameInputButtons[0].size.x = BTN_W;
+        gNameInputButtons[0].size.y = BTN_H;
+
         bool hovered = false, pressed = false;
         UpdateUIButton(NAME_INPUT_ANIM_PLAY, gNameInputButtons[0], mouse, dt, audio, settings, hovered, pressed);
         if (hovered && mouse.leftPressed)
@@ -414,6 +472,11 @@ void UpdateNameInputUI(
     }
     // --- Nút BACK  ---
     {
+        gNameInputButtons[1].position.x = btnX;
+        gNameInputButtons[1].position.y = btnBackY;
+        gNameInputButtons[1].size.x = BTN_W;
+        gNameInputButtons[1].size.y = BTN_H;
+
         bool hovered = false, pressed = false;
         UpdateUIButton(NAME_INPUT_ANIM_BACK, gNameInputButtons[1], mouse, dt, audio, settings, hovered, pressed);
         if (hovered && mouse.leftPressed)
@@ -457,30 +520,27 @@ void DrawNameInputUI(
 
     bool isPvE = (current().gameMode == MODE_PVE);
 
-    // Panel nền
-    DrawPanelFrame({ PANEL_X, PANEL_Y, PANEL_W, PANEL_H });
-
-    // Tiêu đề
-    DrawCenteredText(fontTitle, "ENTER PLAYER NAME",
-        PANEL_Y + 30.0f, 34.0f, Color{ 255, 235, 225, 255 });
-
-    // ── P1 ──────────────────────────────────────────────────
-
-    // Avatar P1 (xử lý click thực sự đã ở Update, đây chỉ vẽ)
-    bool dummyL, dummyR;
-    DrawAvatarSelector(fontSmall, AVA_P1_X, AVA_Y, gAvatarP1, false, mouse, dummyL, dummyR);
-
-    // Input box P1
-    DrawInputBox(fontSmall, gNameBuf1, gNameLen1,
-        BOX_P1_X, BOX_Y, gActiveField == 0, gCursorTimer);
-    {
-        Vector2 sz = MeasureTextEx(fontSmall, "Name (P1):", 18.0f, 1.0f);
-    }
-
-    // ── P2 ──────────────────────────────────────────────────
-
     if (!isPvE)
     {
+        // Panel nền
+        DrawPanelFrame({ PANEL_X, PANEL_Y, PANEL_W, PANEL_H });
+
+        // Tiêu đề
+        DrawCenteredText(fontTitle, "ENTER PLAYER NAME",
+            PANEL_Y + 30.0f, 34.0f, Color{ 255, 235, 225, 255 });
+
+        // ── P1 ──────────────────────────────────────────────────
+
+        // Avatar P1 (xử lý click thực sự đã ở Update, đây chỉ vẽ)
+        bool dummyL, dummyR;
+        DrawAvatarSelector(fontSmall, AVA_P1_X, AVA_Y, gAvatarP1, false, mouse, dummyL, dummyR);
+
+        // Input box P1
+        DrawInputBox(fontSmall, gNameBuf1, gNameLen1,
+            BOX_P1_X, BOX_Y, gActiveField == 0, gCursorTimer);
+
+        // ── P2 ──────────────────────────────────────────────────
+
         DrawTextEx(fontSmall, "Player 1:",
             Vector2{ BOX_P1_X, BOX_Y - 24.0f },
             18.0f, 1.0f, Color{ 120, 220, 255, 200 });
@@ -495,24 +555,55 @@ void DrawNameInputUI(
     }
     else
     {
+        // Panel nền
+        DrawPanelFrame({ PANEL_PVE_X, PANEL_PVE_Y, PANEL_PVE_W, PANEL_PVE_H });
+
+        // Tiêu đề
+        DrawCenteredText(fontTitle, "ENTER PLAYER NAME",
+            PANEL_PVE_Y + 30.0f, 34.0f, Color{ 255, 235, 225, 255 });
+
         DrawTextEx(fontSmall, "Player:",
-            Vector2{ BOX_P1_X, BOX_Y - 24.0f },
+            Vector2{ BOX_PVE_X, BOX_PVE_Y - 24.0f },
             18.0f, 1.0f, Color{ 120, 220, 255, 200 });
+		bool dummyL, dummyR;
+		DrawAvatarSelector(fontSmall, AVA_PVE_X, AVA_PVE_Y, gAvatarP1, false, mouse, dummyL, dummyR);
+		DrawInputBox(fontSmall, gNameBuf1, gNameLen1,
+			BOX_PVE_X, BOX_PVE_Y, true, gCursorTimer);
     }
 
-    // ── Nút PLAY & BACK ─────────────────────────────────────
     {
-        Rectangle hitPlay = GetButtonRect(gNameInputButtons[0]);
+        float btnPlayY  , btnBackY, btnX;
+        btnX = BTN_X;
+        if (!isPvE) {
+            btnPlayY = BTN_PLAY_PVP_Y;
+            btnBackY = BTN_BACK_PVP_Y;
+        }
+        else {
+            btnPlayY = BTN_PLAY_PVE_Y;
+            btnBackY = BTN_BACK_PVE_Y;
+        }
+
+        gNameInputButtons[0].position.x = btnX;
+        gNameInputButtons[0].position.y = btnPlayY;
+        gNameInputButtons[0].size.x = BTN_W;
+        gNameInputButtons[0].size.y = BTN_H;
+
+        Rectangle hitPlay = { btnX, btnPlayY, BTN_W, BTN_H };
         bool hovPlay = IsMouseOverRect(mouse, hitPlay);
         bool prsPlay = hovPlay && mouse.leftDown;
         DrawUIButton(NAME_INPUT_ANIM_PLAY, gNameInputButtons[0], fontSmall, hovPlay, prsPlay);
-    }
-    {
-        Rectangle hitBack = GetButtonRect(gNameInputButtons[1]);
+
+        gNameInputButtons[1].position.x = btnX;
+        gNameInputButtons[1].position.y = btnBackY;
+        gNameInputButtons[1].size.x = BTN_W;
+        gNameInputButtons[1].size.y = BTN_H;
+
+        Rectangle hitBack = { btnX, btnBackY, BTN_W, BTN_H };
         bool hovBack = IsMouseOverRect(mouse, hitBack);
         bool prsBack = hovBack && mouse.leftDown;
         DrawUIButton(NAME_INPUT_ANIM_BACK, gNameInputButtons[1], fontSmall, hovBack, prsBack);
     }
+
 }
 
 int GetSelectedAvatarP1()
