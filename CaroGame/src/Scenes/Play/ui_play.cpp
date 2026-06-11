@@ -645,7 +645,7 @@ static void UpdatePauseMenu(const MouseState &mouse, float dt,
         break;
 
       case PAUSE_BTN_SAVE:
-        if (current().nameGame[0] == '\0') {
+        if (current().nameGame[0] == '\0' || strcmp(current().nameGame, "AutoSave") == 0) {
           currentScreen = SCREEN_SAVE_FIRST;
         } else {
           currentScreen = SCREEN_SAVE_SECOND;
@@ -653,7 +653,7 @@ static void UpdatePauseMenu(const MouseState &mouse, float dt,
         break;
 
       case PAUSE_BTN_SAVE_AS:
-        if (current().nameGame[0] == '\0') {
+        if (current().nameGame[0] == '\0' || strcmp(current().nameGame, "AutoSave") == 0) {
           currentScreen = SCREEN_SAVE_FIRST;
         } else {
           InitSaveUI(); // Reset trạng thái UI Save As trước khi vào
@@ -767,7 +767,7 @@ void UpdatePlayUI(const MouseState &mouse, float dt, AudioAssets &audio,
         }
       } else {
         if (i == 0) {
-          currentScreen = current().nameGame[0] == '\0' ? SCREEN_SAVE_FIRST : SCREEN_SAVE_SECOND;
+          currentScreen = ((current().nameGame[0] == '\0' || strcmp(current().nameGame, "AutoSave") == 0) ? SCREEN_SAVE_FIRST : SCREEN_SAVE_SECOND);
         } else if (i == 1) {
           ResetBoard();
           gBotDelayTimer = 0.0f;
@@ -831,6 +831,7 @@ void UpdatePlayUI(const MouseState &mouse, float dt, AudioAssets &audio,
         PlayPieceSound(audio, settings);
         UpdateGameStateAfterMove();
         PlayGameResultSound(audio, current().result, current().gameMode, settings);
+		gHasGameStateChanged = true; // Đánh dấu đã có thay đổi game state để báo cho Notify UI biết cần hiện thông báo khi back về menu/exit
 
         if (current().result == RESULT_ONGOING) {
           current().turn = (current().turn == CELL_X) ? CELL_O : CELL_X;
