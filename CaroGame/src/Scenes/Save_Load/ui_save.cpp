@@ -5,6 +5,8 @@
 
 // --- BIẾN TRẠNG THÁI HỆ THỐNG ---
 static float gCursorBlinkTimer = 0.0f;
+static bool gIsCompletedAutoSave = false; // Cờ để theo dõi đã hoàn thành AutoSave hay chưa
+static bool gIsRenameAutoSave = false; // Cờ để theo dõi xem có đang trong trạng thái đổi tên AutoSave hay không
 //static float gMessageTimer = 0.0f;          // Bộ đếm thời gian cho thông báo
 //static const float MESSAGE_LIMIT = 3.0f;    // Thời gian hiển thị (3 giây)
 //static bool gShouldExitAfterSave = false;   // Cờ tự động thoát sau khi lưu
@@ -22,6 +24,12 @@ static constexpr float SAVE_PANEL_H = 400.0f;
 static const bool IsValidChar(char key)
 {
     return (isalnum(key) || key == '_');
+}
+
+// Kiểm tra đã tồn tại AutoSave trong gameSaves chưa để quyết định có thực hiện AutoSave hay không
+static const bool hasAutoSave()
+{
+    return gameSaves.find("AutoSave") != gameSaves.end();
 }
 
 static void DrawCenteredText(Font font, const char* text, float y, float fontSize, Color color)
@@ -112,17 +120,35 @@ void UpdateSaveUI(
             {
                 if (gLetterCount > 0)
                 {
-					// LOGIC KIỂM TRA TRÙNG TÊN
+                    // LOGIC KIỂM TRA TRÙNG TÊN
                     if (isDuplicateName(string(gInputBuffer)))
                     {
                         gStatusMsg = "NAME OF GAME ALREADY EXISTS!";
                     }
+
+                    else if (strcmp(gInputBuffer, "AutoSave") == 0) // Cấm người dùng đặt tên trùng với "AutoSave" để tránh nhầm lẫn với bản tự động lưu
+                    {
+                        gStatusMsg = "NAME CANNOT BE \"AutoSave\"!";
+                    }
                     else
                     {
                         // LOGIC LƯU THÀNH CÔNG
-						ChangeGameName(gInputBuffer); // Cập nhật tên game hiện tại trước khi lưu
-                        gStatusMsg = "GAME SAVED SUCCESSFULLY!";
+                        if (strcmp(current().nameGame, "AutoSave") == 0) { // Nếu đang lưu AutoSave mà nhập tên mới thì sẽ không chỉ lưu mà còn đổi tên luôn để tránh nhầm lẫn sau này.
+                            gIsRenameAutoSave = true; // Đặt cờ để sau khi lưu sẽ xóa bản AutoSave cũ đi vì đã được lưu với tên mới rồi
+                        }
+                        ChangeGameName(gInputBuffer); // Cập nhật tên game hiện tại trước khi lưu
+                        gStatusMsg = "";
                         SaveData(current());
+                        gHasGameStateChanged = false; // Đánh dấu đã lưu, không cần thông báo nữa
+
+                        if (gIsRenameAutoSave) {
+                            DeleteGameSave("AutoSave"); // Xóa bản AutoSave cũ sau khi đã lưu với tên mới thành công
+                            SaveGamesToFile(gameSaves);
+                            gameSaves.clear();
+                            LoadGamesFromFile(gameSaves); // Tải lại danh sách để cập nhật tên mới
+                            gIsRenameAutoSave = false; // Reset cờ sau khi hoàn thành đổi tên
+                        }
+
                     }
 
                     //gMessageTimer = MESSAGE_LIMIT; // Bắt đầu đếm ngược 3s
@@ -130,15 +156,28 @@ void UpdateSaveUI(
                 }
                 else
                 {
-                    // LOGIC LỖI
-                    gStatusMsg = "NAME CANNOT BE EMPTY!";
-                    //gMessageTimer = MESSAGE_LIMIT; // Hiện lỗi 3s rồi mất
-                    //gShouldExitAfterSave = false;
+                    if (!hasAutoSave()) { // Nếu chưa có AutoSave nào, thì khi cố tình lưu với tên trống sẽ tự động lưu dưới dạng AutoSave để đảm bảo người chơi không bị mất dữ liệu mà không biết lý do.
+                        ChangeGameName("AutoSave");
+                        gStatusMsg = "";
+                        SaveData(current());
+                        gHasGameStateChanged = false; // Đánh dấu đã lưu, không cần thông báo nữa
+                        gIsCompletedAutoSave = true; // Đánh dấu đã hoàn thành AutoSave
+
+                    }
+                    else
+                    {
+                        // LOGIC LỖI
+                        gStatusMsg = "NAME AUTO-SAVED ALREADY EXISTS! SO CANNOT BE EMPTY!";
+                        //gMessageTimer = MESSAGE_LIMIT; // Hiện lỗi 3s rồi mất
+                        //gShouldExitAfterSave = false;
+                    }
                 }
             }
             else if (gSaveButtons[i].id == SAVE_BTN_BACK)
             {
                 currentScreen = SCREEN_PLAY;
+                gIsCompletedAutoSave = false; // Reset cờ AutoSave khi quay lại 
+                gStatusMsg = ""; // Reset thông báo khi quay lại để tránh nhầm lẫn nếu có quay lại lưu tiếp sau này
             }
         }
     }
@@ -204,6 +243,71 @@ void DrawSaveUI(Font fontTitle, Font fontSmall, const MouseState& mouse, const A
             DrawUIButton(50 + i, gSaveButtons[i], fontSmall, hov, prs);
         }
     }
+
+    else if (strcmp(current().nameGame, "AutoSave") == 0) // Nếu đang lưu AutoSave, hiển thị giao diện cảnh báo
+    {
+        if (!gIsCompletedAutoSave)
+        {
+            // 1. Tiêu đề
+            DrawCenteredText(fontTitle, "SAVE GAME", panel.y + 35.0f, 40.0f, Color{ 255, 235, 225, 255 });
+
+            // 2. Thông báo trạng thái (Hiện ra khi có gStatusMsg)
+            if (gStatusMsg[0] != '\0')
+            {
+                // Màu đỏ cho lỗi (chữ N trong Name), màu xanh cho thành công
+                Color msgColor = (gStatusMsg[0] == 'N') ? Color{ 160, 20, 20, 255 } : Color{ 0, 255, 0, 255 };
+                DrawCenteredText(fontSmall, gStatusMsg, panel.y + 85.0f, 28.0f, msgColor);
+            }
+
+            // 3. Khung nhập liệu
+            Rectangle inputBox = { panel.x + 100, panel.y + 130, 400, 50 };
+            DrawRectangleRec(inputBox, Color{ 20, 20, 30, 255 });
+            DrawRectangleLinesEx(inputBox, 2.0f, RAYWHITE);
+
+            Vector2 textPos = { inputBox.x + 15, inputBox.y + 12 };
+            if (gLetterCount == 0)
+            {
+                DrawTextEx(fontSmall, " Enter save name...", textPos, 24.0f, 1.0f, GRAY);
+            }
+            else
+            {
+                DrawTextEx(fontSmall, gInputBuffer, textPos, 24.0f, 1.0f, GOLD);
+            }
+
+            // 4. Con trỏ nhấp nháy (Cursor)
+            if (fmodf(gCursorBlinkTimer, 1.0f) < 0.5f /* &&!gShouldExitAfterSave */)
+            {
+                Vector2 textSize = MeasureTextEx(fontSmall, gInputBuffer, 24.0f, 1.0f);
+                DrawTextEx(fontSmall, "_", Vector2{ textPos.x + textSize.x + 2.0f, textPos.y }, 24.0f, 1.0f, GOLD);
+            }
+
+            // 5. Hướng dẫn
+            DrawCenteredText(fontSmall, "Press CONFIRM to save your progress", panel.y + 200.0f, 20.0f, LIGHTGRAY);
+
+            // 6. Vẽ các nút bấm
+            for (int i = 0; i < gSaveButtonCount; ++i)
+            {
+                Rectangle hitRect = GetButtonRect(gSaveButtons[i]);
+                bool hov = IsMouseOverRect(mouse, hitRect);
+                bool prs = hov && mouse.leftDown;
+                DrawUIButton(50 + i, gSaveButtons[i], fontSmall, hov, prs);
+            }
+        }
+
+        else {
+            DrawCenteredText(fontTitle, "AUTO SAVE GAME SUCCESSFULLY!", panel.y + 150.0f, 32.0f, DARKGREEN);
+            DrawCenteredText(fontSmall, "AUTO-SAVE TRIGGERED: NO FURTHER SAVES WILL OCCUR.", panel.y + 190.0f, 20.0f, LIGHTGRAY);
+            // Hướng dẫn tiếp theo
+            DrawCenteredText(fontSmall, "Press BACK", panel.y + 220.0f, 20.0f, LIGHTGRAY);
+            SaveData(current()); // Đảm bảo lưu lại dữ liệu trước khi vẽ nút OK
+            // Vẽ nút Back to Game
+            Rectangle hitRect = GetButtonRect(gSaveButtons[1]); // Nút BACK
+            bool hov = IsMouseOverRect(mouse, hitRect);
+            bool prs = hov && mouse.leftDown;
+            DrawUIButton(51, gSaveButtons[1], fontSmall, hov, prs);
+        }
+    }
+
     else // Nếu đã có tên game (đã lưu ít nhất 1 lần), hiển thị giao diện thông báo lưu thành công 
     {
         DrawCenteredText(fontTitle, "GAME SAVED SUCCESSFULLY!", panel.y + 150.0f, 32.0f, DARKGREEN);
@@ -229,6 +333,7 @@ void UpdateSaveUISecond(
     if (IsKeyPressed(KEY_ESCAPE)) currentScreen = SCREEN_PLAY;
     // Chỉ cần xử lý nút Back to Game
     SaveData(current()); // Đảm bảo lưu lại dữ liệu trước khi quay về Play
+    gHasGameStateChanged = false; // Đánh dấu đã lưu, không cần thông báo nữa
     Rectangle hitRect = GetButtonRect(gSaveButtons[1]); // Nút BACK
     bool hovered = IsMouseOverRect(mouse, hitRect);
     bool pressed = hovered && mouse.leftPressed;
@@ -311,8 +416,15 @@ void UpdateSaveAsUI(
                     if (newName == currentName)
                     {
                         gStatusMsg = "GAME NAME IS UNCHANGED!";
-						SaveData(current()); // Vẫn lưu lại dữ liệu hiện tại dù tên không đổi, nhưng sẽ hiển lỗi để người chơi biết
+                        SaveData(current()); // Vẫn lưu lại dữ liệu hiện tại dù tên không đổi, nhưng sẽ hiển lỗi để người chơi biết
+                        gHasGameStateChanged = false; // Đánh dấu đã lưu, không cần thông báo nữa
                     }
+
+                    else if (newName == "AutoSave") // Cấm người dùng đặt tên trùng với "AutoSave" để tránh nhầm lẫn với bản tự động lưu
+                    {
+                        gStatusMsg = "NAME CANNOT BE \"AutoSave\"!";
+                    }
+
                     else if (isDuplicateName(newName))
                     {
                         gStatusMsg = "NAME OF GAME ALREADY EXISTS!";
@@ -321,15 +433,15 @@ void UpdateSaveAsUI(
                     {
                         // LOGIC LƯU THÀNH CÔNG (Ghi đè hoặc Đổi tên)
                         auto it = gameSaves.find(currentName);
-						if (it != gameSaves.end() && newName != currentName)
+                        if (it != gameSaves.end() && newName != currentName)
                         {
                             gameSaves.erase(it); // Xóa tên cũ nếu người chơi đổi sang tên mới
                         }
-						ChangeGameName(newName.c_str()); // Cập nhật tên trong dữ liệu game hiện tại
-                        gameSaves[newName] = current();
-                        gStatusMsg = "GAME SAVED SUCCESSFULLY!";
+                        ChangeGameName(newName.c_str()); // Cập nhật tên trong dữ liệu game hiện tại
+                        gStatusMsg = "GAME SAVED AS SUCCESSFULLY!";
                         SaveData(current());
                         SaveGamesToFile(gameSaves);
+                        gHasGameStateChanged = false; // Đánh dấu đã lưu, không cần thông báo nữa
                     }
                     //gMessageTimer = MESSAGE_LIMIT; // Bắt đầu đếm ngược 3s
                     //gShouldExitAfterSave = true;   // Đặt lệnh chờ thoát
@@ -338,6 +450,7 @@ void UpdateSaveAsUI(
                 {
                     SaveData(current()); // Dù tên trống vẫn lưu (với tên mặc định), nhưng sẽ hiển lỗi để người chơi biết
                     gStatusMsg = "GAME UPDATED.";
+                    gHasGameStateChanged = false; // Đánh dấu đã lưu, không cần thông báo nữa
                     //gMessageTimer = MESSAGE_LIMIT; // Hiện lỗi 3s rồi mất
                     //gShouldExitAfterSave = false;
                 }
@@ -345,6 +458,7 @@ void UpdateSaveAsUI(
             else if (gSaveButtons[i].id == SAVE_BTN_BACK)
             {
                 currentScreen = SCREEN_PLAY;
+                gStatusMsg = ""; // Reset thông báo khi quay lại để tránh nhầm lẫn nếu có quay lại lưu tiếp sau này
             }
         }
     }
@@ -419,7 +533,7 @@ void UpdateSaveToBackMenuUI(
 )
 
 {
-    if (current().nameGame[0] == '\0') // Nếu chưa có tên game (lần đầu lưu), hiển thị giao diện nhập tên
+    if (current().nameGame[0] == '\0' || strcmp(current().nameGame, "AutoSave") == 0) // Nếu chưa có tên game (lần đầu lưu), hiển thị giao diện nhập tên
     {
         char key = GetCharPressed();
         while (key > 0)
@@ -459,13 +573,29 @@ void UpdateSaveToBackMenuUI(
                         {
                             gStatusMsg = "NAME OF GAME ALREADY EXISTS!";
                         }
+
+                        else if (strcmp(gInputBuffer, "AutoSave") == 0) // Cấm người dùng đặt tên trùng với "AutoSave" để tránh nhầm lẫn với bản tự động lưu
+                        {
+                            gStatusMsg = "NAME CANNOT BE \"AutoSave\"!";
+                        }
+
                         else
                         {
+                            if (strcmp(current().nameGame, "AutoSave") == 0) {
+                                gIsRenameAutoSave = true; // Đặt cờ đang trong trạng thái đổi tên AutoSave
+                            }
                             // LOGIC LƯU THÀNH CÔNG
-							ChangeGameName(gInputBuffer);
+                            ChangeGameName(gInputBuffer);
                             gStatusMsg = "GAME SAVED SUCCESSFULLY! BACK TO MENU...";
                             SaveData(current());
-
+                            gHasGameStateChanged = false; // Đánh dấu đã lưu, không cần thông báo nữa
+                            if (gIsRenameAutoSave) {
+                                DeleteGameSave("AutoSave"); // Xóa bản AutoSave cũ sau khi đã lưu với tên mới thành công
+                                SaveGamesToFile(gameSaves); // Lưu danh sách game đã cập nhật
+                                gameSaves.clear();
+                                LoadGamesFromFile(gameSaves); // Tải lại danh sách để cập nhật tên mới
+                                gIsRenameAutoSave = false; // Reset cờ sau khi hoàn thành đổi tên
+                            }
                             InitNewGame();
                             InitSaveUI();
                             currentScreen = SCREEN_MAIN_MENU;
@@ -476,15 +606,29 @@ void UpdateSaveToBackMenuUI(
                     }
                     else
                     {
-                        // LOGIC LỖI
-                        gStatusMsg = "NAME CANNOT BE EMPTY!";
-                        //gMessageTimer = MESSAGE_LIMIT; // Hiện lỗi 3s rồi mất
-                        //gShouldExitAfterSave = false;
+                        if (!hasAutoSave()) { // Nếu chưa có AutoSave nào, thì khi cố tình lưu với tên trống sẽ tự động lưu dưới dạng AutoSave để đảm bảo người chơi không bị mất dữ liệu mà không biết lý do.
+                            ChangeGameName("AutoSave");
+                            gStatusMsg = "GAME SAVED AS \"AutoSave\"!";
+                            SaveData(current());
+                            gHasGameStateChanged = false; // Đánh dấu đã lưu, không cần thông báo nữa
+                            InitNewGame();
+                            InitSaveUI();
+                            currentScreen = SCREEN_MAIN_MENU;
+                        }
+                        else
+                        {
+                            // LOGIC LỖI
+                            gStatusMsg = "NAME AUTO-SAVED HAS EXISTED! NAME CANNOT BE EMPTY!";
+                            //gMessageTimer = MESSAGE_LIMIT; // Hiện lỗi 3s rồi mất
+                            //gShouldExitAfterSave = false;
+                        }
                     }
                 }
                 else if (gSaveButtons[i].id == SAVE_BTN_BACK)
                 {
                     currentScreen = SCREEN_PLAY;
+                    gIsCompletedAutoSave = false; // Reset cờ AutoSave khi quay lại
+                    gStatusMsg = ""; // Reset thông báo khi quay lại để tránh nhầm lẫn nếu có quay lại lưu tiếp sau này
                 }
             }
         }
@@ -515,7 +659,7 @@ void UpdateSaveToExitUI(
 )
 {
     // Xử lý nút bấm
-    if (current().nameGame[0] == '\0') // Nếu chưa có tên game (lần đầu lưu), hiển thị giao diện nhập tên
+    if (current().nameGame[0] == '\0' || strcmp(current().nameGame, "AutoSave") == 0) // Nếu chưa có tên game (lần đầu lưu), hiển thị giao diện nhập tên
     {
         char key = GetCharPressed();
         while (key > 0)
@@ -555,12 +699,31 @@ void UpdateSaveToExitUI(
                         {
                             gStatusMsg = "NAME OF GAME ALREADY EXISTS!";
                         }
+
+                        else if (strcmp(gInputBuffer, "AutoSave") == 0) // Cấm người dùng đặt tên trùng với "AutoSave" để tránh nhầm lẫn với bản tự động lưu
+                        {
+                            gStatusMsg = "NAME CANNOT BE \"AutoSave\"!";
+                        }
+
                         else
                         {
                             // LOGIC LƯU THÀNH CÔNG
+                            if (strcmp(current().nameGame, "AutoSave") == 0) {
+                                gIsRenameAutoSave = true; // Đặt cờ đang trong trạng thái đổi tên AutoSave
+                            }
                             ChangeGameName(gInputBuffer);
                             gStatusMsg = "GAME SAVED SUCCESSFULLY! BACK TO MENU...";
                             SaveData(current());
+                            gIsRenameAutoSave = true; // Đặt cờ đang trong trạng thái đổi tên AutoSave
+                            gHasGameStateChanged = false; // Đánh dấu đã lưu, không cần thông báo nữa
+
+                            if (gIsRenameAutoSave) {
+                                DeleteGameSave("AutoSave"); // Xóa bản AutoSave cũ sau khi đã lưu với tên mới thành công
+                                SaveGamesToFile(gameSaves); // Lưu danh sách game đã cập nhật
+                                gameSaves.clear();
+                                LoadGamesFromFile(gameSaves); // Tải lại danh sách để cập nhật tên mới
+                                gIsRenameAutoSave = false; // Reset cờ sau khi hoàn thành đổi tên
+                            }
                             shouldClose = true;
                         }
 
@@ -569,22 +732,35 @@ void UpdateSaveToExitUI(
                     }
                     else
                     {
-                        // LOGIC LỖI
-                        gStatusMsg = "NAME CANNOT BE EMPTY!";
-                        //gMessageTimer = MESSAGE_LIMIT; // Hiện lỗi 3s rồi mất
-                        //gShouldExitAfterSave = false;
+                        if (!hasAutoSave()) { // Nếu chưa có AutoSave nào, thì khi cố tình lưu với tên trống sẽ tự động lưu dưới dạng AutoSave để đảm bảo người chơi không bị mất dữ liệu mà không biết lý do.
+                            ChangeGameName("AutoSave");
+                            gStatusMsg = "GAME SAVED AS \"AutoSave\"!";
+                            SaveData(current());
+                            gHasGameStateChanged = false; // Đánh dấu đã lưu, không cần thông báo nữa
+                            shouldClose = true;
+                        }
+                        else
+                        {
+                            // LOGIC LỖI
+                            gStatusMsg = "NAME AUTO-SAVED HAS EXISTED! NAME CANNOT BE EMPTY!";
+                            //gMessageTimer = MESSAGE_LIMIT; // Hiện lỗi 3s rồi mất
+                            //gShouldExitAfterSave = false;
+                        }
                     }
                 }
                 else if (gSaveButtons[i].id == SAVE_BTN_BACK)
                 {
                     currentScreen = SCREEN_PLAY;
+                    gStatusMsg = ""; // Reset thông báo khi quay lại để tránh nhầm lẫn nếu có quay lại lưu tiếp sau này
                 }
             }
         }
     }
 
+
     else {
         SaveData(current()); // Đảm bảo lưu lại dữ liệu trước khi thoát game
+        gHasGameStateChanged = false; // Đánh dấu đã lưu, không cần thông báo nữa
         Rectangle hitRect = GetButtonRect(gSaveButtons[1]); // Nút BACK
         bool hovered = IsMouseOverRect(mouse, hitRect);
         bool pressed = hovered && mouse.leftPressed;

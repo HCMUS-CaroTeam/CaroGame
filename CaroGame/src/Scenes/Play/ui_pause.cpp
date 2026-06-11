@@ -106,7 +106,7 @@ void UpdatePauseUI(
 
             case PAUSE_BTN_SAVE:
                 ClosePause();
-                if (current().nameGame[0] == '\0') {
+                if (current().nameGame[0] == '\0' || strcmp(current().nameGame, "AutoSave") == 0) {
                     currentScreen = SCREEN_SAVE_FIRST;
                 }
                 else {
@@ -116,7 +116,7 @@ void UpdatePauseUI(
 
             case PAUSE_BTN_SAVE_AS:
                 ClosePause();
-                if (current().nameGame[0] == '\0') {
+                if (current().nameGame[0] == '\0' || strcmp(current().nameGame, "AutoSave") == 0) {
                     currentScreen = SCREEN_SAVE_FIRST;
                 }
                 else {
