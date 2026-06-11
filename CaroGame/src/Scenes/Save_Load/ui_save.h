@@ -14,6 +14,7 @@
 extern char gInputBuffer[32];         // Buffer chứa tên save
 extern int gLetterCount;              // Độ dài tên hiện tại
 extern const char* gStatusMsg;        // Thông báo trạng thái (Lưu thành công/thất bại)
+inline bool gHasGameStateChanged = false; // Cờ để theo dõi đã có thay đổi trạng thái game hay chưa
 
 void InitSaveUI();
 void ShutdownSaveUI();

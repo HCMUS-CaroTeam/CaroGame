@@ -379,7 +379,7 @@ void DrawLoadUI(Font fontTitle, Font fontSmall, const MouseState& mouse, const A
             // Định dạng: %d (ngày), %m (tháng), %Y (năm), %H (giờ), %M (phút)
             strftime(timeBuffer, sizeof(timeBuffer), "%d/%m/%Y %H:%M", &timeInfo);
 
-            DrawTextEx(fontSmall, timeBuffer, { itemRect.x + itemRect.width - 150, currY + 25.0f }, 23, 1, GRAY);
+            DrawTextEx(fontSmall, timeBuffer, { itemRect.x + itemRect.width - 150, currY + 75.0f }, 23, 1, GRAY);
 
             // --- DÒNG 2: NGƯỜI CHƠI 1 & NGƯỜI CHƠI 2 (KÈM ĐIỂM) ---
             currY += lineSpacing;

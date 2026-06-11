@@ -51,7 +51,7 @@ void UpdateNotifyUI(
 	bool isShouldClose
 ) {
 	// Xử lý nút bấm
-	if (current().nameGame[0] == '\0')
+	if (current().nameGame[0] == '\0' || strcmp(current().nameGame, "AutoSave") == 0 || gHasGameStateChanged) // Nếu chưa có tên game chính thức hoặc có thay đổi trạng thái game, cần hiển thị giao diện thông báo mà có muốn lưu hay không.
 	{
 		for (int i = 0; i < gNotifyButtonCount; ++i)
 		{
@@ -88,8 +88,8 @@ void UpdateNotifyUI(
 			}
 		}
 	}
-	else if (current().nameGame[0] != '\0') {
-		SaveData(current()); // Tự động lưu nếu đã có tên game, không cần hỏi lại
+	else {
+		// Nếu chưa có thay đổi trạng thái game, chỉ cần thoát hoặc quay lại menu mà không cần hỏi. cũng không cần tự động lưu vì chưa có gì thay đổi.
 		if (isShouldClose) {
 			shouldClose = true; // Đặt cờ để thoát game sau khi tự động lưu
 		}
