@@ -206,26 +206,52 @@ static GameMove FindGreedyMove(const int board[][BOARD_SIZE], int piece) {
   return best;
 }
 
+static SearchConfig GetBenchmarkHardConfig() {
+  SearchConfig config = {5, 300, 16};
+  return config;
+}
+
+static const char *GetWinnerLabel(int winnerCode, int hardPiece) {
+  if (winnerCode == RESULT_DRAW)
+    return "Draw";
+  if ((winnerCode == RESULT_X_WINS && hardPiece == CELL_X) ||
+      (winnerCode == RESULT_O_WINS && hardPiece == CELL_O))
+    return "Hard";
+  return "Greedy";
+}
+
 void RunAIVsAIDemo(int gameCount) {
   if (gameCount < 1)
     gameCount = 1;
+  if ((gameCount % 2) != 0)
+    gameCount++;
 
   int hardWins = 0;
   int greedyWins = 0;
   int draws = 0;
+  int hardAsXWins = 0;
+  int hardAsOWins = 0;
+  int greedyAsXWins = 0;
+  int greedyAsOWins = 0;
+  const SearchConfig benchmarkConfig = GetBenchmarkHardConfig();
   std::printf("\n=== AI VS AI FAST SIMULATION ===\n");
+  std::printf("Balanced benchmark: %d games\n", gameCount);
+  std::printf("Hard config: depth=%d, time=%d ms, beam=%d\n",
+              benchmarkConfig.maxDepth, benchmarkConfig.timeLimitMs,
+              benchmarkConfig.beamWidth);
 
   for (int gameIndex = 0; gameIndex < gameCount; gameIndex++) {
     DataGame game;
     ClearGame(&game);
-    const int hardPiece = (gameIndex % 2 == 0) ? CELL_O : CELL_X;
+    const int hardPiece = (gameIndex % 2 == 0) ? CELL_X : CELL_O;
     int moves = 0;
+    int winner = RESULT_DRAW;
 
     while (moves < BOARD_SIZE * BOARD_SIZE) {
       GameMove move;
       if (game.turn == hardPiece) {
-        SearchConfig config = {3, 50, 10};
-        SearchResult search = FindHardMove(game.board, game.turn, config);
+        SearchResult search =
+            FindHardMove(game.board, game.turn, benchmarkConfig);
         move = {search.row, search.col, game.turn};
       } else {
         move = FindGreedyMove(game.board, game.turn);
@@ -239,21 +265,41 @@ void RunAIVsAIDemo(int gameCount) {
       GameWinInfo win =
           CheckWinOnBoard(game.board, move.row, move.col, 1);
       if (win.result != RESULT_ONGOING) {
+        winner = win.result;
         if (move.piece == hardPiece)
           hardWins++;
         else
           greedyWins++;
         break;
       }
-      if (moves == BOARD_SIZE * BOARD_SIZE)
+      if (moves == BOARD_SIZE * BOARD_SIZE) {
+        winner = RESULT_DRAW;
         draws++;
+      }
       game.turn = (game.turn == CELL_X) ? CELL_O : CELL_X;
     }
 
-    std::printf("Game %d: %d moves, Hard=%c\n", gameIndex + 1, moves,
-                hardPiece == CELL_X ? 'X' : 'O');
+    if (winner == RESULT_X_WINS) {
+      if (hardPiece == CELL_X)
+        hardAsXWins++;
+      else
+        greedyAsXWins++;
+    } else if (winner == RESULT_O_WINS) {
+      if (hardPiece == CELL_O)
+        hardAsOWins++;
+      else
+        greedyAsOWins++;
+    }
+
+    std::printf("Game %d: %d moves, Hard=%c, Winner=%s\n", gameIndex + 1, moves,
+                hardPiece == CELL_X ? 'X' : 'O',
+                GetWinnerLabel(winner, hardPiece));
   }
 
   std::printf("Summary: Hard %d - Greedy %d - Draw %d\n", hardWins,
               greedyWins, draws);
+  std::printf("By side: Hard as X %d win(s), Hard as O %d win(s)\n",
+              hardAsXWins, hardAsOWins);
+  std::printf("By side: Greedy as X %d win(s), Greedy as O %d win(s)\n",
+              greedyAsXWins, greedyAsOWins);
 }

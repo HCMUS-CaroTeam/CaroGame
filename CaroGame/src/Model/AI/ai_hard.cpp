@@ -49,6 +49,21 @@ static int CountPieces(const ScratchBoard board) {
   return count;
 }
 
+static void FindFirstOccupiedCell(const ScratchBoard board, int *outRow,
+                                  int *outCol) {
+  *outRow = -1;
+  *outCol = -1;
+  for (int row = 0; row < BOARD_SIZE; row++) {
+    for (int col = 0; col < BOARD_SIZE; col++) {
+      if (board[row][col] != CELL_EMPTY) {
+        *outRow = row;
+        *outCol = col;
+        return;
+      }
+    }
+  }
+}
+
 static int GetSearchRadius(const ScratchBoard board) {
   const int pieceCount = CountPieces(board);
   if (pieceCount <= 6)
@@ -90,6 +105,8 @@ static int GeneratePotentialMoves(SearchMove moves[], int botPiece,
                                   int playerPiece, ScratchBoard board,
                                   int depth, SearchConfig config) {
   const int radius = GetSearchRadius(board);
+  const int pieceCount = CountPieces(board);
+  const int isRootDepth = depth == config.maxDepth;
   int count = 0;
 
   for (int row = 0; row < BOARD_SIZE; row++) {
@@ -102,7 +119,10 @@ static int GeneratePotentialMoves(SearchMove moves[], int botPiece,
           EvaluatePositionHard(row, col, botPiece, board);
       const long long defense =
           EvaluatePositionHard(row, col, playerPiece, board);
-      moves[count++] = {row, col, attack + defense};
+      long long score = attack + defense;
+      if (isRootDepth && pieceCount <= 20)
+        score = attack + defense * 2;
+      moves[count++] = {row, col, score};
     }
   }
 
@@ -211,6 +231,60 @@ static SearchResult MakeImmediateResult(int row, int col, long long score,
   return result;
 }
 
+static int FindOpeningMove(const ScratchBoard board, int botPiece, int *outRow,
+                           int *outCol) {
+  if (botPiece != CELL_O || CountPieces(board) != 1)
+    return 0;
+
+  int enemyRow = -1;
+  int enemyCol = -1;
+  FindFirstOccupiedCell(board, &enemyRow, &enemyCol);
+  if (enemyRow < 0 || enemyCol < 0)
+    return 0;
+
+  static const int preferredOffsets[8][2] = {
+      {-1, -1}, {-1, 1}, {1, -1}, {1, 1},
+      {-1, 0},  {0, -1}, {0, 1},  {1, 0},
+  };
+
+  for (int i = 0; i < 8; i++) {
+    const int row = enemyRow + preferredOffsets[i][0];
+    const int col = enemyCol + preferredOffsets[i][1];
+    if (row < 0 || row >= BOARD_SIZE || col < 0 || col >= BOARD_SIZE)
+      continue;
+    if (board[row][col] == CELL_EMPTY) {
+      *outRow = row;
+      *outCol = col;
+      return 1;
+    }
+  }
+
+  return 0;
+}
+
+static int FindImmediateTacticalMove(const ScratchBoard board, int piece,
+                                     int *outRow, int *outCol) {
+  ScratchBoard scratch;
+  std::memcpy(scratch, board, sizeof(scratch));
+
+  for (int row = 0; row < BOARD_SIZE; row++) {
+    for (int col = 0; col < BOARD_SIZE; col++) {
+      if (scratch[row][col] != CELL_EMPTY)
+        continue;
+      scratch[row][col] = piece;
+      const long long score = EvaluatePositionHard(row, col, piece, scratch);
+      scratch[row][col] = CELL_EMPTY;
+      if (score >= HARD_SCORES[WIN]) {
+        *outRow = row;
+        *outCol = col;
+        return 1;
+      }
+    }
+  }
+
+  return 0;
+}
+
 SearchResult FindHardMove(const int board[][BOARD_SIZE], int botPiece,
                           SearchConfig config) {
   const long long startNs = GetNowNs();
@@ -228,6 +302,22 @@ SearchResult FindHardMove(const int board[][BOARD_SIZE], int botPiece,
   ScratchBoard scratch;
   std::memcpy(scratch, board, sizeof(scratch));
 
+  int openingRow = -1;
+  int openingCol = -1;
+  if (FindOpeningMove(scratch, botPiece, &openingRow, &openingCol))
+    return MakeImmediateResult(openingRow, openingCol, SEARCH_INF / 4,
+                               startNs);
+
+  int tacticalRow = -1;
+  int tacticalCol = -1;
+  if (FindImmediateTacticalMove(scratch, botPiece, &tacticalRow, &tacticalCol))
+    return MakeImmediateResult(tacticalRow, tacticalCol, SEARCH_INF / 2,
+                               startNs);
+  if (FindImmediateTacticalMove(scratch, playerPiece, &tacticalRow,
+                                &tacticalCol))
+    return MakeImmediateResult(tacticalRow, tacticalCol, SEARCH_INF / 2 - 1,
+                               startNs);
+
   SearchMove rootMoves[BOARD_SIZE * BOARD_SIZE];
   const int rootMoveCount = GeneratePotentialMoves(
       rootMoves, botPiece, playerPiece, scratch, config.maxDepth, config);
@@ -241,27 +331,6 @@ SearchResult FindHardMove(const int board[][BOARD_SIZE], int botPiece,
     }
     result.stats.elapsedMs = (GetNowNs() - startNs) / 1000000.0;
     return result;
-  }
-
-  for (int i = 0; i < rootMoveCount; i++) {
-    const int row = rootMoves[i].row;
-    const int col = rootMoves[i].col;
-    scratch[row][col] = botPiece;
-    const long long score = EvaluatePositionHard(row, col, botPiece, scratch);
-    scratch[row][col] = CELL_EMPTY;
-    if (score >= HARD_SCORES[WIN])
-      return MakeImmediateResult(row, col, SEARCH_INF / 2, startNs);
-  }
-
-  for (int i = 0; i < rootMoveCount; i++) {
-    const int row = rootMoves[i].row;
-    const int col = rootMoves[i].col;
-    scratch[row][col] = playerPiece;
-    const long long score =
-        EvaluatePositionHard(row, col, playerPiece, scratch);
-    scratch[row][col] = CELL_EMPTY;
-    if (score >= HARD_SCORES[WIN])
-      return MakeImmediateResult(row, col, SEARCH_INF / 2 - 1, startNs);
   }
 
   SearchContext context = {};

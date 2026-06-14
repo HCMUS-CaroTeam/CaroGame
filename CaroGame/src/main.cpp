@@ -18,6 +18,7 @@
 #include "Scenes/Setup/ui_name_setup.h"
 #include "Scenes/Story/ui_story.h"
 #include "Model/AI/ai_technical_demo.h"
+#include <cstdlib>
 #include <cstring>
 
 
@@ -75,7 +76,10 @@ int main(int argc, char *argv[])
     }
     if (argc > 1 && std::strcmp(argv[1], "--ai-vs-ai") == 0)
     {
-        RunAIVsAIDemo(3);
+        int gameCount = 6;
+        if (argc > 2)
+            gameCount = std::atoi(argv[2]);
+        RunAIVsAIDemo(gameCount);
         return 0;
     }
 
