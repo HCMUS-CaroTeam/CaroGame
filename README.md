@@ -254,6 +254,7 @@ CaroGame.exe --ai-vs-ai 10
 | Thành viên | Đóng góp chính |
 |---|---|
 | Thien | Save/load logic |
-| Loi | Play scene redesign |
+| Loi | UI, scene design |
 | Tri | AI benchmark, build system |
-| Linh | UI, scene design |
+| Linh | PVP PVE logic |
+| Tran | Team leader, UI/UX scene design |
